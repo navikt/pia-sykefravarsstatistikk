@@ -87,6 +87,12 @@ dependencies {
                 """.trimIndent(),
             )
         }
+        testImplementation("commons-io:commons-io") {
+            version {
+                require("2.16.1")
+            }
+            because("testcontainers har sårbar versjon (dependabot alert på commons-io:2.11)")
+        }
     }
 }
 
