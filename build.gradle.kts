@@ -1,10 +1,10 @@
-val kafkClientVersion = "3.8.1"
-val kotestVersion = "5.8.1"
+val kafkClientVersion = "3.9.0"
+val kotestVersion = "6.0.0.M1"
 val kotlinVersion = "2.1.0"
-val ktorVersion = "3.0.1"
-val logbackVersion = "1.5.15"
+val ktorVersion = "3.0.3"
+val logbackVersion = "1.5.16"
 val logstashLogbackEncoderVersion = "8.0"
-val prometeusVersion = "1.14.1"
+val prometeusVersion = "1.14.2"
 val testcontainersVersion = "1.20.4"
 val wiremockStandaloneVersion = "3.10.0"
 
@@ -41,8 +41,8 @@ dependencies {
 
     // Database
     implementation("org.postgresql:postgresql:42.7.4")
-    implementation("com.zaxxer:HikariCP:6.0.0")
-    implementation("org.flywaydb:flyway-database-postgresql:10.20.1")
+    implementation("com.zaxxer:HikariCP:6.2.1")
+    implementation("org.flywaydb:flyway-database-postgresql:11.1.1")
     implementation("com.github.seratch:kotliquery:1.9.0")
 
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -66,7 +66,7 @@ dependencies {
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.1.115.Final")
+                require("4.1.116.Final")
             }
             because("From Ktor version: 2.3.5 -> io.netty:netty-codec-http2 vulnerable to HTTP/2 Rapid Reset Attack")
         }
