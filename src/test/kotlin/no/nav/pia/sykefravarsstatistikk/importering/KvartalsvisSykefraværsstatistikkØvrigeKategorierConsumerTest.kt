@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkGjeldendeKvartal
-import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.shouldBeEqual
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
@@ -36,9 +36,9 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             kodenavn = "land",
         )
 
-        statistikkQ12023.tapteDagsverk shouldBeEqual 17.5
-        statistikkQ12023.muligeDagsverk shouldBeEqual 761.3
-        statistikkQ12023.prosent shouldBeEqual 2.3
+        statistikkQ12023.tapteDagsverk bigDecimalShouldBe 17.5
+        statistikkQ12023.muligeDagsverk bigDecimalShouldBe 761.3
+        statistikkQ12023.prosent bigDecimalShouldBe 2.3
         statistikkQ12023.antallPersoner shouldBe 4
     }
 }

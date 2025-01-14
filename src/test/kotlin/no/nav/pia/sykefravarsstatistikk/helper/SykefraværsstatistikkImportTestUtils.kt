@@ -40,6 +40,7 @@ class SykefraværsstatistikkImportTestUtils {
             tapteDagsverk: Double,
             muligeDagsverk: Double,
             antallPersoner: Int,
+            tapteDagsverGradert: Double = 0.0,
         ) : this(
             JsonKey(
                 kategori = kategori,
@@ -54,6 +55,7 @@ class SykefraværsstatistikkImportTestUtils {
                 prosent = prosent.toBigDecimal(),
                 tapteDagsverk = tapteDagsverk.toBigDecimal(),
                 muligeDagsverk = muligeDagsverk.toBigDecimal(),
+                tapteDagsverkGradert = tapteDagsverGradert.toBigDecimal(),
                 antallPersoner = antallPersoner,
             ),
         )
@@ -86,7 +88,7 @@ class SykefraværsstatistikkImportTestUtils {
     companion object {
         val KVARTAL_2024_3 = ÅrstallOgKvartal(2024, 3)
 
-        infix fun BigDecimal.shouldBeEqual(expected: Double) = this.toDouble().shouldBe(expected)
+        infix fun BigDecimal.bigDecimalShouldBe(expected: Double) = this.toDouble().shouldBe(expected)
 
         private fun Statistikkategori.tilKodenavn() =
             when (this) {
