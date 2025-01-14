@@ -54,17 +54,41 @@ class SykefraværsstatistikkRepository(
         }
 
     private fun TransactionalSession.insertStatistikk(sykefraværsstatistikkDto: SykefraværsstatistikkDto) =
-        insertIkkeBehandletSykefraværsstatistikk(
-            tabellNavn = sykefraværsstatistikkDto.tilTabellNavn(),
-            kolonneNavn = sykefraværsstatistikkDto.tilKolonneNavn(),
-            sykefraværsstatistikkDto = sykefraværsstatistikkDto,
-        )
+        when (sykefraværsstatistikkDto) {
+            is LandSykefraværsstatistikkDto -> {
+                insertSykefraværsstatistikk(
+                    sykefraværsstatistikkDto = sykefraværsstatistikkDto,
+                )
+            }
 
-    private fun TransactionalSession.insertIkkeBehandletSykefraværsstatistikk(
-        tabellNavn: String,
-        kolonneNavn: String,
-        sykefraværsstatistikkDto: SykefraværsstatistikkDto,
-    ) {
+            is NæringSykefraværsstatistikkDto -> {
+                insertSykefraværsstatistikk(
+                    sykefraværsstatistikkDto = sykefraværsstatistikkDto,
+                )
+            }
+
+            is NæringskodeSykefraværsstatistikkDto -> {
+                insertSykefraværsstatistikk(
+                    sykefraværsstatistikkDto = sykefraværsstatistikkDto,
+                )
+            }
+
+            is SektorSykefraværsstatistikkDto -> {
+                insertSykefraværsstatistikk(
+                    sykefraværsstatistikkDto = sykefraværsstatistikkDto,
+                )
+            }
+
+            is VirksomhetSykefraværsstatistikkDto -> {
+                insertVirksomhetSykefraværsstatistikk(
+                    sykefraværsstatistikkDto = sykefraværsstatistikkDto,
+                )
+            }
+        }
+
+    private fun TransactionalSession.insertSykefraværsstatistikk(sykefraværsstatistikkDto: SykefraværsstatistikkDto) {
+        val tabellNavn = sykefraværsstatistikkDto.tilTabellNavn()
+        val kolonneNavn = sykefraværsstatistikkDto.tilKolonneNavn()
         val statement =
             """
             INSERT INTO $tabellNavn(
@@ -102,6 +126,54 @@ class SykefraværsstatistikkRepository(
                     "antall_personer" to sykefraværsstatistikkDto.antallPersoner,
                     "tapte_dagsverk" to sykefraværsstatistikkDto.tapteDagsverk,
                     "mulige_dagsverk" to sykefraværsstatistikkDto.muligeDagsverk,
+                    "prosent" to sykefraværsstatistikkDto.prosent,
+                ),
+            ).asUpdate,
+        )
+    }
+
+    private fun TransactionalSession.insertVirksomhetSykefraværsstatistikk(sykefraværsstatistikkDto: VirksomhetSykefraværsstatistikkDto) {
+        val statement =
+            """
+            INSERT INTO sykefravarsstatistikk_virksomhet(
+                orgnr,
+                arstall,
+                kvartal,
+                antall_personer,
+                tapte_dagsverk,
+                mulige_dagsverk,
+                tapte_dagsverk_gradert_sykemelding,
+                prosent
+            )
+            VALUES(
+                :orgnr,
+                :arstall,
+                :kvartal,
+                :antall_personer,
+                :tapte_dagsverk,
+                :mulige_dagsverk,
+                :tapte_dagsverk_gradert_sykemelding,
+                :prosent
+            )
+            ON CONFLICT (orgnr, arstall, kvartal) DO UPDATE SET
+                antall_personer = :antall_personer,
+                tapte_dagsverk = :tapte_dagsverk,
+                mulige_dagsverk = :mulige_dagsverk,
+                tapte_dagsverk_gradert_sykemelding = :tapte_dagsverk_gradert_sykemelding,
+                prosent = :prosent,
+                opprettet = now()
+            """.trimIndent()
+        run(
+            queryOf(
+                statement,
+                mapOf(
+                    "orgnr" to sykefraværsstatistikkDto.orgnr,
+                    "arstall" to sykefraværsstatistikkDto.årstall,
+                    "kvartal" to sykefraværsstatistikkDto.kvartal,
+                    "antall_personer" to sykefraværsstatistikkDto.antallPersoner,
+                    "tapte_dagsverk" to sykefraværsstatistikkDto.tapteDagsverk,
+                    "mulige_dagsverk" to sykefraværsstatistikkDto.muligeDagsverk,
+                    "tapte_dagsverk_gradert_sykemelding" to sykefraværsstatistikkDto.tapteDagsverkGradert,
                     "prosent" to sykefraværsstatistikkDto.prosent,
                 ),
             ).asUpdate,

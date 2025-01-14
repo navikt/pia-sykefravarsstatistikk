@@ -37,7 +37,6 @@ class KafkaContainerHelper(
     private val kafkaNetworkAlias = "kafkaContainer"
     private var adminClient: AdminClient
     private var kafkaProducer: KafkaProducer<String, String>
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     val kafkaContainer = ConfluentKafkaContainer(
         DockerImageName.parse("confluentinc/cp-kafka:7.4.3"),
@@ -61,7 +60,7 @@ class KafkaContainerHelper(
             createTopics()
             kafkaProducer = producer()
         }
-
+    // TODO: tas i bruk når vi sender kafka meldinger til andre applikasjoner
     fun nyKonsument(topic: KafkaTopics) =
         KafkaConfig(
             brokers = kafkaContainer.bootstrapServers,
@@ -74,6 +73,7 @@ class KafkaContainerHelper(
                 KafkaConsumer(config, StringDeserializer(), StringDeserializer())
             }
 
+    // TODO: tas i bruk når vi sender kafka meldinger til andre applikasjoner
     suspend fun ventOgKonsumerKafkaMeldinger(
         key: String,
         konsument: KafkaConsumer<String, String>,
@@ -107,7 +107,7 @@ class KafkaContainerHelper(
         adminClient.createTopics(
             listOf(
                 NewTopic(KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER.navn, 1, 1.toShort()),
-                // NewTopic(KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET.navn, 1, 1.toShort()),
+                NewTopic(KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET.navn, 1, 1.toShort()),
             ),
         )
     }
@@ -134,7 +134,6 @@ class KafkaContainerHelper(
         topic: KafkaTopics,
     ) {
         runBlocking {
-            logger.info("[TEST] Sender Kafka melding med nøkkel: '$nøkkel' og melding: '$melding' på topic: '$topic'")
             val sendtMelding = kafkaProducer.send(ProducerRecord(topic.navnMedNamespace, nøkkel, melding)).get()
             ventTilKonsumert(
                 konsumentGruppeId = topic.konsumentGruppe,

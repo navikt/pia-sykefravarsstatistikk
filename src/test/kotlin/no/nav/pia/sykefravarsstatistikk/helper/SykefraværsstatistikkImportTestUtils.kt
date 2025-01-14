@@ -17,6 +17,17 @@ class SykefraværsstatistikkImportTestUtils {
         val antallPersoner: Int,
     )
 
+    data class VirksomhetStatistikkGjeldendeKvartal(
+        val orgnr: String,
+        val årstall: Int,
+        val kvartal: Int,
+        val tapteDagsverk: BigDecimal,
+        val muligeDagsverk: BigDecimal,
+        val tapteDagsverkGradertSykemelding: BigDecimal,
+        val prosent: BigDecimal,
+        val antallPersoner: Int,
+    )
+
     data class JsonMelding(
         val key: JsonKey,
         val value: JsonValue,
@@ -36,7 +47,8 @@ class SykefraværsstatistikkImportTestUtils {
                 kvartal = årstallOgKvartal,
             ),
             JsonValue(
-                land = kode,
+                kategori = kategori,
+                kode = kode,
                 årstall = årstallOgKvartal.årstall,
                 kvartal = årstallOgKvartal.kvartal,
                 prosent = prosent.toBigDecimal(),
@@ -58,13 +70,17 @@ class SykefraværsstatistikkImportTestUtils {
     )
 
     data class JsonValue(
-        val land: String,
+        val kategori: Statistikkategori,
+        val kode: String,
         val årstall: Int,
         val kvartal: Int,
         val prosent: BigDecimal,
         val tapteDagsverk: BigDecimal,
         val muligeDagsverk: BigDecimal,
         val antallPersoner: Int,
+        val tapteDagsverkGradert: BigDecimal = 0.toBigDecimal(),
+        val tapteDagsverkPerVarighet: List<String> = emptyList(),
+        val rectype: String = "",
     )
 
     companion object {
@@ -72,16 +88,13 @@ class SykefraværsstatistikkImportTestUtils {
 
         infix fun BigDecimal.shouldBeEqual(expected: Double) = this.toDouble().shouldBe(expected)
 
-        private fun rekursivtLagÅrstallOgKvartal(
-            perioderIgjen: Int,
-            perioder: MutableList<ÅrstallOgKvartal>,
-            periode: ÅrstallOgKvartal,
-        ): List<ÅrstallOgKvartal> =
-            if (perioderIgjen == 0) {
-                perioder
-            } else {
-                perioder.add(periode)
-                rekursivtLagÅrstallOgKvartal(perioderIgjen - 1, perioder, periode.minusKvartaler(1))
+        private fun Statistikkategori.tilKodenavn() =
+            when (this) {
+                Statistikkategori.LAND -> "land"
+                Statistikkategori.VIRKSOMHET -> "orgnr"
+                Statistikkategori.NÆRING -> "næring"
+                Statistikkategori.NÆRINGSKODE -> "næringskode"
+                Statistikkategori.SEKTOR -> "sektor"
             }
 
         fun JsonKey.toJson(): String =
@@ -95,17 +108,38 @@ class SykefraværsstatistikkImportTestUtils {
             """.trimIndent()
 
         fun JsonValue.toJson(): String =
-            """
-            {
-              "land": "$land",
-              "årstall": $årstall,
-              "kvartal": $kvartal,
-              "prosent": ${prosent.toPlainString()},
-              "tapteDagsverk": ${tapteDagsverk.toPlainString()},
-              "muligeDagsverk": ${muligeDagsverk.toPlainString()},
-              "antallPersoner": $antallPersoner
+            when (kategori) {
+                Statistikkategori.LAND ->
+                    """
+                    {
+                      "${kategori.tilKodenavn()}": "$kode",
+                      "årstall": $årstall,
+                      "kvartal": $kvartal,
+                      "prosent": ${prosent.toPlainString()},
+                      "tapteDagsverk": ${tapteDagsverk.toPlainString()},
+                      "muligeDagsverk": ${muligeDagsverk.toPlainString()},
+                      "antallPersoner": $antallPersoner
+                    }
+                    """.trimIndent()
+
+                Statistikkategori.VIRKSOMHET ->
+                    """
+                    {
+                      "${kategori.tilKodenavn()}": "$kode",
+                      "årstall": $årstall,
+                      "kvartal": $kvartal,
+                      "prosent": ${prosent.toPlainString()},
+                      "tapteDagsverk": ${tapteDagsverk.toPlainString()},
+                      "muligeDagsverk": ${muligeDagsverk.toPlainString()},
+                      "tapteDagsverkGradert": ${tapteDagsverkGradert.toPlainString()},
+                      "tapteDagsverkPerVarighet": [],
+                      "rectype": "$rectype",
+                      "antallPersoner": $antallPersoner
+                    }
+                    """.trimIndent()
+
+                else -> throw IllegalArgumentException("Kategori ikke implementert enda: $kategori")
             }
-            """.trimIndent()
 
         fun hentStatistikkGjeldendeKvartal(
             kategori: Statistikkategori,
@@ -133,6 +167,34 @@ class SykefraværsstatistikkImportTestUtils {
                     prosent = rs.getBigDecimal("prosent"),
                     tapteDagsverk = rs.getBigDecimal("tapte_dagsverk"),
                     muligeDagsverk = rs.getBigDecimal("mulige_dagsverk"),
+                    antallPersoner = rs.getInt("antall_personer"),
+                )
+            }
+        }
+
+        fun hentVirksomhetStatistikkGjeldendeKvartal(
+            orgnr: String,
+            kvartal: ÅrstallOgKvartal,
+        ): VirksomhetStatistikkGjeldendeKvartal {
+            val query = """
+            select * from sykefravarsstatistikk_virksomhet 
+             where orgnr = '$orgnr'
+             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            """.trimMargin()
+            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+                val statement = connection.createStatement()
+                statement.execute(query)
+                val rs = statement.resultSet
+                rs.next()
+                rs.row shouldBe 1
+                return VirksomhetStatistikkGjeldendeKvartal(
+                    orgnr = rs.getString("orgnr"),
+                    årstall = rs.getInt("arstall"),
+                    kvartal = rs.getInt("kvartal"),
+                    prosent = rs.getBigDecimal("prosent"),
+                    tapteDagsverk = rs.getBigDecimal("tapte_dagsverk"),
+                    muligeDagsverk = rs.getBigDecimal("mulige_dagsverk"),
+                    tapteDagsverkGradertSykemelding = rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
                     antallPersoner = rs.getInt("antall_personer"),
                 )
             }
