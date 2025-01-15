@@ -1,6 +1,9 @@
 package no.nav.pia.sykefravarsstatistikk.helper
 
 import io.kotest.matchers.shouldBe
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import java.math.BigDecimal
@@ -17,7 +20,7 @@ class SykefraværsstatistikkImportTestUtils {
         val antallPersoner: Int,
     )
 
-    data class VirksomhetStatistikkGjeldendeKvartal(
+    data class VirksomhetStatistikk(
         val orgnr: String,
         val årstall: Int,
         val kvartal: Int,
@@ -26,6 +29,19 @@ class SykefraværsstatistikkImportTestUtils {
         val tapteDagsverkGradertSykemelding: BigDecimal,
         val prosent: BigDecimal,
         val antallPersoner: Int,
+    )
+
+    data class VirksomhetStatistikkMedVarighet(
+        val orgnr: String,
+        val årstall: Int,
+        val kvartal: Int,
+        val tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet>,
+    )
+
+    @Serializable
+    data class TapteDagsverkPerVarighet(
+        val varighet: String,
+        val tapteDagsverk: Double,
     )
 
     data class JsonMelding(
@@ -41,6 +57,7 @@ class SykefraværsstatistikkImportTestUtils {
             muligeDagsverk: Double,
             antallPersoner: Int,
             tapteDagsverGradert: Double = 0.0,
+            tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         ) : this(
             JsonKey(
                 kategori = kategori,
@@ -56,6 +73,7 @@ class SykefraværsstatistikkImportTestUtils {
                 tapteDagsverk = tapteDagsverk.toBigDecimal(),
                 muligeDagsverk = muligeDagsverk.toBigDecimal(),
                 tapteDagsverkGradert = tapteDagsverGradert.toBigDecimal(),
+                tapteDagsverkPerVarighet = tapteDagsverkMedVarighet,
                 antallPersoner = antallPersoner,
             ),
         )
@@ -81,7 +99,7 @@ class SykefraværsstatistikkImportTestUtils {
         val muligeDagsverk: BigDecimal,
         val antallPersoner: Int,
         val tapteDagsverkGradert: BigDecimal = 0.toBigDecimal(),
-        val tapteDagsverkPerVarighet: List<String> = emptyList(),
+        val tapteDagsverkPerVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         val rectype: String = "",
     )
 
@@ -98,6 +116,8 @@ class SykefraværsstatistikkImportTestUtils {
                 Statistikkategori.NÆRINGSKODE -> "næringskode"
                 Statistikkategori.SEKTOR -> "sektor"
             }
+
+        private fun List<TapteDagsverkPerVarighet>.toJson() = Json.encodeToString(this)
 
         fun JsonKey.toJson(): String =
             """
@@ -134,7 +154,7 @@ class SykefraværsstatistikkImportTestUtils {
                       "tapteDagsverk": ${tapteDagsverk.toPlainString()},
                       "muligeDagsverk": ${muligeDagsverk.toPlainString()},
                       "tapteDagsverkGradert": ${tapteDagsverkGradert.toPlainString()},
-                      "tapteDagsverkPerVarighet": [],
+                      "tapteDagsverkPerVarighet": ${tapteDagsverkPerVarighet.toJson()},
                       "rectype": "$rectype",
                       "antallPersoner": $antallPersoner
                     }
@@ -174,10 +194,10 @@ class SykefraværsstatistikkImportTestUtils {
             }
         }
 
-        fun hentVirksomhetStatistikkGjeldendeKvartal(
+        fun hentVirksomhetStatistikk(
             orgnr: String,
             kvartal: ÅrstallOgKvartal,
-        ): VirksomhetStatistikkGjeldendeKvartal {
+        ): VirksomhetStatistikk {
             val query = """
             select * from sykefravarsstatistikk_virksomhet 
              where orgnr = '$orgnr'
@@ -189,7 +209,7 @@ class SykefraværsstatistikkImportTestUtils {
                 val rs = statement.resultSet
                 rs.next()
                 rs.row shouldBe 1
-                return VirksomhetStatistikkGjeldendeKvartal(
+                return VirksomhetStatistikk(
                     orgnr = rs.getString("orgnr"),
                     årstall = rs.getInt("arstall"),
                     kvartal = rs.getInt("kvartal"),
@@ -199,6 +219,56 @@ class SykefraværsstatistikkImportTestUtils {
                     tapteDagsverkGradertSykemelding = rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
                     antallPersoner = rs.getInt("antall_personer"),
                 )
+            }
+        }
+
+        fun hentVirksomhetStatistikkMedVarighet(
+            orgnr: String,
+            kvartal: ÅrstallOgKvartal,
+        ): VirksomhetStatistikkMedVarighet {
+            val query = """
+            select * from sykefravarsstatistikk_virksomhet_med_varighet 
+             where orgnr = '$orgnr'
+             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            """.trimMargin()
+            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+                val statement = connection.createStatement()
+                statement.execute(query)
+                val rs = statement.resultSet
+                rs.next()
+                rs.row shouldBe 1
+                return VirksomhetStatistikkMedVarighet(
+                    orgnr = rs.getString("orgnr"),
+                    årstall = rs.getInt("arstall"),
+                    kvartal = rs.getInt("kvartal"),
+                    tapteDagsverkMedVarighet = hentTapteDagsverkMedVarighet(orgnr, kvartal),
+                )
+            }
+        }
+
+        fun hentTapteDagsverkMedVarighet(
+            orgnr: String,
+            kvartal: ÅrstallOgKvartal,
+        ): List<TapteDagsverkPerVarighet> {
+            val query = """
+            select * from sykefravarsstatistikk_virksomhet_med_varighet 
+             where orgnr = '$orgnr'
+             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            """.trimMargin()
+            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+                val statement = connection.createStatement()
+                statement.execute(query)
+                val rs = statement.resultSet
+                val list = mutableListOf<TapteDagsverkPerVarighet>()
+                while (rs.next()) {
+                    list.add(
+                        TapteDagsverkPerVarighet(
+                            varighet = rs.getString("varighet"),
+                            tapteDagsverk = rs.getBigDecimal("tapte_dagsverk").toDouble(),
+                        ),
+                    )
+                }
+                return list
             }
         }
     }

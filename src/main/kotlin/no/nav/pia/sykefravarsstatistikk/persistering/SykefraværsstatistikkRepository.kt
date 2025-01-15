@@ -83,6 +83,14 @@ class SykefraværsstatistikkRepository(
                 insertVirksomhetSykefraværsstatistikk(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
+                sykefraværsstatistikkDto.tapteDagsverkPerVarighet.forEach {
+                    insertTapteDagsverkPerVarighetForVirksomhet(
+                        orgnr = sykefraværsstatistikkDto.orgnr,
+                        årstall = sykefraværsstatistikkDto.årstall,
+                        kvartal = sykefraværsstatistikkDto.kvartal,
+                        tapteDagsverkPerVarighet = it,
+                    )
+                }
             }
         }
 
@@ -175,6 +183,46 @@ class SykefraværsstatistikkRepository(
                     "mulige_dagsverk" to sykefraværsstatistikkDto.muligeDagsverk,
                     "tapte_dagsverk_gradert_sykemelding" to sykefraværsstatistikkDto.tapteDagsverkGradert,
                     "prosent" to sykefraværsstatistikkDto.prosent,
+                ),
+            ).asUpdate,
+        )
+    }
+
+    private fun TransactionalSession.insertTapteDagsverkPerVarighetForVirksomhet(
+        orgnr: String,
+        årstall: Int,
+        kvartal: Int,
+        tapteDagsverkPerVarighet: TapteDagsverkPerVarighetDto,
+    ) {
+        val statement =
+            """
+            INSERT INTO sykefravarsstatistikk_virksomhet_med_varighet(
+                orgnr,
+                arstall,
+                kvartal,
+                varighet,
+                tapte_dagsverk
+            )
+            VALUES(
+                :orgnr,
+                :arstall,
+                :kvartal,
+                :varighet,
+                :tapte_dagsverk
+            )
+            ON CONFLICT (orgnr, arstall, kvartal, varighet) DO UPDATE SET
+                tapte_dagsverk = :tapte_dagsverk,
+                opprettet = now()
+            """.trimIndent()
+        run(
+            queryOf(
+                statement,
+                mapOf(
+                    "orgnr" to orgnr,
+                    "arstall" to årstall,
+                    "kvartal" to kvartal,
+                    "varighet" to tapteDagsverkPerVarighet.varighet,
+                    "tapte_dagsverk" to tapteDagsverkPerVarighet.tapteDagsverk,
                 ),
             ).asUpdate,
         )
