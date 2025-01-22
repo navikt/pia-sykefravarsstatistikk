@@ -41,4 +41,37 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         statistikkQ12023.prosent bigDecimalShouldBe 2.3
         statistikkQ12023.antallPersoner shouldBe 4
     }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori SEKTOR lagres i DB`() {
+        val sykefraværsstatistikk = JsonMelding(
+            kategori = Statistikkategori.SEKTOR,
+            kode = "1",
+            årstallOgKvartal = KVARTAL_2024_3,
+            tapteDagsverk = 17.5,
+            muligeDagsverk = 761.3,
+            prosent = 2.3,
+            antallPersoner = 4,
+        )
+        kafkaContainerHelper.sendOgVentTilKonsumert(
+            sykefraværsstatistikk.toJsonKey(),
+            sykefraværsstatistikk.toJsonValue(),
+            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+            kategori = Statistikkategori.SEKTOR,
+            verdi = "1",
+            kvartal = KVARTAL_2024_3,
+            tabellnavn = "sykefravarsstatistikk_sektor",
+            kodenavn = "sektor",
+        )
+
+        statistikkQ32024.kategori shouldBe Statistikkategori.SEKTOR
+        statistikkQ32024.kode shouldBe "1"
+        statistikkQ32024.tapteDagsverk bigDecimalShouldBe 17.5
+        statistikkQ32024.muligeDagsverk bigDecimalShouldBe 761.3
+        statistikkQ32024.prosent bigDecimalShouldBe 2.3
+        statistikkQ32024.antallPersoner shouldBe 4
+    }
 }

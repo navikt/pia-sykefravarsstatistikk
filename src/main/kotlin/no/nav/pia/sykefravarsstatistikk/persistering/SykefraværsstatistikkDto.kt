@@ -172,9 +172,10 @@ internal object TapteDagsverkPerVarighetListSerializer : KSerializer<List<TapteD
 }
 
 object SykefraværsstatistikkDtoSerializer : JsonContentPolymorphicSerializer<SykefraværsstatistikkDto>(
-    SykefraværsstatistikkDto::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<SykefraværsstatistikkDto> {
-        return if (element.jsonObject["land"]?.jsonPrimitive?.content.equals("NO")) {
+    SykefraværsstatistikkDto::class,
+) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<SykefraværsstatistikkDto> =
+        if (element.jsonObject["land"]?.jsonPrimitive?.content.equals("NO")) {
             LandSykefraværsstatistikkDto.serializer()
         } else if (element.jsonObject["sektor"]?.jsonPrimitive?.isString == true) {
             SektorSykefraværsstatistikkDto.serializer()
@@ -187,7 +188,6 @@ object SykefraværsstatistikkDtoSerializer : JsonContentPolymorphicSerializer<Sy
         } else {
             throw Exception("Ukjent kategori for statistikk")
         }
-    }
 }
 
 fun String.serializeToSykefraværsstatistikkDto(): SykefraværsstatistikkDto =

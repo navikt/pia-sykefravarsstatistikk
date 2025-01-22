@@ -131,7 +131,7 @@ class SykefraværsstatistikkImportTestUtils {
 
         fun JsonValue.toJson(): String =
             when (kategori) {
-                Statistikkategori.LAND ->
+                Statistikkategori.LAND, Statistikkategori.SEKTOR ->
                     """
                     {
                       "${kategori.tilKodenavn()}": "$kode",
