@@ -31,15 +31,7 @@ class SykefraværsstatistikkImportTestUtils {
         val antallPersoner: Int,
     )
 
-    data class VirksomhetStatistikkMedVarighet(
-        val orgnr: String,
-        val årstall: Int,
-        val kvartal: Int,
-        val tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet>,
-    )
-
-    data class NæringStatistikkMedVarighet(
-        val næring: String,
+    data class StatistikkMedVarighet(
         val årstall: Int,
         val kvartal: Int,
         val tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet>,
@@ -151,7 +143,7 @@ class SykefraværsstatistikkImportTestUtils {
                     }
                     """.trimIndent()
 
-                Statistikkategori.NÆRING ->
+                Statistikkategori.NÆRING, Statistikkategori.NÆRINGSKODE ->
                     """
                     {
                       "${kategori.tilKodenavn()}": "$kode",
@@ -244,14 +236,16 @@ class SykefraværsstatistikkImportTestUtils {
             }
         }
 
-        fun hentVirksomhetStatistikkMedVarighet(
-            orgnr: String,
-            kvartal: ÅrstallOgKvartal,
-        ): VirksomhetStatistikkMedVarighet {
+        fun hentStatistikkMedVarighet(
+            tabellnavn: String,
+            kolonnenavn: String,
+            verdi: String,
+            årstallOgKvartal: ÅrstallOgKvartal,
+        ): StatistikkMedVarighet {
             val query = """
-            select * from sykefravarsstatistikk_virksomhet_med_varighet 
-             where orgnr = '$orgnr'
-             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            select * from $tabellnavn 
+             where $kolonnenavn = '$verdi'
+             and arstall = ${årstallOgKvartal.årstall} and kvartal = ${årstallOgKvartal.kvartal}
             """.trimMargin()
             TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
                 val statement = connection.createStatement()
@@ -259,72 +253,32 @@ class SykefraværsstatistikkImportTestUtils {
                 val rs = statement.resultSet
                 rs.next()
                 rs.row shouldBe 1
-                return VirksomhetStatistikkMedVarighet(
-                    orgnr = rs.getString("orgnr"),
-                    årstall = rs.getInt("arstall"),
-                    kvartal = rs.getInt("kvartal"),
-                    tapteDagsverkMedVarighet = hentTapteDagsverkMedVarighet(orgnr, kvartal),
+                val årstall = rs.getInt("arstall")
+                val kvartal = rs.getInt("kvartal")
+                val tapteDagsverkMedVarighet = hentTapteDagsverkMedVarighet(
+                    tabellnavn = tabellnavn,
+                    kolonnenavn = kolonnenavn,
+                    verdi = verdi,
+                    kvartal = årstallOgKvartal,
+                )
+
+                return StatistikkMedVarighet(
+                    årstall = årstall,
+                    kvartal = kvartal,
+                    tapteDagsverkMedVarighet = tapteDagsverkMedVarighet,
                 )
             }
         }
 
         fun hentTapteDagsverkMedVarighet(
-            orgnr: String,
+            tabellnavn: String,
+            kolonnenavn: String,
+            verdi: String,
             kvartal: ÅrstallOgKvartal,
         ): List<TapteDagsverkPerVarighet> {
             val query = """
-            select * from sykefravarsstatistikk_virksomhet_med_varighet 
-             where orgnr = '$orgnr'
-             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
-            """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
-                val statement = connection.createStatement()
-                statement.execute(query)
-                val rs = statement.resultSet
-                val list = mutableListOf<TapteDagsverkPerVarighet>()
-                while (rs.next()) {
-                    list.add(
-                        TapteDagsverkPerVarighet(
-                            varighet = rs.getString("varighet"),
-                            tapteDagsverk = rs.getBigDecimal("tapte_dagsverk").toDouble(),
-                        ),
-                    )
-                }
-                return list
-            }
-        }
-
-        fun hentNæringStatistikkMedVarighet(
-            næring: String,
-            kvartal: ÅrstallOgKvartal,
-        ): NæringStatistikkMedVarighet {
-            val query = """
-            select * from sykefravarsstatistikk_naring_med_varighet 
-             where naring = '$næring'
-             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
-            """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
-                val statement = connection.createStatement()
-                statement.execute(query)
-                val rs = statement.resultSet
-                rs.next()
-                rs.row shouldBe 1
-                return NæringStatistikkMedVarighet(
-                    næring = rs.getString("naring"),
-                    årstall = rs.getInt("arstall"),
-                    kvartal = rs.getInt("kvartal"),
-                    tapteDagsverkMedVarighet = hentTapteDagsverkMedVarighetForNæring(næring, kvartal),
-                )
-            }
-        }
-
-        fun hentTapteDagsverkMedVarighetForNæring(
-            næring: String,
-            kvartal: ÅrstallOgKvartal,
-        ): List<TapteDagsverkPerVarighet> {
-            val query = """
-            select * from sykefravarsstatistikk_naring_med_varighet 
-             where naring = '$næring'
+            select * from $tabellnavn 
+             where $kolonnenavn = '$verdi'
              and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
             """.trimMargin()
             TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->

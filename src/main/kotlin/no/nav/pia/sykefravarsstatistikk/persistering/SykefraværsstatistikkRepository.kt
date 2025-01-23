@@ -81,6 +81,16 @@ class SykefraværsstatistikkRepository(
                 insertSykefraværsstatistikk(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
+                sykefraværsstatistikkDto.tapteDagsverkPerVarighet.forEach {
+                    insertTapteDagsverkPerVarighetForKategori(
+                        tabellnavn = "sykefravarsstatistikk_naringskode_med_varighet",
+                        kolonnenavn = "naringskode",
+                        verdi = sykefraværsstatistikkDto.næringskode,
+                        årstall = sykefraværsstatistikkDto.årstall,
+                        kvartal = sykefraværsstatistikkDto.kvartal,
+                        tapteDagsverkPerVarighet = it,
+                    )
+                }
             }
 
             is SektorSykefraværsstatistikkDto -> {

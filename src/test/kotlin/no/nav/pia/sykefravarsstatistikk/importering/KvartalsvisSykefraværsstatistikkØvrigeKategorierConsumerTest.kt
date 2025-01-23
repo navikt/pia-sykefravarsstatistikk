@@ -4,8 +4,8 @@ import io.kotest.matchers.shouldBe
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
-import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentNæringStatistikkMedVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkGjeldendeKvartal
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkMedVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
@@ -116,13 +116,76 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         statistikkQ32024.kode shouldBe "22"
         statistikkQ32024.tapteDagsverk bigDecimalShouldBe 5039.8
 
-        val virksomhetStatistikkMedVarighet = hentNæringStatistikkMedVarighet(
-            næring = "22",
-            kvartal = KVARTAL_2024_3,
+        val statistikkMedVarighet = hentStatistikkMedVarighet(
+            tabellnavn = "sykefravarsstatistikk_naring_med_varighet",
+            kolonnenavn = "naring",
+            verdi = "22",
+            årstallOgKvartal = KVARTAL_2024_3,
         )
 
-        virksomhetStatistikkMedVarighet.næring shouldBe "22"
-        virksomhetStatistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
+        statistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
+            TapteDagsverkPerVarighet(
+                varighet = "A",
+                tapteDagsverk = 12.3,
+            ),
+            TapteDagsverkPerVarighet(
+                varighet = "D",
+                tapteDagsverk = 5.2,
+            ),
+        )
+    }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori NÆRINGSKODE lagres i DB`() {
+        val sykefraværsstatistikk = JsonMelding(
+            kategori = Statistikkategori.NÆRINGSKODE,
+            kode = "88911",
+            årstallOgKvartal = KVARTAL_2024_3,
+            tapteDagsverk = 17.5,
+            muligeDagsverk = 761.3,
+            prosent = 2.3,
+            antallPersoner = 4,
+            tapteDagsverGradert = 19.2,
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 12.3,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 5.2,
+                ),
+            ),
+        )
+        kafkaContainerHelper.sendOgVentTilKonsumert(
+            sykefraværsstatistikk.toJsonKey(),
+            sykefraværsstatistikk.toJsonValue(),
+            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+            kategori = Statistikkategori.NÆRINGSKODE,
+            verdi = "88911",
+            kvartal = KVARTAL_2024_3,
+            tabellnavn = "sykefravarsstatistikk_naringskode",
+            kodenavn = "naringskode",
+        )
+
+        statistikkQ32024.kategori shouldBe Statistikkategori.NÆRINGSKODE
+        statistikkQ32024.kode shouldBe "88911"
+        statistikkQ32024.tapteDagsverk bigDecimalShouldBe 17.5
+        statistikkQ32024.muligeDagsverk bigDecimalShouldBe 761.3
+        statistikkQ32024.prosent bigDecimalShouldBe 2.3
+        statistikkQ32024.antallPersoner shouldBe 4
+
+        val næringskodeStatistikkMedVarighet = hentStatistikkMedVarighet(
+            tabellnavn = "sykefravarsstatistikk_naringskode_med_varighet",
+            kolonnenavn = "naringskode",
+            verdi = "88911",
+            årstallOgKvartal = KVARTAL_2024_3,
+        )
+
+        næringskodeStatistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
             TapteDagsverkPerVarighet(
                 varighet = "A",
                 tapteDagsverk = 12.3,

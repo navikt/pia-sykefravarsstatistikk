@@ -5,7 +5,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentVirksomhetStatistikk
-import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentVirksomhetStatistikkMedVarighet
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkMedVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
@@ -52,13 +52,14 @@ class KvartalsvisSykefraværsstatistikkVirksomhetConsumerTest {
         statistikkQ12023.antallPersoner shouldBe 4
         statistikkQ12023.tapteDagsverkGradertSykemelding bigDecimalShouldBe 33.2
 
-        val virksomhetStatistikkMedVarighet = hentVirksomhetStatistikkMedVarighet(
-            orgnr = "987654321",
-            kvartal = KVARTAL_2024_3,
+        val statistikkMedVarighet = hentStatistikkMedVarighet(
+            tabellnavn = "sykefravarsstatistikk_virksomhet_med_varighet",
+            kolonnenavn = "orgnr",
+            verdi = "987654321",
+            årstallOgKvartal = KVARTAL_2024_3,
         )
 
-        virksomhetStatistikkMedVarighet.orgnr shouldBe "987654321"
-        virksomhetStatistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
+        statistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
             TapteDagsverkPerVarighet(
                 varighet = "A",
                 tapteDagsverk = 12.3,
