@@ -65,6 +65,16 @@ class SykefraværsstatistikkRepository(
                 insertNæringSykefraværsstatistikk(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
+                sykefraværsstatistikkDto.tapteDagsverkPerVarighet.forEach {
+                    insertTapteDagsverkPerVarighetForKategori(
+                        tabellnavn = "sykefravarsstatistikk_naring_med_varighet",
+                        kolonnenavn = "naring",
+                        verdi = sykefraværsstatistikkDto.næring,
+                        årstall = sykefraværsstatistikkDto.årstall,
+                        kvartal = sykefraværsstatistikkDto.kvartal,
+                        tapteDagsverkPerVarighet = it,
+                    )
+                }
             }
 
             is NæringskodeSykefraværsstatistikkDto -> {
@@ -84,8 +94,10 @@ class SykefraværsstatistikkRepository(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
                 sykefraværsstatistikkDto.tapteDagsverkPerVarighet.forEach {
-                    insertTapteDagsverkPerVarighetForVirksomhet(
-                        orgnr = sykefraværsstatistikkDto.orgnr,
+                    insertTapteDagsverkPerVarighetForKategori(
+                        tabellnavn = "sykefravarsstatistikk_virksomhet_med_varighet",
+                        kolonnenavn = "orgnr",
+                        verdi = sykefraværsstatistikkDto.orgnr,
                         årstall = sykefraværsstatistikkDto.årstall,
                         kvartal = sykefraværsstatistikkDto.kvartal,
                         tapteDagsverkPerVarighet = it,
@@ -240,29 +252,31 @@ class SykefraværsstatistikkRepository(
         )
     }
 
-    private fun TransactionalSession.insertTapteDagsverkPerVarighetForVirksomhet(
-        orgnr: String,
+    private fun TransactionalSession.insertTapteDagsverkPerVarighetForKategori(
+        tabellnavn: String,
+        kolonnenavn: String,
+        verdi: String,
         årstall: Int,
         kvartal: Int,
         tapteDagsverkPerVarighet: TapteDagsverkPerVarighetDto,
     ) {
         val statement =
             """
-            INSERT INTO sykefravarsstatistikk_virksomhet_med_varighet(
-                orgnr,
+            INSERT INTO $tabellnavn(
+                $kolonnenavn,
                 arstall,
                 kvartal,
                 varighet,
                 tapte_dagsverk
             )
             VALUES(
-                :orgnr,
+                :verdi,
                 :arstall,
                 :kvartal,
                 :varighet,
                 :tapte_dagsverk
             )
-            ON CONFLICT (orgnr, arstall, kvartal, varighet) DO UPDATE SET
+            ON CONFLICT ($kolonnenavn, arstall, kvartal, varighet) DO UPDATE SET
                 tapte_dagsverk = :tapte_dagsverk,
                 opprettet = now()
             """.trimIndent()
@@ -270,7 +284,7 @@ class SykefraværsstatistikkRepository(
             queryOf(
                 statement,
                 mapOf(
-                    "orgnr" to orgnr,
+                    "verdi" to verdi,
                     "arstall" to årstall,
                     "kvartal" to kvartal,
                     "varighet" to tapteDagsverkPerVarighet.varighet,

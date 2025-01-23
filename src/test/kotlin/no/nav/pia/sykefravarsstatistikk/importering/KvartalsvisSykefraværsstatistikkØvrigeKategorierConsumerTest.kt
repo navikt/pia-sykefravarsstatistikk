@@ -4,8 +4,10 @@ import io.kotest.matchers.shouldBe
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentNæringStatistikkMedVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkGjeldendeKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import kotlin.test.Test
@@ -86,7 +88,16 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             muligeDagsverk = 186.3,
             antallPersoner = 3,
             tapteDagsverGradert = 0.0,
-            tapteDagsverkMedVarighet = emptyList(), // TODO: legg til støtte for naring med varighet
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 12.3,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 5.2,
+                ),
+            ),
         )
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
@@ -101,9 +112,25 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             tabellnavn = "sykefravarsstatistikk_naring",
             kodenavn = "naring",
         )
-
         statistikkQ32024.kategori shouldBe Statistikkategori.NÆRING
         statistikkQ32024.kode shouldBe "22"
         statistikkQ32024.tapteDagsverk bigDecimalShouldBe 5039.8
+
+        val virksomhetStatistikkMedVarighet = hentNæringStatistikkMedVarighet(
+            næring = "22",
+            kvartal = KVARTAL_2024_3,
+        )
+
+        virksomhetStatistikkMedVarighet.næring shouldBe "22"
+        virksomhetStatistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
+            TapteDagsverkPerVarighet(
+                varighet = "A",
+                tapteDagsverk = 12.3,
+            ),
+            TapteDagsverkPerVarighet(
+                varighet = "D",
+                tapteDagsverk = 5.2,
+            ),
+        )
     }
 }

@@ -38,6 +38,13 @@ class SykefraværsstatistikkImportTestUtils {
         val tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet>,
     )
 
+    data class NæringStatistikkMedVarighet(
+        val næring: String,
+        val årstall: Int,
+        val kvartal: Int,
+        val tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet>,
+    )
+
     @Serializable
     data class TapteDagsverkPerVarighet(
         val varighet: String,
@@ -268,6 +275,56 @@ class SykefraværsstatistikkImportTestUtils {
             val query = """
             select * from sykefravarsstatistikk_virksomhet_med_varighet 
              where orgnr = '$orgnr'
+             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            """.trimMargin()
+            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+                val statement = connection.createStatement()
+                statement.execute(query)
+                val rs = statement.resultSet
+                val list = mutableListOf<TapteDagsverkPerVarighet>()
+                while (rs.next()) {
+                    list.add(
+                        TapteDagsverkPerVarighet(
+                            varighet = rs.getString("varighet"),
+                            tapteDagsverk = rs.getBigDecimal("tapte_dagsverk").toDouble(),
+                        ),
+                    )
+                }
+                return list
+            }
+        }
+
+        fun hentNæringStatistikkMedVarighet(
+            næring: String,
+            kvartal: ÅrstallOgKvartal,
+        ): NæringStatistikkMedVarighet {
+            val query = """
+            select * from sykefravarsstatistikk_naring_med_varighet 
+             where naring = '$næring'
+             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            """.trimMargin()
+            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+                val statement = connection.createStatement()
+                statement.execute(query)
+                val rs = statement.resultSet
+                rs.next()
+                rs.row shouldBe 1
+                return NæringStatistikkMedVarighet(
+                    næring = rs.getString("naring"),
+                    årstall = rs.getInt("arstall"),
+                    kvartal = rs.getInt("kvartal"),
+                    tapteDagsverkMedVarighet = hentTapteDagsverkMedVarighetForNæring(næring, kvartal),
+                )
+            }
+        }
+
+        fun hentTapteDagsverkMedVarighetForNæring(
+            næring: String,
+            kvartal: ÅrstallOgKvartal,
+        ): List<TapteDagsverkPerVarighet> {
+            val query = """
+            select * from sykefravarsstatistikk_naring_med_varighet 
+             where naring = '$næring'
              and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
             """.trimMargin()
             TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
