@@ -38,8 +38,8 @@ class SykefraværsstatistikkRepository(
     private fun SykefraværsstatistikkDto.tilTabellNavn() =
         when (this) {
             is LandSykefraværsstatistikkDto -> "sykefravarsstatistikk_land"
-            is NæringSykefraværsstatistikkDto -> "sykefravarsstatistikk_naering"
-            is NæringskodeSykefraværsstatistikkDto -> "sykefravarsstatistikk_naeringskode"
+            is NæringSykefraværsstatistikkDto -> "sykefravarsstatistikk_naring"
+            is NæringskodeSykefraværsstatistikkDto -> "sykefravarsstatistikk_naringskode"
             is SektorSykefraværsstatistikkDto -> "sykefravarsstatistikk_sektor"
             is VirksomhetSykefraværsstatistikkDto -> "sykefravarsstatistikk_virksomhet"
         }
@@ -47,8 +47,8 @@ class SykefraværsstatistikkRepository(
     private fun SykefraværsstatistikkDto.tilKolonneNavn() =
         when (this) {
             is LandSykefraværsstatistikkDto -> "land"
-            is NæringSykefraværsstatistikkDto -> "naering"
-            is NæringskodeSykefraværsstatistikkDto -> "naeringskode"
+            is NæringSykefraværsstatistikkDto -> "naring"
+            is NæringskodeSykefraværsstatistikkDto -> "naringskode"
             is SektorSykefraværsstatistikkDto -> "sektor"
             is VirksomhetSykefraværsstatistikkDto -> "orgnr"
         }
@@ -62,7 +62,7 @@ class SykefraværsstatistikkRepository(
             }
 
             is NæringSykefraværsstatistikkDto -> {
-                insertSykefraværsstatistikk(
+                insertNæringSykefraværsstatistikk(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
             }
@@ -140,6 +140,54 @@ class SykefraværsstatistikkRepository(
         )
     }
 
+    private fun TransactionalSession.insertNæringSykefraværsstatistikk(sykefraværsstatistikkDto: NæringSykefraværsstatistikkDto) {
+        val statement =
+            """
+            INSERT INTO sykefravarsstatistikk_naring(
+                naring,
+                arstall,
+                kvartal,
+                antall_personer,
+                tapte_dagsverk,
+                mulige_dagsverk,
+                tapte_dagsverk_gradert,
+                prosent
+            )
+            VALUES(
+                :naring,
+                :arstall,
+                :kvartal,
+                :antall_personer,
+                :tapte_dagsverk,
+                :mulige_dagsverk,
+                :tapte_dagsverk_gradert,
+                :prosent
+            )
+            ON CONFLICT (naring, arstall, kvartal) DO UPDATE SET
+                antall_personer = :antall_personer,
+                tapte_dagsverk = :tapte_dagsverk,
+                mulige_dagsverk = :mulige_dagsverk,
+                tapte_dagsverk_gradert = :tapte_dagsverk_gradert,
+                prosent = :prosent,
+                opprettet = now()
+            """.trimIndent()
+        run(
+            queryOf(
+                statement,
+                mapOf(
+                    "naring" to sykefraværsstatistikkDto.næring,
+                    "arstall" to sykefraværsstatistikkDto.årstall,
+                    "kvartal" to sykefraværsstatistikkDto.kvartal,
+                    "antall_personer" to sykefraværsstatistikkDto.antallPersoner,
+                    "tapte_dagsverk" to sykefraværsstatistikkDto.tapteDagsverk,
+                    "mulige_dagsverk" to sykefraværsstatistikkDto.muligeDagsverk,
+                    "tapte_dagsverk_gradert" to sykefraværsstatistikkDto.tapteDagsverkGradert,
+                    "prosent" to sykefraværsstatistikkDto.prosent,
+                ),
+            ).asUpdate,
+        )
+    }
+
     private fun TransactionalSession.insertVirksomhetSykefraværsstatistikk(sykefraværsstatistikkDto: VirksomhetSykefraværsstatistikkDto) {
         val statement =
             """
@@ -150,8 +198,9 @@ class SykefraværsstatistikkRepository(
                 antall_personer,
                 tapte_dagsverk,
                 mulige_dagsverk,
-                tapte_dagsverk_gradert_sykemelding,
-                prosent
+                tapte_dagsverk_gradert,
+                prosent,
+                rectype
             )
             VALUES(
                 :orgnr,
@@ -160,15 +209,17 @@ class SykefraværsstatistikkRepository(
                 :antall_personer,
                 :tapte_dagsverk,
                 :mulige_dagsverk,
-                :tapte_dagsverk_gradert_sykemelding,
-                :prosent
+                :tapte_dagsverk_gradert,
+                :prosent,
+                :rectype
             )
             ON CONFLICT (orgnr, arstall, kvartal) DO UPDATE SET
                 antall_personer = :antall_personer,
                 tapte_dagsverk = :tapte_dagsverk,
                 mulige_dagsverk = :mulige_dagsverk,
-                tapte_dagsverk_gradert_sykemelding = :tapte_dagsverk_gradert_sykemelding,
+                tapte_dagsverk_gradert = :tapte_dagsverk_gradert,
                 prosent = :prosent,
+                rectype = :rectype,
                 opprettet = now()
             """.trimIndent()
         run(
@@ -181,8 +232,9 @@ class SykefraværsstatistikkRepository(
                     "antall_personer" to sykefraværsstatistikkDto.antallPersoner,
                     "tapte_dagsverk" to sykefraværsstatistikkDto.tapteDagsverk,
                     "mulige_dagsverk" to sykefraværsstatistikkDto.muligeDagsverk,
-                    "tapte_dagsverk_gradert_sykemelding" to sykefraværsstatistikkDto.tapteDagsverkGradert,
+                    "tapte_dagsverk_gradert" to sykefraværsstatistikkDto.tapteDagsverkGradert,
                     "prosent" to sykefraværsstatistikkDto.prosent,
+                    "rectype" to sykefraværsstatistikkDto.rectype,
                 ),
             ).asUpdate,
         )

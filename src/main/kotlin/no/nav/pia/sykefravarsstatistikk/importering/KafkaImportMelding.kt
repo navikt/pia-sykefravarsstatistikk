@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.LAND
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkDto
@@ -47,6 +48,7 @@ class KafkaImportMelding {
                 when (it.nøkkel.kategori) {
                     LAND -> it.verdi.toSykefraværsstatistikkDto()
                     SEKTOR -> it.verdi.toSykefraværsstatistikkDto()
+                    NÆRING -> it.verdi.toSykefraværsstatistikkDto()
                     VIRKSOMHET -> it.verdi.toSykefraværsstatistikkDto()
                     else -> throw RuntimeException("Ukjent kategori")
                 }

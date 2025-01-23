@@ -144,6 +144,21 @@ class SykefraværsstatistikkImportTestUtils {
                     }
                     """.trimIndent()
 
+                Statistikkategori.NÆRING ->
+                    """
+                    {
+                      "${kategori.tilKodenavn()}": "$kode",
+                        "årstall": $årstall,
+                        "kvartal": $kvartal,
+                        "prosent": ${prosent.toPlainString()},
+                        "tapteDagsverk": ${tapteDagsverk.toPlainString()},
+                        "muligeDagsverk": ${muligeDagsverk.toPlainString()},
+                        "tapteDagsverkGradert": ${tapteDagsverkGradert.toPlainString()},
+                        "tapteDagsverkPerVarighet": ${tapteDagsverkPerVarighet.toJson()},
+                        "antallPersoner": $antallPersoner
+                    }
+                    """.trimIndent()
+
                 Statistikkategori.VIRKSOMHET ->
                     """
                     {
@@ -216,7 +231,7 @@ class SykefraværsstatistikkImportTestUtils {
                     prosent = rs.getBigDecimal("prosent"),
                     tapteDagsverk = rs.getBigDecimal("tapte_dagsverk"),
                     muligeDagsverk = rs.getBigDecimal("mulige_dagsverk"),
-                    tapteDagsverkGradertSykemelding = rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
+                    tapteDagsverkGradertSykemelding = rs.getBigDecimal("tapte_dagsverk_gradert"),
                     antallPersoner = rs.getInt("antall_personer"),
                 )
             }

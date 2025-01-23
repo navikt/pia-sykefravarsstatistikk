@@ -12,7 +12,7 @@ import kotlin.test.Test
 
 class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
     @Test
-    fun `sykefraværsstatistikk lagres i DB`() {
+    fun `sykefraværsstatistikk for kategori LAND lagres i DB`() {
         val sykefraværsstatistikk = JsonMelding(
             kategori = Statistikkategori.LAND,
             kode = "NO",
@@ -73,5 +73,37 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         statistikkQ32024.muligeDagsverk bigDecimalShouldBe 761.3
         statistikkQ32024.prosent bigDecimalShouldBe 2.3
         statistikkQ32024.antallPersoner shouldBe 4
+    }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori NÆRING lagres i DB`() {
+        val sykefraværsstatistikk = JsonMelding(
+            kategori = Statistikkategori.NÆRING,
+            kode = "22",
+            årstallOgKvartal = KVARTAL_2024_3,
+            prosent = 2.7,
+            tapteDagsverk = 5039.8,
+            muligeDagsverk = 186.3,
+            antallPersoner = 3,
+            tapteDagsverGradert = 0.0,
+            tapteDagsverkMedVarighet = emptyList(), // TODO: legg til støtte for naring med varighet
+        )
+        kafkaContainerHelper.sendOgVentTilKonsumert(
+            sykefraværsstatistikk.toJsonKey(),
+            sykefraværsstatistikk.toJsonValue(),
+            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+            kategori = Statistikkategori.NÆRING,
+            verdi = "22",
+            kvartal = KVARTAL_2024_3,
+            tabellnavn = "sykefravarsstatistikk_naring",
+            kodenavn = "naring",
+        )
+
+        statistikkQ32024.kategori shouldBe Statistikkategori.NÆRING
+        statistikkQ32024.kode shouldBe "22"
+        statistikkQ32024.tapteDagsverk bigDecimalShouldBe 5039.8
     }
 }
