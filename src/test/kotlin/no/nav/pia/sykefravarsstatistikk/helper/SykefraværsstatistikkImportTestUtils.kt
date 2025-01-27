@@ -113,6 +113,7 @@ class SykefraværsstatistikkImportTestUtils {
                 Statistikkategori.VIRKSOMHET -> "orgnr"
                 Statistikkategori.NÆRING -> "næring"
                 Statistikkategori.NÆRINGSKODE -> "næringskode"
+                Statistikkategori.BRANSJE -> "bransje"
                 Statistikkategori.SEKTOR -> "sektor"
             }
 
@@ -143,7 +144,7 @@ class SykefraværsstatistikkImportTestUtils {
                     }
                     """.trimIndent()
 
-                Statistikkategori.NÆRING, Statistikkategori.NÆRINGSKODE ->
+                Statistikkategori.NÆRING, Statistikkategori.NÆRINGSKODE, Statistikkategori.BRANSJE ->
                     """
                     {
                       "${kategori.tilKodenavn()}": "$kode",

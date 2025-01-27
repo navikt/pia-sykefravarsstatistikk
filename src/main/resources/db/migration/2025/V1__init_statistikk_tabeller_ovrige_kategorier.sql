@@ -84,3 +84,31 @@ create table sykefravarsstatistikk_naringskode_med_varighet
     constraint naringskode_arstall_kvartal_varighet unique (naringskode, arstall, kvartal, varighet)
 );
 create index idx_naringskode_sykefravarsstatistikk_naringskode_med_varighet on sykefravarsstatistikk_naringskode_med_varighet (naringskode);
+
+create table sykefravarsstatistikk_bransje
+(
+    id              serial primary key,
+    bransje         varchar        not null,
+    arstall         smallint       not null,
+    kvartal         smallint       not null,
+    antall_personer numeric(17, 0) not null,
+    tapte_dagsverk  numeric(17, 6) not null,
+    mulige_dagsverk numeric(17, 6) not null,
+    prosent         numeric(3, 2)  not null,
+    opprettet       timestamp default current_timestamp,
+    constraint bransje_arstall_kvartal unique (bransje, arstall, kvartal)
+);
+create index idx_bransje_sykefravarsstatistikk_bransje on sykefravarsstatistikk_bransje (bransje);
+
+create table sykefravarsstatistikk_bransje_med_varighet
+(
+    id             serial primary key,
+    bransje        varchar        not null,
+    arstall        smallint       not null,
+    kvartal        smallint       not null,
+    varighet       varchar(1)     not null,
+    tapte_dagsverk numeric(17, 6) not null,
+    opprettet      timestamp default current_timestamp,
+    constraint bransje_arstall_kvartal_varighet unique (bransje, arstall, kvartal, varighet)
+);
+create index idx_bransje_sykefravarsstatistikk_bransje_med_varighet on sykefravarsstatistikk_bransje_med_varighet (bransje);

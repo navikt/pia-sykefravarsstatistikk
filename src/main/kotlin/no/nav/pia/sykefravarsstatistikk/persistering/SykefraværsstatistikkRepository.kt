@@ -31,6 +31,7 @@ class SykefraværsstatistikkRepository(
             is LandSykefraværsstatistikkDto -> this.land
             is NæringSykefraværsstatistikkDto -> this.næring
             is NæringskodeSykefraværsstatistikkDto -> this.næringskode
+            is BransjeSykefraværsstatistikkDto -> this.bransje
             is SektorSykefraværsstatistikkDto -> this.sektor
             is VirksomhetSykefraværsstatistikkDto -> this.orgnr
         }
@@ -40,6 +41,7 @@ class SykefraværsstatistikkRepository(
             is LandSykefraværsstatistikkDto -> "sykefravarsstatistikk_land"
             is NæringSykefraværsstatistikkDto -> "sykefravarsstatistikk_naring"
             is NæringskodeSykefraværsstatistikkDto -> "sykefravarsstatistikk_naringskode"
+            is BransjeSykefraværsstatistikkDto -> "sykefravarsstatistikk_bransje"
             is SektorSykefraværsstatistikkDto -> "sykefravarsstatistikk_sektor"
             is VirksomhetSykefraværsstatistikkDto -> "sykefravarsstatistikk_virksomhet"
         }
@@ -49,6 +51,7 @@ class SykefraværsstatistikkRepository(
             is LandSykefraværsstatistikkDto -> "land"
             is NæringSykefraværsstatistikkDto -> "naring"
             is NæringskodeSykefraværsstatistikkDto -> "naringskode"
+            is BransjeSykefraværsstatistikkDto -> "bransje"
             is SektorSykefraværsstatistikkDto -> "sektor"
             is VirksomhetSykefraværsstatistikkDto -> "orgnr"
         }
@@ -86,6 +89,22 @@ class SykefraværsstatistikkRepository(
                         tabellnavn = "sykefravarsstatistikk_naringskode_med_varighet",
                         kolonnenavn = "naringskode",
                         verdi = sykefraværsstatistikkDto.næringskode,
+                        årstall = sykefraværsstatistikkDto.årstall,
+                        kvartal = sykefraværsstatistikkDto.kvartal,
+                        tapteDagsverkPerVarighet = it,
+                    )
+                }
+            }
+
+            is BransjeSykefraværsstatistikkDto -> {
+                insertSykefraværsstatistikk(
+                    sykefraværsstatistikkDto = sykefraværsstatistikkDto,
+                )
+                sykefraværsstatistikkDto.tapteDagsverkPerVarighet.forEach {
+                    insertTapteDagsverkPerVarighetForKategori(
+                        tabellnavn = "sykefravarsstatistikk_bransje_med_varighet",
+                        kolonnenavn = "bransje",
+                        verdi = sykefraværsstatistikkDto.bransje,
                         årstall = sykefraværsstatistikkDto.årstall,
                         kvartal = sykefraværsstatistikkDto.kvartal,
                         tapteDagsverkPerVarighet = it,

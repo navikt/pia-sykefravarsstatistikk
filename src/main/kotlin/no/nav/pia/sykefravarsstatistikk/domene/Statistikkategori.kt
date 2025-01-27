@@ -5,5 +5,6 @@ enum class Statistikkategori {
     SEKTOR,
     NÆRING,
     NÆRINGSKODE,
+    BRANSJE,
     VIRKSOMHET,
 }

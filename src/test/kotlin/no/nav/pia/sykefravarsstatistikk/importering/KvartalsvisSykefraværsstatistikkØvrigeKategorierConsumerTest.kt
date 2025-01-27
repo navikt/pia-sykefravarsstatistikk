@@ -196,4 +196,66 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             ),
         )
     }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori BRANSJE lagres i DB`() {
+        val sykefraværsstatistikk = JsonMelding(
+            kategori = Statistikkategori.BRANSJE,
+            kode = "22",
+            årstallOgKvartal = KVARTAL_2024_3,
+            prosent = 2.7,
+            tapteDagsverk = 5039.8,
+            muligeDagsverk = 186.3,
+            antallPersoner = 3,
+            tapteDagsverGradert = 0.0,
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 12.3,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 5.2,
+                ),
+            ),
+        )
+        kafkaContainerHelper.sendOgVentTilKonsumert(
+            sykefraværsstatistikk.toJsonKey(),
+            sykefraværsstatistikk.toJsonValue(),
+            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+            kategori = Statistikkategori.BRANSJE,
+            verdi = "22",
+            kvartal = KVARTAL_2024_3,
+            tabellnavn = "sykefravarsstatistikk_bransje",
+            kodenavn = "bransje",
+        )
+
+        statistikkQ32024.kategori shouldBe Statistikkategori.BRANSJE
+        statistikkQ32024.kode shouldBe "22"
+        statistikkQ32024.tapteDagsverk bigDecimalShouldBe 5039.8
+        statistikkQ32024.muligeDagsverk bigDecimalShouldBe 186.3
+        statistikkQ32024.prosent bigDecimalShouldBe 2.7
+        statistikkQ32024.antallPersoner shouldBe 3
+
+        val bransjeStatistikkMedVarighet = hentStatistikkMedVarighet(
+            tabellnavn = "sykefravarsstatistikk_bransje_med_varighet",
+            kolonnenavn = "bransje",
+            verdi = "22",
+            årstallOgKvartal = KVARTAL_2024_3,
+        )
+
+        bransjeStatistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
+            TapteDagsverkPerVarighet(
+                varighet = "A",
+                tapteDagsverk = 12.3,
+            ),
+            TapteDagsverkPerVarighet(
+                varighet = "D",
+                tapteDagsverk = 5.2,
+            ),
+        )
+    }
 }
