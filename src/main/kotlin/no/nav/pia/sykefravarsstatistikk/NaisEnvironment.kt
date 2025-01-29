@@ -14,11 +14,7 @@ class NaisEnvironment(
 }
 
 class Database(
-    val host: String = getEnvVar("NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_HOST"),
-    val port: String = getEnvVar("NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_PORT"),
-    val username: String = getEnvVar("NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_USERNAME"),
-    val password: String = getEnvVar("NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_PASSWORD"),
-    val name: String = getEnvVar("NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_DATABASE"),
+    val jdbcUrl: String = getEnvVar("NAIS_DATABASE_PIA_SYKEFRAVARSSTATISTIKK_PIA_SYKEFRAVARSSTATISTIKK_DB_JDBC_URL"),
 )
 
 

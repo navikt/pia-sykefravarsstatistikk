@@ -2,17 +2,11 @@ package no.nav.pia.sykefravarsstatistikk
 
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
-import org.postgresql.ds.PGSimpleDataSource
 import javax.sql.DataSource
 
 fun createDataSource(database: Database): DataSource =
     HikariDataSource().apply {
-        dataSourceClassName = PGSimpleDataSource::class.qualifiedName
-        addDataSourceProperty("serverName", database.host)
-        addDataSourceProperty("portNumber", database.port)
-        addDataSourceProperty("user", database.username)
-        addDataSourceProperty("password", database.password)
-        addDataSourceProperty("databaseName", database.name)
+        jdbcUrl = database.jdbcUrl
         maximumPoolSize = 10
         minimumIdle = 1
         idleTimeout = 100000

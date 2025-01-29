@@ -1,0 +1,38 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: pia-sykefravarsstatistikk
+  namespace: pia
+  labels:
+    team: pia
+spec:
+  image: {{image}}
+  resources:
+    limits:
+      cpu: {{limitsCpu}}
+      memory: {{limitsMemory}}
+    requests:
+      cpu: {{requestsCpu}}
+      memory: {{requestsMemory}}
+  liveness:
+    path: "/internal/isalive"
+    port: 8080
+    initialDelay: 20
+    timeout: 60
+  readiness:
+    path: "/internal/isready"
+    port: 8080
+    initialDelay: 20
+    timeout: 60
+  prometheus:
+    enabled: true
+    path: "/metrics"
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_17
+        diskAutoresize: {{dbAutoresizeDisk}}
+        tier: {{dbTier}}
+        databases:
+          - name: "pia-sykefravarsstatistikk-db"
+  kafka:
+    pool: {{kafkaPool}}

@@ -16,16 +16,16 @@ class PostgrestContainerHelper(
     log: Logger = LoggerFactory.getLogger(PostgrestContainerHelper::class.java),
 ) {
     private val postgresNetworkAlias = "postgrescontainer"
-    private val lydiaDbName = "lydia-api-container-db"
+    private val piaSykefraværsstatistikkDbName = "pia-sykefravarsstatistikk-container-db"
     private var migreringErKjørt = false
     val postgresContainer: PostgreSQLContainer<*> =
-        PostgreSQLContainer("postgres:14")
+        PostgreSQLContainer("postgres:17")
             .withLogConsumer(
                 Slf4jLogConsumer(log).withPrefix(postgresNetworkAlias).withSeparateOutputStreams(),
             )
             .withNetwork(network)
             .withNetworkAliases(postgresNetworkAlias)
-            .withDatabaseName(lydiaDbName)
+            .withDatabaseName(piaSykefraværsstatistikkDbName)
             .withCreateContainerCmdModifier { cmd -> cmd.withName("$postgresNetworkAlias-${System.currentTimeMillis()}") }
             .waitingFor(HostPortWaitStrategy()).apply {
                 start()
@@ -73,10 +73,7 @@ class PostgrestContainerHelper(
 
     fun envVars() =
         mapOf(
-            "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_HOST" to postgresNetworkAlias,
-            "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_PORT" to "5432",
-            "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_USERNAME" to postgresContainer.username,
-            "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_PASSWORD" to postgresContainer.password,
-            "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISITKK_DB_DATABASE" to lydiaDbName,
+            "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISTIKK_PIA_SYKEFRAVARSSTATISTIKK_DB_JDBC_URL" to
+                "jdbc:postgresql://$postgresNetworkAlias:5432/$piaSykefraværsstatistikkDbName?password=${postgresContainer.password}&user=${postgresContainer.username}",
         )
 }
