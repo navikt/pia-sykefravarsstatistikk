@@ -8,6 +8,7 @@ enum class KafkaTopics(
 ) {
     KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER("kvartalsvis-sykefravarsstatistikk-ovrige-kategorier-v1"),
     KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET("kvartalsvis-sykefravarsstatistikk-virksomhet-v1"),
+    KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA("kvartalsvis-sykefravarsstatistikk-virksomhet-metadata-v1"),
     ;
 
     val konsumentGruppe

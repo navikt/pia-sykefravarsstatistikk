@@ -4,6 +4,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
+import no.nav.pia.sykefravarsstatistikk.importering.VirksomhetMetadataConsumer
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureMonitoring
@@ -26,6 +27,12 @@ fun main() {
 
     SykefraværsstatistikkConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        sykefraværsstatistikkService = SykefraværsstatistikkService(SykefraværsstatistikkRepository(dataSource = dataSource)),
+        applikasjonsHelse = applikasjonsHelse,
+    ).run()
+
+    VirksomhetMetadataConsumer(
+        topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
         sykefraværsstatistikkService = SykefraværsstatistikkService(SykefraværsstatistikkRepository(dataSource = dataSource)),
         applikasjonsHelse = applikasjonsHelse,
     ).run()

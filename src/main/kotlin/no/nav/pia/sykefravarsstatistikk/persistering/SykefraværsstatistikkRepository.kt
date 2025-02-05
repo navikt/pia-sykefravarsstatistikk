@@ -26,6 +26,54 @@ class SykefraværsstatistikkRepository(
         }
     }
 
+    fun insertVirksomhetMetadata(virksomhetMetadataDto: List<VirksomhetMetadataDto>) {
+        using(sessionOf(dataSource)) { session ->
+            session.transaction { tx ->
+                virksomhetMetadataDto.forEach {
+                    tx.run(
+                        queryOf(
+                            """
+                            INSERT INTO virksomhet_metadata(
+                                orgnr,
+                                arstall,
+                                kvartal,
+                                sektor,
+                                primarnaring,
+                                primarnaringskode,
+                                rectype
+                            )
+                            VALUES(
+                                :orgnr,
+                                :arstall,
+                                :kvartal,
+                                :sektor,
+                                :primarnaring,
+                                :primarnaringskode,
+                                :rectype
+                            )
+                            ON CONFLICT (orgnr, arstall, kvartal) DO UPDATE SET
+                                sektor = :sektor,
+                                primarnaring = :primarnaring,
+                                primarnaringskode = :primarnaringskode,
+                                rectype = :rectype,
+                                importert = now()
+                            """.trimIndent(),
+                            mapOf(
+                                "orgnr" to it.orgnr,
+                                "arstall" to it.årstall,
+                                "kvartal" to it.kvartal,
+                                "sektor" to it.sektor,
+                                "primarnaring" to it.primærnæring,
+                                "primarnaringskode" to it.primarnæringskode,
+                                "rectype" to it.rectype,
+                            ),
+                        ).asUpdate,
+                    )
+                }
+            }
+        }
+    }
+
     private fun SykefraværsstatistikkDto.tilStatistikkSpesifikkVerdi() =
         when (this) {
             is LandSykefraværsstatistikkDto -> this.land
