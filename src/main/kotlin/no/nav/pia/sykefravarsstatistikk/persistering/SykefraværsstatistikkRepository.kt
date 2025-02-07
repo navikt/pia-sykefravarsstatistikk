@@ -64,7 +64,7 @@ class SykefraværsstatistikkRepository(
                                 "kvartal" to it.kvartal,
                                 "sektor" to it.sektor,
                                 "primarnaring" to it.primærnæring,
-                                "primarnaringskode" to it.primarnæringskode,
+                                "primarnaringskode" to it.primærnæringskode,
                                 "rectype" to it.rectype,
                             ),
                         ).asUpdate,
