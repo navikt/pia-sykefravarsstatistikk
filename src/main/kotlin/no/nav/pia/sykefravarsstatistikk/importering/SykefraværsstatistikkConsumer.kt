@@ -12,13 +12,16 @@ import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
+import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
 import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.SimpleDateFormat
 import java.time.Duration
+import java.util.Date
 import kotlin.coroutines.CoroutineContext
 
 class SykefraværsstatistikkConsumer(
@@ -41,6 +44,8 @@ class SykefraværsstatistikkConsumer(
         Runtime.getRuntime().addShutdownHook(Thread(this::cancel))
     }
 
+    fun Long.displayDate(): String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(Date(this))
+
     fun run() {
         launch {
             kafkaConsumer.use { consumer ->
@@ -51,8 +56,20 @@ class SykefraværsstatistikkConsumer(
                     )
                     while (applikasjonsHelse.alive) {
                         try {
-                            val records = consumer.poll(Duration.ofSeconds(1))
+                            val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
+                                records.forEach {
+                                    logger.info(
+                                        "[Feilsøk] fikk følgende melding i topic '${topic.navn}': ${it.key()} - ${it.value()}, " +
+                                            "timestamp: ${it.timestamp().displayDate()}, " +
+                                            "timestampType: ${it.timestampType()}, " +
+                                            "topic fra record: ${it.topic()}, " +
+                                            "headers: ${it.headers()}",
+                                    )
+                                    it.timestamp()
+                                    it.timestampType()
+                                    it.key() to it.value()
+                                }
                                 records.toSykefraværsstatistikkImportKafkaMelding().let {
                                     sykefraværsstatistikkService.lagreSykefraværsstatistikk(
                                         it.toSykefraværsstatistikkDto(),
