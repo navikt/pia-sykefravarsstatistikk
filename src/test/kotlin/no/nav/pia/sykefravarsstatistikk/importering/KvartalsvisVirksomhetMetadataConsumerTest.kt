@@ -16,7 +16,7 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
             årstallOgKvartal = KVARTAL_2024_3,
             sektor = "2",
             primærnæring = "88",
-            primarnæringskode = "88911",
+            primærnæringskode = "88911",
         )
 
         kafkaContainerHelper.sendOgVentTilKonsumert(
@@ -34,6 +34,6 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
         metadataQ32024.kvartal shouldBe 3
         metadataQ32024.sektor shouldBe "2"
         metadataQ32024.primærnæring shouldBe "88"
-        metadataQ32024.primarnæringskode shouldBe "88911"
+        metadataQ32024.primærnæringskode shouldBe "88911"
     }
 }

@@ -9,7 +9,7 @@ class VirksomhetMetadataImportTestUtils {
         val kvartal: Int,
         val sektor: String,
         val primærnæring: String?,
-        val primarnæringskode: String?,
+        val primærnæringskode: String?,
         val rectype: String,
     )
 
@@ -22,7 +22,7 @@ class VirksomhetMetadataImportTestUtils {
             årstallOgKvartal: ÅrstallOgKvartal = ÅrstallOgKvartal(2023, 1),
             sektor: String = "2",
             primærnæring: String? = "",
-            primarnæringskode: String? = "",
+            primærnæringskode: String? = "",
             rectype: String = "1",
         ) : this(
             VirksomhetMetadataJsonKey(
@@ -35,7 +35,7 @@ class VirksomhetMetadataImportTestUtils {
                 kvartal = årstallOgKvartal.kvartal,
                 sektor = sektor,
                 primærnæring = primærnæring,
-                primarnæringskode = primarnæringskode,
+                primærnæringskode = primærnæringskode,
                 rectype = rectype,
             ),
         )
@@ -56,7 +56,7 @@ class VirksomhetMetadataImportTestUtils {
         val kvartal: Int,
         val sektor: String,
         val primærnæring: String? = "",
-        val primarnæringskode: String? = "",
+        val primærnæringskode: String? = "",
         val rectype: String = "",
     )
 
@@ -78,7 +78,7 @@ class VirksomhetMetadataImportTestUtils {
                 "kvartal":$kvartal,
                 "sektor":"$sektor",
                 "primærnæring":"$primærnæring",
-                "primarnæringskode":"$primarnæringskode",
+                "primærnæringskode":"$primærnæringskode",
                 "rectype":"$rectype"
             }
             """.trimIndent()
@@ -104,7 +104,7 @@ class VirksomhetMetadataImportTestUtils {
                     kvartal = rs.getInt("kvartal"),
                     sektor = rs.getString("sektor"),
                     primærnæring = rs.getString("primarnaring"),
-                    primarnæringskode = rs.getString("primarnaringskode"),
+                    primærnæringskode = rs.getString("primarnaringskode"),
                     rectype = rs.getString("rectype"),
                 )
             }
