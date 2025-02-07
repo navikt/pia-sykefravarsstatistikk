@@ -3,6 +3,7 @@ package no.nav.pia.sykefravarsstatistikk
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.VirksomhetMetadataConsumer
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
@@ -10,6 +11,8 @@ import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureMonitoring
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureRouting
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureSerialization
+import no.nav.pia.sykefravarsstatistikk.persistering.MetadataRepository
+import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
 
@@ -33,7 +36,13 @@ fun main() {
 
     VirksomhetMetadataConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
-        sykefraværsstatistikkService = SykefraværsstatistikkService(SykefraværsstatistikkRepository(dataSource = dataSource)),
+        metadataService = MetadataService(MetadataRepository(dataSource = dataSource)),
+        applikasjonsHelse = applikasjonsHelse,
+    ).run()
+
+    PubliseringsdatoConsumer(
+        topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_PUBLISERINGSDATO,
+        metadataService = MetadataService(MetadataRepository(dataSource = dataSource)),
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 

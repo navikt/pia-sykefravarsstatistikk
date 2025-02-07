@@ -10,7 +10,7 @@ import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
-import no.nav.pia.sykefravarsstatistikk.persistering.tilVirksomhetMetadataDto
+import no.nav.pia.sykefravarsstatistikk.persistering.tilPubliseringsdatoDto
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
 import org.apache.kafka.common.errors.WakeupException
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class VirksomhetMetadataConsumer(
+class PubliseringsdatoConsumer(
     val topic: KafkaTopics,
     val metadataService: MetadataService,
     val applikasjonsHelse: ApplikasjonsHelse,
@@ -52,25 +52,27 @@ class VirksomhetMetadataConsumer(
                         try {
                             val records = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                records.map { it.value().tilVirksomhetMetadataDto() }.let {
-                                    metadataService.lagreVirksomhetMetadata(it)
+                                records.map {
+                                    it.value().tilPubliseringsdatoDto()
+                                }.let {
+                                    metadataService.lagrePubliseringsdato(it)
                                 }
-                                logger.info("Lagret ${records.count()} meldinger i VirksomhetMetadataConsumer (topic '$topic') ")
+                                logger.info("Lagret ${records.count()} meldinger i PubliseringsdatoConsumer (topic '$topic') ")
                                 consumer.commitSync()
                                 logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navnMedNamespace}")
                             }
                         } catch (e: RetriableException) {
                             logger.warn(
-                                "Had a retriable exception in VirksomhetMetadataConsumer (topic '$topic'), retrying",
+                                "Had a retriable exception in PubliseringsdatoConsumer (topic '$topic'), retrying",
                                 e,
                             )
                         }
                     }
                 } catch (e: WakeupException) {
-                    logger.info("VirksomhetMetadataConsumer (topic '$topic')  is shutting down...")
+                    logger.info("PubliseringsdatoConsumer (topic '$topic')  is shutting down...")
                 } catch (e: Exception) {
                     logger.error(
-                        "Exception is shutting down kafka listner i VirksomhetMetadataConsumer (topic '$topic')",
+                        "Exception is shutting down kafka listner i PubliseringsdatoConsumer (topic '$topic')",
                         e,
                     )
                     applikasjonsHelse.ready = false
@@ -82,9 +84,9 @@ class VirksomhetMetadataConsumer(
 
     private fun cancel() =
         runBlocking {
-            logger.info("Stopping kafka consumer job i VirksomhetMetadataConsumer (topic '$topic')")
+            logger.info("Stopping kafka consumer job i PubliseringsdatoConsumer (topic '$topic')")
             kafkaConsumer.wakeup()
             job.cancelAndJoin()
-            logger.info("Stopped kafka consumer job i VirksomhetMetadataConsumer (topic '$topic')")
+            logger.info("Stopped kafka consumer job i PubliseringsdatoConsumer (topic '$topic')")
         }
 }

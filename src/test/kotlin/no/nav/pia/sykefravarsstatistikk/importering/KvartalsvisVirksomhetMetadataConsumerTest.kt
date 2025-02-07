@@ -10,7 +10,7 @@ import kotlin.test.Test
 
 class KvartalsvisVirksomhetMetadataConsumerTest {
     @Test
-    fun `Kafkamelding om statistikk for VIRKSOMHET_METADATA blir lagret i DB`() {
+    fun `Kafkamelding om metadata for VIRKSOMHET_METADATA blir lagret i DB`() {
         val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
             orgnr = "998877665",
             årstallOgKvartal = KVARTAL_2024_3,
