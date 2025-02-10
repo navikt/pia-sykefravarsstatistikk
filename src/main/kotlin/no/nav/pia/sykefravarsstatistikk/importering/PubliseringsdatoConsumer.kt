@@ -6,7 +6,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import no.nav.pia.sykefravarsstatistikk.NaisEnvironment
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
@@ -53,19 +52,12 @@ class PubliseringsdatoConsumer(
                         try {
                             val records = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                if (NaisEnvironment.kjørerLokalt()) {
-                                    records.map {
-                                        it.value().tilPubliseringsdatoDto()
-                                    }.let {
-                                        metadataService.lagrePubliseringsdato(it)
-                                    }
-                                    logger.info("Lagret ${records.count()} meldinger i PubliseringsdatoConsumer (topic '$topic') ")
-                                } else {
-                                    // TODO: delete log
-                                    logger.info(
-                                        "Ignorert og synk ${records.count()} meldinger i PubliseringsdatoConsumer (topic '$topic') ",
-                                    )
+                                records.map {
+                                    it.value().tilPubliseringsdatoDto()
+                                }.let {
+                                    metadataService.lagrePubliseringsdato(it)
                                 }
+                                logger.info("Lagret ${records.count()} meldinger i PubliseringsdatoConsumer (topic '$topic') ")
                                 consumer.commitSync()
                                 logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navnMedNamespace}")
                             }
