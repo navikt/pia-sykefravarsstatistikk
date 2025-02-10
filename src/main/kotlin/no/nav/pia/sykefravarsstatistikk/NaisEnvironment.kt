@@ -10,6 +10,8 @@ class NaisEnvironment(
             varName: String,
             defaultValue: String? = null,
         ) = System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable $varName")
+
+        fun kjørerLokalt() = getEnvVar("NAIS_CLUSTER_NAME") == "lokal"
     }
 }
 

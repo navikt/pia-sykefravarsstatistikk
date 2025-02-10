@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.NaisEnvironment
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
@@ -52,10 +53,17 @@ class VirksomhetMetadataConsumer(
                         try {
                             val records = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                records.map { it.value().tilVirksomhetMetadataDto() }.let {
-                                    metadataService.lagreVirksomhetMetadata(it)
+                                if (NaisEnvironment.kjørerLokalt()) {
+                                    records.map { it.value().tilVirksomhetMetadataDto() }.let {
+                                        metadataService.lagreVirksomhetMetadata(it)
+                                    }
+                                    logger.info("Lagret ${records.count()} meldinger i VirksomhetMetadataConsumer (topic '$topic') ")
+                                } else {
+                                    // TODO: delete log
+                                    logger.info(
+                                        "Ignorert og synk ${records.count()} meldinger i VirksomhetMetadataConsumer (topic '$topic') ",
+                                    )
                                 }
-                                logger.info("Lagret ${records.count()} meldinger i VirksomhetMetadataConsumer (topic '$topic') ")
                                 consumer.commitSync()
                                 logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navnMedNamespace}")
                             }
