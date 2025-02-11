@@ -44,7 +44,7 @@ class MetadataRepository(
                                 primarnaring = :primarnaring,
                                 primarnaringskode = :primarnaringskode,
                                 rectype = :rectype,
-                                importert = now()
+                                sist_endret = now()
                             """.trimIndent(),
                             mapOf(
                                 "orgnr" to it.orgnr,
@@ -73,19 +73,17 @@ class MetadataRepository(
                             INSERT INTO publiseringsdatoer(
                                 rapport_periode,
                                 offentlig_dato,
-                                oppdatert_i_dvh,
-                                importert
+                                oppdatert_i_dvh
                             )
                             VALUES(
                                 :rapport_periode,
                                 :offentlig_dato,
-                                :oppdatert_i_dvh,
-                                :importert
+                                :oppdatert_i_dvh
                             )
                             ON CONFLICT (rapport_periode) DO UPDATE SET
                                 offentlig_dato = :offentlig_dato,
                                 oppdatert_i_dvh = :oppdatert_i_dvh,
-                                importert = now()
+                                sist_endret = now()
                             """.trimIndent(),
                             mapOf(
                                 "rapport_periode" to it.rapportPeriode,
