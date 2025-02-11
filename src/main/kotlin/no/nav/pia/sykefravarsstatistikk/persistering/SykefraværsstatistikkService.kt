@@ -9,7 +9,7 @@ class SykefraværsstatistikkService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun lagreSykefraværsstatistikk(statistikk: List<SykefraværsstatistikkDto>) {
-        logger.info("Starter import av statistikk, antall statistikk som skal lagres: '${statistikk.size}'")
+        logger.info("Starter lagring av statistikk, antall statistikk som skal lagres: '${statistikk.size}'")
         sykefraværsstatistikkRepository.insertSykefraværsstatistikk(statistikk)
     }
 }

@@ -4,8 +4,8 @@ import io.kotest.matchers.shouldBe
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
-import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentVirksomhetStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkMedVarighet
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentVirksomhetStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
@@ -19,8 +19,8 @@ class KvartalsvisSykefraværsstatistikkVirksomhetConsumerTest {
             kategori = Statistikkategori.VIRKSOMHET,
             kode = "987654321",
             årstallOgKvartal = KVARTAL_2024_3,
-            prosent = 2.3,
-            tapteDagsverk = 17.5,
+            prosent = 28.3,
+            tapteDagsverk = 154.5439,
             muligeDagsverk = 761.3,
             antallPersoner = 4,
             tapteDagsverGradert = 33.2,
@@ -46,9 +46,9 @@ class KvartalsvisSykefraværsstatistikkVirksomhetConsumerTest {
             kvartal = KVARTAL_2024_3,
         )
         statistikkQ12023.orgnr shouldBe "987654321"
-        statistikkQ12023.tapteDagsverk bigDecimalShouldBe 17.5
+        statistikkQ12023.tapteDagsverk bigDecimalShouldBe 154.5439
         statistikkQ12023.muligeDagsverk bigDecimalShouldBe 761.3
-        statistikkQ12023.prosent bigDecimalShouldBe 2.3
+        statistikkQ12023.prosent bigDecimalShouldBe 28.3
         statistikkQ12023.antallPersoner shouldBe 4
         statistikkQ12023.tapteDagsverkGradertSykemelding bigDecimalShouldBe 33.2
 
