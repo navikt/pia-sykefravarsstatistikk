@@ -21,8 +21,8 @@ class VirksomhetMetadataImportTestUtils {
             orgnr: String,
             årstallOgKvartal: ÅrstallOgKvartal = ÅrstallOgKvartal(2023, 1),
             sektor: String = "2",
-            primærnæring: String? = "",
-            primærnæringskode: String? = "",
+            primærnæring: String?,
+            primærnæringskode: String?,
             rectype: String = "1",
         ) : this(
             VirksomhetMetadataJsonKey(
@@ -55,9 +55,9 @@ class VirksomhetMetadataImportTestUtils {
         val årstall: Int,
         val kvartal: Int,
         val sektor: String,
-        val primærnæring: String? = "",
-        val primærnæringskode: String? = "",
-        val rectype: String = "",
+        val primærnæring: String?,
+        val primærnæringskode: String?,
+        val rectype: String,
     )
 
     companion object {
@@ -77,8 +77,8 @@ class VirksomhetMetadataImportTestUtils {
                 "årstall":$årstall,
                 "kvartal":$kvartal,
                 "sektor":"$sektor",
-                "primærnæring":"$primærnæring",
-                "primærnæringskode":"$primærnæringskode",
+                "primærnæring": ${nullOrStringWithQuotes(primærnæring)},
+                "primærnæringskode": ${nullOrStringWithQuotes(primærnæringskode)},
                 "rectype":"$rectype"
             }
             """.trimIndent()
@@ -109,5 +109,7 @@ class VirksomhetMetadataImportTestUtils {
                 )
             }
         }
+
+        private fun nullOrStringWithQuotes(value: String?): String? = if (value != null) """"$value"""" else null
     }
 }
