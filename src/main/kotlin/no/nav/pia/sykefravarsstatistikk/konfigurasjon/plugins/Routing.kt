@@ -1,11 +1,92 @@
 package no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins
 
-import io.ktor.server.application.Application
-import io.ktor.server.routing.routing
+import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwt.interfaces.Claim
+import com.auth0.jwt.interfaces.DecodedJWT
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.plugins.doublereceive.DoubleReceive
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.plugins.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import no.nav.pia.sykefravarsstatistikk.Systemmiljø
+import no.nav.pia.sykefravarsstatistikk.api.auth.AuthorizationPlugin
+import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
+import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
+import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.helse
+import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
+import java.net.URI
+import java.util.concurrent.TimeUnit
 
-fun Application.configureRouting() {
+fun Route.medAltinnTilgang(authorizedRoutes: Route.() -> Unit) =
+    (this as RoutingNode).createChild(selector).apply {
+        install(AuthorizationPlugin)
+        authorizedRoutes()
+    }
+
+fun Application.configureRouting(sykefraværsstatistikkService: SykefraværsstatistikkService) {
     routing {
         helse()
+        install(StatusPages) {
+            exception<Throwable> { call, cause ->
+                when (cause) {
+                    is IkkeFunnetException -> call.respond(
+                        status = HttpStatusCode.NotFound,
+                        message = cause.message!!,
+                    )
+
+                    is UgyldigForespørselException -> call.respond(
+                        status = HttpStatusCode.BadRequest,
+                        message = cause.message,
+                    )
+
+                    is BadRequestException -> call.respond(
+                        status = HttpStatusCode.BadRequest,
+                        message = cause.message!!,
+                    )
+
+                    else -> {
+                        this@configureRouting.log.error("Uhåndtert feil", cause)
+                        call.respond(status = HttpStatusCode.InternalServerError, "Uhåndtert feil")
+                    }
+                }
+            }
+        }
+        val jwkProvider = JwkProviderBuilder(URI(Systemmiljø.tokenxJwkPath).toURL())
+            .cached(10, 24, TimeUnit.HOURS)
+            .rateLimited(10, 1, TimeUnit.MINUTES)
+            .build()
+        install(DoubleReceive)
+        install(Authentication) {
+            jwt(name = "tokenx") {
+                val tokenFortsattGyldigFørUtløpISekunder = 3L
+                verifier(jwkProvider, issuer = Systemmiljø.tokenxIssuer) {
+                    acceptLeeway(tokenFortsattGyldigFørUtløpISekunder)
+                    withAudience(Systemmiljø.tokenxClientId)
+                    withClaim("acr") { claim: Claim, _: DecodedJWT ->
+                        claim.asString().equals("Level4") ||
+                            claim.asString()
+                                .equals("idporten-loa-high")
+                    }
+                    withClaimPresence("sub")
+                }
+                validate { token ->
+                    JWTPrincipal(token.payload)
+                }
+            }
+        }
+        install(IgnoreTrailingSlash)
+        authenticate("tokenx") {
+            // organisasjoner() TODO
+            medAltinnTilgang {
+                sykefraværsstatistikk(sykefraværsstatistikkService = sykefraværsstatistikkService)
+            }
+        }
     }
 }

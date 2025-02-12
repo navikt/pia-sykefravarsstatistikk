@@ -1,7 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk
 
 import io.ktor.server.application.Application
-import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.*
 import io.ktor.server.netty.Netty
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
@@ -15,12 +15,16 @@ import no.nav.pia.sykefravarsstatistikk.persistering.MetadataRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
+import java.util.concurrent.TimeUnit
 
 fun main() {
     val naisEnvironment = NaisEnvironment()
     val applikasjonsHelse = ApplikasjonsHelse()
     val dataSource = createDataSource(database = naisEnvironment.database)
     runMigration(dataSource = dataSource)
+
+    val sykefraværsstatistikkService =
+        SykefraværsstatistikkService(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
 
     SykefraværsstatistikkConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
@@ -46,11 +50,20 @@ fun main() {
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::configure).start(wait = true)
+    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+        configure(
+            sykefraværsstatistikkService = sykefraværsstatistikkService,
+        )
+    }.also {
+        // https://doc.nais.io/nais-application/good-practices/#handles-termination-gracefully
+        it.addShutdownHook {
+            it.stop(3, 5, TimeUnit.SECONDS)
+        }
+    }.start(wait = true)
 }
 
-fun Application.configure() {
+fun Application.configure(sykefraværsstatistikkService: SykefraværsstatistikkService) {
     configureMonitoring()
     configureSerialization()
-    configureRouting()
+    configureRouting(sykefraværsstatistikkService = sykefraværsstatistikkService)
 }
