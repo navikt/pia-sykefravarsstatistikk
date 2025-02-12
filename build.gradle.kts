@@ -1,9 +1,12 @@
+val altinnKlientVersion = "5.0.0"
+val arrowCoreVersion = "1.2.4"
 val kafkClientVersion = "3.9.0"
 val kotestVersion = "6.0.0.M1"
 val kotlinVersion = "2.1.0"
 val ktorVersion = "3.0.3"
 val logbackVersion = "1.5.16"
 val logstashLogbackEncoderVersion = "8.0"
+val nimbusJoseJwtVersion = "10.0.1"
 val prometeusVersion = "1.14.2"
 val testcontainersVersion = "1.20.4"
 val wiremockStandaloneVersion = "3.10.0"
@@ -22,12 +25,17 @@ repositories {
 }
 
 dependencies {
+    implementation("com.github.navikt:altinn-rettigheter-proxy-klient:altinn-rettigheter-proxy-klient-$altinnKlientVersion")
+    implementation("com.nimbusds:nimbus-jose-jwt:$nimbusJoseJwtVersion")
+    implementation("io.arrow-kt:arrow-core:$arrowCoreVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-double-receive:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer-jvm:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$prometeusVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktorVersion")
