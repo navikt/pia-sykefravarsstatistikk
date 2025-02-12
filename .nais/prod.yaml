@@ -1,0 +1,7 @@
+kafkaPool: nav-prod
+dbTier: db-custom-2-3840
+dbAutoresizeDisk: true
+limitsCpu: 2000m
+limitsMemory: 2Gi
+requestsCpu: 100m
+requestsMemory: 512Mi
