@@ -8,7 +8,9 @@ import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.Parameters
-import no.nav.pia.sykefravarsstatistikk.Systemmiljø
+import no.nav.pia.sykefravarsstatistikk.Systemmiljø.tokenXTokenEndpoint
+import no.nav.pia.sykefravarsstatistikk.Systemmiljø.tokenxClientId
+import no.nav.pia.sykefravarsstatistikk.Systemmiljø.tokenxPrivateJwk
 import no.nav.pia.sykefravarsstatistikk.http.HttpClient
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -17,7 +19,7 @@ import java.util.Date
 import java.util.UUID
 
 object TokenExchanger {
-    private val privateKey = RSAKey.parse(Systemmiljø.tokenxPrivateJwk).toRSAPrivateKey()
+    private val privateKey = RSAKey.parse(tokenxPrivateJwk).toRSAPrivateKey()
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     internal suspend fun exchangeToken(
@@ -25,12 +27,12 @@ object TokenExchanger {
         audience: String,
     ): String =
         try {
-            HttpClient.client.post(URI.create(Systemmiljø.tokenXTokenEndpoint).toURL()) {
+            HttpClient.client.post(URI.create(tokenXTokenEndpoint).toURL()) {
                 val now = Instant.now()
                 val clientAssertion = JWT.create().apply {
-                    withSubject(Systemmiljø.tokenxClientId)
-                    withIssuer(Systemmiljø.tokenxClientId)
-                    withAudience(Systemmiljø.tokenXTokenEndpoint)
+                    withSubject(tokenxClientId)
+                    withIssuer(tokenxClientId)
+                    withAudience(tokenXTokenEndpoint)
                     withJWTId(UUID.randomUUID().toString())
                     withIssuedAt(Date.from(now))
                     withNotBefore(Date.from(now))
