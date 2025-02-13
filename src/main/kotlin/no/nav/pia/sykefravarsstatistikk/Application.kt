@@ -1,7 +1,8 @@
 package no.nav.pia.sykefravarsstatistikk
 
 import io.ktor.server.application.Application
-import io.ktor.server.engine.*
+import io.ktor.server.engine.addShutdownHook
+import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
