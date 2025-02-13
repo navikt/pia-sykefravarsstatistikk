@@ -4,14 +4,15 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import org.testcontainers.Testcontainers
 import wiremock.com.google.common.net.HttpHeaders.CONTENT_TYPE
 
 class AltinnMockHelper {
-
     companion object {
         private const val SERVICE_CODE = "5934"
         private const val SERVICE_EDITION = "1"
+        val enVirksomhetIAltinn = Virksomhet("811076732")
 
         val wireMock = WireMockServer(WireMockConfiguration.options().dynamicPort()).also {
             it.stubFor(
@@ -72,6 +73,5 @@ class AltinnMockHelper {
             println("Starter Wiremock på port ${it.port()}")
             Testcontainers.exposeHostPorts(it.port())
         }
-
     }
 }

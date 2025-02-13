@@ -5,10 +5,10 @@ import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.auth.AuthenticationChecked
 import io.ktor.server.response.respond
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
-import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
-import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedIkkeTilgangTilOrg
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedOkKall
+import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
+import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.hentToken
 import no.nav.pia.sykefravarsstatistikk.http.orgnr
@@ -21,7 +21,6 @@ val AuthorizationPlugin = createRouteScopedPlugin(
         on(AuthenticationChecked) { call ->
             val fnr = call.request.tokenSubject()
             val token = call.request.hentToken()
-
             val virksomheterVedkommendeHarTilgangTil =
                 hentVirksomheterSomBrukerHarRiktigEnkelRettighetI(
                     token = TokenExchanger.exchangeToken(
