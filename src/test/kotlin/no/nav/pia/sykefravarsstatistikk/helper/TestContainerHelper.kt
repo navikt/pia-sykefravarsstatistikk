@@ -1,17 +1,13 @@
 package no.nav.pia.sykefravarsstatistikk.helper
 
 import io.kotest.matchers.string.shouldContain
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.header
-import io.ktor.client.request.request
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.URLProtocol
-import io.ktor.http.path
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.time.withTimeoutOrNull
 import no.nav.pia.sykefravarsstatistikk.helper.AltinnMockHelper.Companion.wireMock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,25 +23,27 @@ class TestContainerHelper {
     companion object {
         val log: Logger = LoggerFactory.getLogger(TestContainerHelper::class.java)
         val network = Network.newNetwork()
+        val authContainerHelper = AuthContainerHelper(network = network)
 
-        val postgresContainer = PostgrestContainerHelper(network = network, log = log)
+        val postgresContainerHelper = PostgrestContainerHelper(network = network, log = log)
 
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
 
-        val sykefraværsstatistikkApplikasjon =
+        val applikasjon: GenericContainer<*> =
             GenericContainer(
                 ImageFromDockerfile().withDockerfile(Path("./Dockerfile")),
             )
                 .dependsOn(
                     kafkaContainerHelper.kafkaContainer,
-                    postgresContainer.postgresContainer,
+                    postgresContainerHelper.postgresContainer,
+                    authContainerHelper.authContainer,
                 )
                 .withNetwork(network)
                 .withExposedPorts(8080)
                 .withLogConsumer(
                     Slf4jLogConsumer(log).withPrefix("pia.sykefravarsstatistikk").withSeparateOutputStreams(),
                 ).withEnv(
-                    postgresContainer.envVars()
+                    postgresContainerHelper.envVars()
                         .plus(
                             kafkaContainerHelper.envVars()
                                 .plus(
@@ -89,34 +87,49 @@ class TestContainerHelper {
                     start()
                 }
 
+        internal suspend fun GenericContainer<*>.performGet(
+            url: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ) = performRequest(url) {
+            config()
+            method = HttpMethod.Get
+        }
+
+        private val httpClient = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json()
+            }
+        }
+
+        private suspend fun GenericContainer<*>.performRequest(
+            url: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ) = withTimeoutOrNull(Duration.ofSeconds(5)) {
+            httpClient.request {
+                config()
+                header(HttpHeaders.Accept, "application/json")
+                url {
+                    protocol = URLProtocol.HTTP
+                    host = this@performRequest.host
+                    port = firstMappedPort
+                    path(url)
+                }
+            }
+        }
+
         infix fun GenericContainer<*>.shouldContainLog(regex: Regex) = logs shouldContain regex
-    }
-}
 
-private val httpClient = HttpClient(CIO) {
-    install(ContentNegotiation) {
-        json()
+        internal fun accessToken(
+            subject: String = "123",
+            audience: String = "hei",
+            claims: Map<String, String> = mapOf(
+                "acr" to "Level4",
+                "pid" to subject,
+            ),
+        ) = authContainerHelper.issueToken(
+            subject = subject,
+            audience = audience,
+            claims = claims,
+        )
     }
-}
-
-private suspend fun GenericContainer<*>.performRequest(
-    url: String,
-    config: HttpRequestBuilder.() -> Unit = {},
-) = httpClient.request {
-    config()
-    header(HttpHeaders.Accept, "application/json")
-    url {
-        protocol = URLProtocol.HTTP
-        host = this@performRequest.host
-        port = firstMappedPort
-        path(url)
-    }
-}
-
-internal suspend fun GenericContainer<*>.performGet(
-    url: String,
-    config: HttpRequestBuilder.() -> Unit = {},
-) = performRequest(url) {
-    config()
-    method = HttpMethod.Get
 }
