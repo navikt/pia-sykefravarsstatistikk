@@ -1,14 +1,12 @@
 package no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll
 
 import arrow.core.Either
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.ApplicationCall
 
 fun <T> ApplicationCall.somInnloggetBruker(
     block: () -> Either<Feil, T>,
-): Either<Feil, T> {
-    return block()
-}
+): Either<Feil, T> = block()
 
 class Feil(
     val feilmelding: String,
