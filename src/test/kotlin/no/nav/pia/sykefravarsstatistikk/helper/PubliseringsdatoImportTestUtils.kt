@@ -61,7 +61,7 @@ class PubliseringsdatoImportTestUtils {
             select * from publiseringsdatoer 
              where rapport_periode = '$rapportPeriode'
             """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+            TestContainerHelper.postgresContainerHelper.dataSource.connection.use { connection ->
                 val statement = connection.createStatement()
                 statement.execute(query)
                 val rs = statement.resultSet

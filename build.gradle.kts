@@ -6,6 +6,7 @@ val kotlinVersion = "2.1.0"
 val ktorVersion = "3.0.3"
 val logbackVersion = "1.5.16"
 val logstashLogbackEncoderVersion = "8.0"
+val mockOAuth2ServerVersion = "2.1.10"
 val nimbusJoseJwtVersion = "10.0.1"
 val prometeusVersion = "1.14.2"
 val testcontainersVersion = "1.20.4"
@@ -53,6 +54,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql:11.1.1")
     implementation("com.github.seratch:kotliquery:1.9.0")
 
+    // Test
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
@@ -62,8 +64,17 @@ dependencies {
 
     testImplementation("io.aiven:testcontainers-fake-gcs-server:0.2.0")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockStandaloneVersion")
+    testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
+        implementation("commons-codec:commons-codec") {
+            version {
+                require("1.17.2")
+            }
+            because(
+                "altinn-rettigheter-proxy bruker codec 1.11 som har en sårbarhet",
+            )
+        }
         implementation("net.minidev:json-smart") {
             version {
                 require("2.5.1")

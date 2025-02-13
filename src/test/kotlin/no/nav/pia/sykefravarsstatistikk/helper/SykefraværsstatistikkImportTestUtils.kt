@@ -190,7 +190,7 @@ class SykefraværsstatistikkImportTestUtils {
              where $kodenavn = '$verdi'
              and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
             """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+            TestContainerHelper.postgresContainerHelper.dataSource.connection.use { connection ->
                 val statement = connection.createStatement()
                 statement.execute(query)
                 val rs = statement.resultSet
@@ -218,7 +218,7 @@ class SykefraværsstatistikkImportTestUtils {
              where orgnr = '$orgnr'
              and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
             """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+            TestContainerHelper.postgresContainerHelper.dataSource.connection.use { connection ->
                 val statement = connection.createStatement()
                 statement.execute(query)
                 val rs = statement.resultSet
@@ -248,7 +248,7 @@ class SykefraværsstatistikkImportTestUtils {
              where $kolonnenavn = '$verdi'
              and arstall = ${årstallOgKvartal.årstall} and kvartal = ${årstallOgKvartal.kvartal}
             """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+            TestContainerHelper.postgresContainerHelper.dataSource.connection.use { connection ->
                 val statement = connection.createStatement()
                 statement.execute(query)
                 val rs = statement.resultSet
@@ -282,7 +282,7 @@ class SykefraværsstatistikkImportTestUtils {
              where $kolonnenavn = '$verdi'
              and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
             """.trimMargin()
-            TestContainerHelper.postgresContainer.dataSource.connection.use { connection ->
+            TestContainerHelper.postgresContainerHelper.dataSource.connection.use { connection ->
                 val statement = connection.createStatement()
                 statement.execute(query)
                 val rs = statement.resultSet
