@@ -17,7 +17,7 @@ fun hentVirksomheterSomBrukerRepresenterer(
     AltinnrettigheterProxyKlient(
         AltinnrettigheterProxyKlientConfig(
             ProxyConfig(
-                consumerId = "Forebyggingsplan",
+                consumerId = "pia-sykefravarsstatistikk",
                 url = Systemmiljø.altinnRettigheterProxyUrl,
             ),
         ),
@@ -34,7 +34,7 @@ fun hentVirksomheterSomBrukerHarRiktigEnkelRettighetI(
     AltinnrettigheterProxyKlient(
         AltinnrettigheterProxyKlientConfig(
             ProxyConfig(
-                consumerId = "Forebyggingsplan",
+                consumerId = "pia-sykefravarsstatistikk",
                 url = Systemmiljø.altinnRettigheterProxyUrl,
             ),
         ),

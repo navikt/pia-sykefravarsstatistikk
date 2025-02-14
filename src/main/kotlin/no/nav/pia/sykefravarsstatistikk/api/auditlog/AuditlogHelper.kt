@@ -38,7 +38,7 @@ enum class Tillat(
 }
 
 private val auditLog = LoggerFactory.getLogger("auditLogger")
-private val fiaLog = LoggerFactory.getLogger("auditLogLokal")
+private val applikasjonsLog = LoggerFactory.getLogger("applikasjonsLogger")
 
 fun ApplicationCall.auditLogVedUkjentOrgnummer(
     fnr: String,
@@ -88,7 +88,7 @@ suspend fun ApplicationCall.auditLogVedOkKall(
         fnr = fnr,
         orgnummer = orgnummer,
         tillat = Tillat.Ja,
-        beskrivelse = "$fnr har gjort følgende mot organisajonsnummer $orgnummer " +
+        beskrivelse = "$fnr har utført følgende kall mot organisajonsnummer $orgnummer " +
             "path: ${this.request.path()} " +
             "arg: ${this.request.queryParameters.toMap()} " +
             "body: ${this.receiveText()}",
@@ -107,7 +107,7 @@ private fun ApplicationCall.auditLog(
     val method = this.request.httpMethod.value
     val uri = this.request.uri
     val severity = if (orgnummer.isNullOrEmpty()) "WARN" else "INFO"
-    val appIdentifikator = "forebyggingsplan"
+    val appIdentifikator = "pia-sykefravarsstatistikk"
     val virksomheterSomBrukerRepresenterer = virksomheter.map { it.organizationNumber }.joinToString()
     val logstring =
         "CEF:0|$appIdentifikator|auditLog|1.0|audit:${auditType.name}|Sporingslogg|$severity|end=${System.currentTimeMillis()} " +
@@ -130,6 +130,6 @@ private fun ApplicationCall.auditLog(
     when (Systemmiljø.cluster) {
         Clusters.PROD_GCP.clusterId -> auditLog.info(logstring)
         Clusters.DEV_GCP.clusterId -> auditLog.info(logstring)
-        Clusters.LOKAL.clusterId -> fiaLog.info(logstring)
+        Clusters.LOKAL.clusterId -> applikasjonsLog.info(logstring)
     }
 }

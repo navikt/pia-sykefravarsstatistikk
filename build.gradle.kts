@@ -42,9 +42,11 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+    // Logging (inkl. auditlogg)
+    implementation("com.papertrailapp:logback-syslog4j:1.0.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
     // Kafka
     implementation("org.apache.kafka:kafka-clients:$kafkClientVersion")
 

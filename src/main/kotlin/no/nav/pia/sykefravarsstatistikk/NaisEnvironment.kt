@@ -33,5 +33,5 @@ enum class Clusters(
 ) {
     PROD_GCP("prod-gcp"),
     DEV_GCP("dev-gcp"),
-    LOKAL("local"),
+    LOKAL("lokal"),
 }

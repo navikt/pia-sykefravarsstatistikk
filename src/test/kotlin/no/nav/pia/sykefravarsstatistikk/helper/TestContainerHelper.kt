@@ -14,6 +14,7 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.time.withTimeoutOrNull
 import no.nav.pia.sykefravarsstatistikk.helper.AltinnMockHelper.Companion.wireMock
+import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.GenericContainer
@@ -125,7 +126,7 @@ class TestContainerHelper {
         infix fun GenericContainer<*>.shouldContainLog(regex: Regex) = logs shouldContain regex
 
         internal fun accessToken(
-            subject: String = "123",
+            subject: String = FNR,
             audience: String = "hei",
             claims: Map<String, String> = mapOf(
                 "acr" to "Level4",

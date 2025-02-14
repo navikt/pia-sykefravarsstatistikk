@@ -63,10 +63,14 @@ class AuthContainerHelper(
         val tokenRequest = TokenRequest(
             URI.create(baseEndpointUrl),
             ClientSecretBasic(ClientID(issuerName), Secret("secret")),
-            AuthorizationCodeGrant(AuthorizationCode("123"), URI.create("http://localhost")),
+            AuthorizationCodeGrant(AuthorizationCode(FNR), URI.create("http://localhost")),
             Scope(audience),
         )
         return oAuth2Config.tokenProvider.accessToken(tokenRequest, issuerUrl.toHttpUrl(), tokenCallback, null)
+    }
+
+    companion object {
+        const val FNR = "12345678901"
     }
 }
 
