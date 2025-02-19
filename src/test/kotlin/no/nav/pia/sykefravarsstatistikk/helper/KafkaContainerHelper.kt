@@ -146,13 +146,13 @@ class KafkaContainerHelper(
         konsumentGruppeId: String,
         recordMetadata: RecordMetadata,
     ) = withTimeoutOrNull(Duration.ofSeconds(5)) {
-        val harOffset: Boolean = consumerSinOffset(
-            consumerGroup = konsumentGruppeId,
-            topic = recordMetadata.topic(),
-        ) <= recordMetadata.offset()
         do {
             delay(timeMillis = 1L)
-        } while (harOffset)
+        } while (consumerSinOffset(
+                consumerGroup = konsumentGruppeId,
+                topic = recordMetadata.topic(),
+            ) <= recordMetadata.offset()
+        )
     }
 
     private fun consumerSinOffset(
