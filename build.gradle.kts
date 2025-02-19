@@ -1,21 +1,21 @@
 val altinnKlientVersion = "5.0.0"
-val arrowCoreVersion = "1.2.4"
+val arrowCoreVersion = "2.0.1"
 val kafkClientVersion = "3.9.0"
 val kotestVersion = "6.0.0.M1"
-val kotlinVersion = "2.1.0"
-val ktorVersion = "3.0.3"
+val kotlinVersion = "2.1.10"
+val ktorVersion = "3.1.0"
 val logbackVersion = "1.5.16"
 val logstashLogbackEncoderVersion = "8.0"
 val mockOAuth2ServerVersion = "2.1.10"
 val nimbusJoseJwtVersion = "10.0.1"
-val prometeusVersion = "1.14.2"
+val prometeusVersion = "1.14.4"
 val testcontainersVersion = "1.20.4"
-val wiremockStandaloneVersion = "3.10.0"
+val wiremockStandaloneVersion = "3.12.0"
 
 plugins {
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.serialization") version "2.1.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm") version "2.1.10"
+    kotlin("plugin.serialization") version "2.1.10"
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 group = "no.nav"
@@ -42,7 +42,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     // Logging (inkl. auditlogg)
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -51,10 +51,10 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:$kafkClientVersion")
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("org.postgresql:postgresql:42.7.5")
     implementation("com.zaxxer:HikariCP:6.2.1")
-    implementation("org.flywaydb:flyway-database-postgresql:11.1.1")
-    implementation("com.github.seratch:kotliquery:1.9.0")
+    implementation("org.flywaydb:flyway-database-postgresql:11.3.3")
+    implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Test
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -71,7 +71,7 @@ dependencies {
     constraints {
         implementation("commons-codec:commons-codec") {
             version {
-                require("1.17.2")
+                require("1.18.0")
             }
             because(
                 "altinn-rettigheter-proxy bruker codec 1.11 som har en sårbarhet",
@@ -79,7 +79,7 @@ dependencies {
         }
         implementation("net.minidev:json-smart") {
             version {
-                require("2.5.1")
+                require("2.5.2")
             }
             because(
                 "From Kotlin version: 1.7.20 -> Earlier versions of json-smart package are vulnerable to Denial of Service (DoS) due to a StackOverflowError when parsing a deeply nested JSON array or object.",
@@ -87,7 +87,7 @@ dependencies {
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.1.116.Final")
+                require("4.1.118.Final")
             }
             because("From Ktor version: 2.3.5 -> io.netty:netty-codec-http2 vulnerable to HTTP/2 Rapid Reset Attack")
         }
@@ -107,12 +107,6 @@ dependencies {
                 introdusert gjennom io.kotest:kotest-assertions-json:5.8.0
                 """.trimIndent(),
             )
-        }
-        testImplementation("commons-io:commons-io") {
-            version {
-                require("2.16.1")
-            }
-            because("testcontainers har sårbar versjon (dependabot alert på commons-io:2.11)")
         }
     }
 }
