@@ -54,6 +54,7 @@ class PostgrestContainerHelper(
             val rs = statement.resultSet
             val list = mutableListOf<T>()
             while (rs.next()) {
+                @Suppress("UNCHECKED_CAST")
                 list.add(rs.getObject(1) as T)
             }
             return list
@@ -67,6 +68,7 @@ class PostgrestContainerHelper(
             val rs = statement.resultSet
             rs.next()
             rs.row shouldBe 1
+            @Suppress("UNCHECKED_CAST")
             return rs.getObject(1) as T
         }
     }
