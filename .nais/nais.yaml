@@ -19,6 +19,8 @@ spec:
     port: 8080
     initialDelay: 20
     timeout: 60
+  tokenx:
+    enabled: true
   readiness:
     path: "/internal/isready"
     port: 8080
