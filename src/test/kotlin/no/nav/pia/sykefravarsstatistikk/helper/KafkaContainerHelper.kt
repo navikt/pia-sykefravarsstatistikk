@@ -6,6 +6,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
 import kotlinx.coroutines.time.withTimeoutOrNull
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
+import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.helper.AltinnMockHelper.Companion.enVirksomhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import org.apache.kafka.clients.CommonClientConfigs
@@ -60,6 +65,7 @@ class KafkaContainerHelper(
             createTopics()
             kafkaProducer = producer()
         }
+
     // TODO: tas i bruk når vi sender kafka meldinger til andre applikasjoner
     fun nyKonsument(topic: KafkaTopics) =
         KafkaConfig(
@@ -163,4 +169,166 @@ class KafkaContainerHelper(
             .partitionsToOffsetAndMetadata().get()
         return offsetMetadata[offsetMetadata.keys.firstOrNull { it.topic().contains(topic) }]?.offset() ?: -1
     }
+
+    fun sendVirksomhetsstatistikk(
+        startÅr: Int = 2010,
+        sluttÅr: Int = 2024,
+    ) {
+        for (år in startÅr..sluttÅr) {
+            for (kvartal in 1..4) {
+                val virksomhetMelding = enStandardVirksomhetsMelding(år, kvartal)
+                sendOgVentTilKonsumert(
+                    nøkkel = virksomhetMelding.toJsonKey(),
+                    melding = virksomhetMelding.toJsonValue(),
+                    topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
+                )
+            }
+        }
+    }
+
+    fun sendLandsstatistikk(
+        startÅr: Int = 2010,
+        sluttÅr: Int = 2024,
+    ) {
+        for (år in startÅr..sluttÅr) {
+            for (kvartal in 1..4) {
+                val landmelding = enStandardLandMelding(år, kvartal)
+                sendOgVentTilKonsumert(
+                    nøkkel = landmelding.toJsonKey(),
+                    melding = landmelding.toJsonValue(),
+                    topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+                )
+            }
+        }
+    }
+
+    fun sendSektorstatistikk(
+        startÅr: Int = 2010,
+        sluttÅr: Int = 2024,
+    ) {
+        for (år in startÅr..sluttÅr) {
+            for (kvartal in 1..4) {
+                val sektormelding = enStandardSektorMelding(år, kvartal)
+                sendOgVentTilKonsumert(
+                    nøkkel = sektormelding.toJsonKey(),
+                    melding = sektormelding.toJsonValue(),
+                    topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+                )
+            }
+        }
+    }
+
+    fun sendBransjestatistikk(
+        bransje: String,
+        startÅr: Int = 2010,
+        sluttÅr: Int = 2024,
+    ) {
+        for (år in startÅr..sluttÅr) {
+            for (kvartal in 1..4) {
+                val bransjemelding = enStandardBransjeMelding(år, kvartal, bransje)
+                sendOgVentTilKonsumert(
+                    nøkkel = bransjemelding.toJsonKey(),
+                    melding = bransjemelding.toJsonValue(),
+                    topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+                )
+            }
+        }
+    }
+
+    private fun enStandardVirksomhetsMelding(
+        årstall: Int,
+        kvartal: Int,
+        orgnr: String = enVirksomhetIAltinn.orgnr,
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.VIRKSOMHET,
+            kode = orgnr,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            prosent = 28.3,
+            tapteDagsverk = 154.5439,
+            muligeDagsverk = 761.3,
+            antallPersoner = 4,
+            tapteDagsverGradert = 33.2,
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 12.3,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 5.2,
+                ),
+            ),
+        )
+
+    private fun enStandardBransjeMelding(
+        årstall: Int,
+        kvartal: Int,
+        bransje: String = "Sykehjem",
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.BRANSJE,
+            kode = bransje,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            prosent = 5.8,
+            tapteDagsverk = 270744.659570,
+            muligeDagsverk = 4668011.371895,
+            antallPersoner = 88563,
+            tapteDagsverGradert = 1000.0,
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 93005.180000,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "B",
+                    tapteDagsverk = 4505.170000,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "C",
+                    tapteDagsverk = 114144.140000,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 17410.030000,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "E",
+                    tapteDagsverk = 48317.900000,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "F",
+                    tapteDagsverk = 5835.970000,
+                ),
+            ),
+        )
+
+    private fun enStandardSektorMelding(
+        årstall: Int,
+        kvartal: Int,
+        sektor: String = "1",
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.SEKTOR,
+            kode = sektor,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            tapteDagsverk = 1275292.330000,
+            muligeDagsverk = 19790049.740000,
+            prosent = 6.3,
+            antallPersoner = 367239,
+        )
+
+    private fun enStandardLandMelding(
+        årstall: Int,
+        kvartal: Int,
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.LAND,
+            kode = "NO",
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            tapteDagsverk = 11539578.440000,
+            muligeDagsverk = 180204407.260000,
+            prosent = 6.4,
+            antallPersoner = 3365162,
+        )
 }

@@ -1,14 +1,49 @@
 package no.nav.pia.sykefravarsstatistikk.domene
 
-import java.math.BigDecimal
+import java.time.LocalDateTime
 
 data class SykefraværsstatistikkVirksomhet(
-    override val årstall: Int = 0,
-    override val kvartal: Int = 0,
-    val orgnr: String? = null, // TODO orgnr er vel ikke nullable?
-    val varighet: Char? = null,
+    val orgnr: String,
+    override val årstall: Int,
+    override val kvartal: Int,
+    val tapteDagsverkGradert: Double,
+    override val antallPersoner: Int,
+    override val tapteDagsverk: Double,
+    override val muligeDagsverk: Double,
+    val prosent: Double,
     val rectype: String,
-    override val antallPersoner: Int = 0,
-    override val tapteDagsverk: BigDecimal,
-    override val muligeDagsverk: BigDecimal
+    val opprettet: LocalDateTime,
+) : Sykefraværsstatistikk
+
+data class SykefraværsstatistikkBransje(
+    val bransje: String,
+    override val årstall: Int,
+    override val kvartal: Int,
+    override val antallPersoner: Int,
+    override val tapteDagsverk: Double,
+    override val muligeDagsverk: Double,
+    val prosent: Double,
+    val opprettet: LocalDateTime,
+) : Sykefraværsstatistikk
+
+data class SykefraværsstatistikkSektor(
+    val sektor: String,
+    override val årstall: Int,
+    override val kvartal: Int,
+    override val antallPersoner: Int,
+    override val tapteDagsverk: Double,
+    override val muligeDagsverk: Double,
+    val prosent: Double,
+    val opprettet: LocalDateTime,
+) : Sykefraværsstatistikk
+
+data class SykefraværsstatistikkLand(
+    val land: String,
+    override val årstall: Int,
+    override val kvartal: Int,
+    override val antallPersoner: Int,
+    override val tapteDagsverk: Double,
+    override val muligeDagsverk: Double,
+    val prosent: Double,
+    val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk

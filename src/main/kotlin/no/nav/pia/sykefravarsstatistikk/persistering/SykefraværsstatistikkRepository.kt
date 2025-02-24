@@ -1,9 +1,14 @@
 package no.nav.pia.sykefravarsstatistikk.persistering
 
+import kotliquery.Row
 import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
+import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
+import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
+import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -131,6 +136,173 @@ class SykefraværsstatistikkRepository(
                 )
             }
         }
+
+    fun hentSykefraværsstatistikkVirksomhet(orgnr: String): List<SykefraværsstatistikkVirksomhet> =
+
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentSykefraværsstatistikk(orgnr)
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet $orgnr", e)
+            throw e
+        }
+
+    fun hentSykefraværsstatistikkBransje(bransje: String): List<SykefraværsstatistikkBransje> =
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentBransjestatistikk(bransje)
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for bransje $bransje", e)
+            throw e
+        }
+
+    fun hentSykefraværsstatistikkSektor(sektor: String): List<SykefraværsstatistikkSektor> =
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentSektorstatistikk(sektor)
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for sektor $sektor", e)
+            throw e
+        }
+
+    fun hentSykefraværsstatistikkLand(): List<SykefraværsstatistikkLand> =
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentLandstatistikk()
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for land", e)
+            throw e
+        }
+
+    fun Row.tilVirksomhetsstatistikk(): SykefraværsstatistikkVirksomhet =
+        SykefraværsstatistikkVirksomhet(
+            orgnr = string("orgnr"),
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            tapteDagsverkGradert = double("tapte_dagsverk_gradert"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = double("tapte_dagsverk"),
+            muligeDagsverk = double("mulige_dagsverk"),
+            prosent = double("prosent"),
+            rectype = string("rectype"),
+            opprettet = localDateTime("opprettet"),
+        )
+
+    fun Row.tilBransjestatistikk(): SykefraværsstatistikkBransje =
+        SykefraværsstatistikkBransje(
+            bransje = string("bransje"),
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = double("tapte_dagsverk"),
+            muligeDagsverk = double("mulige_dagsverk"),
+            prosent = double("prosent"),
+            opprettet = localDateTime("opprettet"),
+        )
+
+    fun Row.tilSektorstatistikk(): SykefraværsstatistikkSektor =
+        SykefraværsstatistikkSektor(
+            sektor = string("sektor"),
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = double("tapte_dagsverk"),
+            muligeDagsverk = double("mulige_dagsverk"),
+            prosent = double("prosent"),
+            opprettet = localDateTime("opprettet"),
+        )
+
+    fun Row.tilLandstatistikk(): SykefraværsstatistikkLand =
+        SykefraværsstatistikkLand(
+            land = if (string("land") == "NO") "Norge" else "Ukjent",
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = double("tapte_dagsverk"),
+            muligeDagsverk = double("mulige_dagsverk"),
+            prosent = double("prosent"),
+            opprettet = localDateTime("opprettet"),
+        )
+
+    private fun TransactionalSession.hentBransjestatistikk(bransje: String): List<SykefraværsstatistikkBransje> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_bransje
+            WHERE bransje = :bransje
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "bransje" to bransje,
+                ),
+            ).map { row -> row.tilBransjestatistikk() }.asList,
+        )
+    }
+
+    private fun TransactionalSession.hentSektorstatistikk(sektor: String): List<SykefraværsstatistikkSektor> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_sektor
+            WHERE sektor = :sektor
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "sektor" to sektor,
+                ),
+            ).map { row -> row.tilSektorstatistikk() }.asList,
+        )
+    }
+
+    private fun TransactionalSession.hentLandstatistikk(land: String = "NO"): List<SykefraværsstatistikkLand> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_land
+            WHERE land = :land
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "land" to land,
+                ),
+            ).map { row -> row.tilLandstatistikk() }.asList,
+        )
+    }
+
+    private fun TransactionalSession.hentSykefraværsstatistikk(orgnr: String): List<SykefraværsstatistikkVirksomhet> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_virksomhet
+            WHERE orgnr = :orgnr
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "orgnr" to orgnr,
+                ),
+            ).map { row -> row.tilVirksomhetsstatistikk() }.asList,
+        )
+    }
 
     private fun TransactionalSession.insertSykefraværsstatistikk(sykefraværsstatistikkDto: SykefraværsstatistikkDto) {
         val tabellNavn = sykefraværsstatistikkDto.tilTabellNavn()
