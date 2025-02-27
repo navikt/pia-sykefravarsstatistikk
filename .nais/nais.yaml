@@ -42,3 +42,10 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
+  env:
+    - name: BRREG_URL
+      value: "https://data.brreg.no/"
+    - name: ALTINN_RETTIGHET_SERVICE_CODE
+      value: "3403"
+    - name: ALTINN_RETTIGHET_SERVICE_EDITION
+      value: {{serviceEdition}}
