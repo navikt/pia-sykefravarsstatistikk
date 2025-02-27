@@ -1,8 +1,10 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
+import ia.felles.definisjoner.bransjer.Bransje
 import io.kotest.inspectors.shouldForOne
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
@@ -11,6 +13,7 @@ import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikk
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetUtenStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enVirksomhetUtenTilgangIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
@@ -43,11 +46,10 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Innlogget bruker får en 200`() {
         runBlocking {
-            val bransje = "Sykehjem"
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk()
-            kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
-            kafkaContainerHelper.sendVirksomhetsstatistikk()
+            kafkaContainerHelper.sendBransjestatistikk(bransje = Bransje.SYKEHJEM)
+            kafkaContainerHelper.sendVirksomhetsstatistikk(orgnr = enUnderenhetIAltinn.orgnr)
             // TODO: Returner en tom liste for virksomhet i stedet for feil
 
             val resultat = TestContainerHelper.applikasjon.performGet(
@@ -62,9 +64,55 @@ class SykefraværsstatistikkApiEndepunkterTest {
     }
 
     @Test
-    @Ignore
     fun `Får feil ved manglende statistikk`() {
-        TODO("Skal få feil fordi det mangler statistikk?")
+        // TODO: mulig det ikke skal bli feil, men heller tom liste om statistikk mangler
+        runBlocking {
+            val responseManglerAltAvStatistikk = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+
+            responseManglerAltAvStatistikk.shouldNotBeNull()
+            responseManglerAltAvStatistikk.status shouldNotBe HttpStatusCode.OK
+            kafkaContainerHelper.sendLandsstatistikk()
+
+            val responseManglerAltUtenomLand = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+
+            responseManglerAltUtenomLand.shouldNotBeNull()
+            responseManglerAltUtenomLand.status shouldNotBe HttpStatusCode.OK
+
+            kafkaContainerHelper.sendSektorstatistikk()
+
+            val responseManglerAltUtenomLandOgSektor = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+
+            responseManglerAltUtenomLandOgSektor.shouldNotBeNull()
+            responseManglerAltUtenomLandOgSektor.status shouldNotBe HttpStatusCode.OK
+
+            kafkaContainerHelper.sendBransjestatistikk(bransje = Bransje.BARNEHAGER)
+
+            val responseManglerVirksomhet = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+
+            responseManglerVirksomhet.shouldNotBeNull()
+            responseManglerVirksomhet.status shouldNotBe HttpStatusCode.OK
+
+            kafkaContainerHelper.sendVirksomhetsstatistikk(orgnr = enUnderenhetUtenStatistikk.orgnr)
+
+            val harAltAvStatistikk = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+            harAltAvStatistikk.shouldNotBeNull()
+            harAltAvStatistikk.status shouldBe HttpStatusCode.OK
+        }
     }
 
     @Test
@@ -73,7 +121,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk()
-            kafkaContainerHelper.sendVirksomhetsstatistikk()
+            kafkaContainerHelper.sendVirksomhetsstatistikk(orgnr = enVirksomhetUtenTilgangIAltinn.orgnr)
 
             val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
                 url = "/${enVirksomhetUtenTilgangIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",
@@ -130,7 +178,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk()
-            kafkaContainerHelper.sendVirksomhetsstatistikk()
+            kafkaContainerHelper.sendVirksomhetsstatistikk(orgnr = enUnderenhetIAltinn.orgnr)
 
             val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
                 url = "/${enUnderenhetIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",

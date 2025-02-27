@@ -5,7 +5,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetUtenStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetUtenStatistikk
 import org.testcontainers.Testcontainers
 import wiremock.com.google.common.net.HttpHeaders.CONTENT_TYPE
 
@@ -32,10 +34,18 @@ class AltinnMockHelper {
                         .withBody(
                             """[
                             {
-                                "Name": "BALLSTAD OG HAMARØY",
+                                "Name": "${enUnderenhetIAltinn.navn}",
                                  "Type": "Business",
                                  "OrganizationNumber": "${enUnderenhetIAltinn.orgnr}",
                                  "ParentOrganizationNumber": "${enOverordnetEnhetIAltinn.orgnr}",
+                                 "OrganizationForm": "BEDR",
+                                 "Status": "Active"
+                            }, 
+                            {
+                                "Name": "${enUnderenhetUtenStatistikk.navn}",
+                                 "Type": "Business",
+                                 "OrganizationNumber": "${enUnderenhetUtenStatistikk.orgnr}",
+                                 "ParentOrganizationNumber": "${enOverordnetEnhetUtenStatistikk.orgnr}",
                                  "OrganizationForm": "BEDR",
                                  "Status": "Active"
                             }, 
@@ -62,10 +72,18 @@ class AltinnMockHelper {
                         .withBody(
                             """[
                             {
-                                "Name": "BALLSTAD OG HAMARØY",
+                                "Name": "${enUnderenhetIAltinn.navn}",
                                  "Type": "Business",
                                  "OrganizationNumber": "${enUnderenhetIAltinn.orgnr}",
                                  "ParentOrganizationNumber": "${enOverordnetEnhetIAltinn.orgnr}",
+                                 "OrganizationForm": "BEDR",
+                                 "Status": "Active"
+                            }, 
+                            {
+                                "Name": "${enUnderenhetUtenStatistikk.navn}",
+                                 "Type": "Business",
+                                 "OrganizationNumber": "${enUnderenhetUtenStatistikk.orgnr}",
+                                 "ParentOrganizationNumber": "${enOverordnetEnhetUtenStatistikk.orgnr}",
                                  "OrganizationForm": "BEDR",
                                  "Status": "Active"
                             }

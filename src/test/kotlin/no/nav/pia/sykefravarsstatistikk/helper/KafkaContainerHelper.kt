@@ -1,5 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.helper
 
+import ia.felles.definisjoner.bransjer.Bransje
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -10,7 +11,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import org.apache.kafka.clients.CommonClientConfigs
@@ -171,12 +171,13 @@ class KafkaContainerHelper(
     }
 
     fun sendVirksomhetsstatistikk(
+        orgnr: String,
         startÅr: Int = 2010,
         sluttÅr: Int = 2024,
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {
-                val virksomhetMelding = enStandardVirksomhetsMelding(år, kvartal)
+                val virksomhetMelding = enStandardVirksomhetsMelding(årstall = år, kvartal = kvartal, orgnr = orgnr)
                 sendOgVentTilKonsumert(
                     nøkkel = virksomhetMelding.toJsonKey(),
                     melding = virksomhetMelding.toJsonValue(),
@@ -219,13 +220,13 @@ class KafkaContainerHelper(
     }
 
     fun sendBransjestatistikk(
-        bransje: String,
+        bransje: Bransje,
         startÅr: Int = 2010,
         sluttÅr: Int = 2024,
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {
-                val bransjemelding = enStandardBransjeMelding(år, kvartal, bransje)
+                val bransjemelding = enStandardBransjeMelding(årstall = år, kvartal = kvartal, bransje = bransje)
                 sendOgVentTilKonsumert(
                     nøkkel = bransjemelding.toJsonKey(),
                     melding = bransjemelding.toJsonValue(),
@@ -238,7 +239,7 @@ class KafkaContainerHelper(
     private fun enStandardVirksomhetsMelding(
         årstall: Int,
         kvartal: Int,
-        orgnr: String = enUnderenhetIAltinn.orgnr,
+        orgnr: String,
     ): JsonMelding =
         JsonMelding(
             kategori = Statistikkategori.VIRKSOMHET,
@@ -264,11 +265,11 @@ class KafkaContainerHelper(
     private fun enStandardBransjeMelding(
         årstall: Int,
         kvartal: Int,
-        bransje: String = "Sykehjem",
+        bransje: Bransje,
     ): JsonMelding =
         JsonMelding(
             kategori = Statistikkategori.BRANSJE,
-            kode = bransje,
+            kode = bransje.navn,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
             prosent = 5.8,
             tapteDagsverk = 270744.659570,

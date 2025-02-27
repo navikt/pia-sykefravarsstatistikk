@@ -42,6 +42,21 @@ class TestContainerHelper {
 //        val OverordnetEnhetIBransjeMedRettighet = OverordnetEnhet()
 //        val OverordnetEnhetIkkeIBransjeMedRettighet = OverordnetEnhet()
 
+        val enOverordnetEnhetUtenStatistikk = OverordnetEnhet(
+            orgnr = "345678901",
+            navn = "Overordnet Enhet Uten Statistikk",
+            næringskode = Næringskode.tilFemsiffer("88.911"),
+            antallAnsatte = 1000,
+        )
+
+        val enUnderenhetUtenStatistikk = Underenhet(
+            orgnr = "234567890",
+            navn = "Underenhet Uten Statistikk",
+            næringskode = Næringskode.tilFemsiffer("88.911"),
+            overordnetEnhetOrgnr = enOverordnetEnhetUtenStatistikk.orgnr,
+            antallAnsatte = 10,
+        )
+
         val enOverordnetEnhetIAltinn = OverordnetEnhet(
             orgnr = "889640782",
             navn = "ARBEIDS- OG VELFERDSETATEN",

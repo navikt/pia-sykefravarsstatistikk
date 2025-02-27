@@ -1,5 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.api.auditlog
 
+import ia.felles.definisjoner.bransjer.Bransje
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
@@ -17,11 +18,10 @@ class AuditlogTest {
     @Test
     fun `auditlogger autorisert uthenting av kvartalsvis sykefraværsstatistikk`() {
         runBlocking {
-            val bransje = "Sykehjem"
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk()
-            kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
-            kafkaContainerHelper.sendVirksomhetsstatistikk()
+            kafkaContainerHelper.sendBransjestatistikk(bransje = Bransje.SYKEHJEM)
+            kafkaContainerHelper.sendVirksomhetsstatistikk(orgnr = enUnderenhetIAltinn.orgnr)
 
             val resultat =
                 applikasjon.performGet(

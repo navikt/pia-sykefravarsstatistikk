@@ -11,7 +11,7 @@ import no.nav.pia.sykefravarsstatistikk.api.auth.TilgangerKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.UnderenhetKey
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.tilDto
-import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.BRANSJE
+import no.nav.pia.sykefravarsstatistikk.api.dto.SamletAggregertStatistikkDto
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -40,13 +40,13 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
 
                 underenhet.bransje()?.let { bransje ->
                     val bransjestatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkBransje(
-                        bransje = bransje.name,
+                        bransje = bransje.navn,
                         førsteÅrstalOgKvartal = førsteKvartal,
                     ).ifEmpty {
-                        call.respond(message = "Ingen statistikk funnet or bransje '${bransje.name}'", status = HttpStatusCode.BadRequest)
+                        call.respond(message = "Ingen statistikk funnet or bransje '${bransje.navn}'", status = HttpStatusCode.BadRequest)
                         return@get
                     }
-                    response.add(bransjestatistikk.tilDto(type = BRANSJE.name, label = bransje.name))
+                    response.add(bransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
                 } ?: call.application.log.info("${underenhet.orgnr} er ikke en del av en bransje")
 
                 response.add(

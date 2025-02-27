@@ -3,8 +3,12 @@ package no.nav.pia.sykefravarsstatistikk.helper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
+import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetUtenStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetUtenStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enVirksomhetUtenTilgangIAltinn
 import org.testcontainers.Testcontainers
 import wiremock.com.google.common.net.HttpHeaders.CONTENT_TYPE
@@ -139,7 +143,8 @@ class BrregMockHelper {
 }
             """.trimIndent()
 
-        private val underenhetJson = """{
+        private val underenhetJson = """
+            {
   "organisasjonsnummer": "${enUnderenhetIAltinn.orgnr}",
   "navn": "${enUnderenhetIAltinn.navn}",
   "organisasjonsform": {
@@ -196,7 +201,167 @@ class BrregMockHelper {
 }
         """.trimMargin()
 
+        private fun enOverordnetEnhetUtenStatistikkJson(overordnetEnhet: OverordnetEnhet) =
+            """{
+  "organisasjonsnummer": "${overordnetEnhet.orgnr}",
+  "navn": "${overordnetEnhet.navn}",
+  "organisasjonsform": {
+    "kode": "ORGL",
+    "beskrivelse": "Organisasjonsledd",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/ORGL"
+      }
+    }
+  },
+  "hjemmeside": "www.nav.no",
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "8601",
+    "poststed": "MO I RANA",
+    "adresse": [
+      "Postboks 354"
+    ],
+    "kommune": "RANA",
+    "kommunenummer": "1833"
+  },
+  "registreringsdatoEnhetsregisteret": "2006-03-23",
+  "registrertIMvaregisteret": true,
+  "naeringskode1": {
+    "kode": "${overordnetEnhet.næringskode.femsifferIdentifikator}",
+    "beskrivelse": "Offentlig administrasjon tilknyttet helsestell, sosial virksomhet, undervisning, kirke, kultur og miljøvern"
+  },
+  "antallAnsatte": ${overordnetEnhet.antallAnsatte},
+  "harRegistrertAntallAnsatte": true,
+  "overordnetEnhet": "983887457",
+  "registreringsdatoMerverdiavgiftsregisteret": "2006-07-01",
+  "registreringsdatoMerverdiavgiftsregisteretEnhetsregisteret": "2006-10-04",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "2025-02-12",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "2025-02-10",
+  "telefon": "21 07 00 00",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0661",
+    "poststed": "OSLO",
+    "adresse": [
+      "Fyrstikkalléen 1"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "institusjonellSektorkode": {
+    "kode": "6100",
+    "beskrivelse": "Statsforvaltningen"
+  },
+  "registrertIForetaksregisteret": false,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "aktivitet": [
+    "Arbeids- og velferdsetaten har ansvaret for gjennomføringen av",
+    "arbeidsmarkeds- trygde- og pensjonspolitikken"
+  ],
+  "registrertIPartiregisteret": false,
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/889640782"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/983887457"
+    }
+  }
+}
+            """.trimMargin()
+
+        private fun enUnderenhetUtenStatistikkJson(
+            underenhet: Underenhet,
+            overordnetEnhet: OverordnetEnhet,
+        ) = """
+{
+  "organisasjonsnummer": "${underenhet.orgnr}",
+  "navn": "${underenhet.navn}",
+  "organisasjonsform": {
+    "kode": "BEDR",
+    "beskrivelse": "Underenhet til næringsdrivende og offentlig forvaltning",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/BEDR"
+      }
+    }
+  },
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "8601",
+    "poststed": "MO I RANA",
+    "adresse": [
+      "Postboks 354"
+    ],
+    "kommune": "RANA",
+    "kommunenummer": "1833"
+  },
+  "registreringsdatoEnhetsregisteret": "2013-12-23",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "kode": "${underenhet.næringskode.femsifferIdentifikator}",
+    "beskrivelse": "Offentlig administrasjon tilknyttet helsestell, sosial virksomhet, undervisning, kirke, kultur og miljøvern"
+  },
+  "antallAnsatte": ${underenhet.antallAnsatte},
+  "harRegistrertAntallAnsatte": true,
+  "overordnetEnhet": "${overordnetEnhet.orgnr}",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "2025-02-11",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "2025-02-10",
+  "oppstartsdato": "2013-12-01",
+  "beliggenhetsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0661",
+    "poststed": "OSLO",
+    "adresse": [
+      "Fyrstikkalléen 1"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/underenheter/912998827"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/889640782"
+    }
+  }
+}
+            """.trimMargin()
+
         val brregMock = WireMockServer(WireMockConfiguration.options().dynamicPort()).also {
+
+            it.stubFor(
+                WireMock.get(WireMock.urlPathEqualTo("/enhetsregisteret/api/enheter/${enOverordnetEnhetUtenStatistikk.orgnr}"))
+                    .willReturn(
+                        WireMock.ok()
+                            .withHeader(CONTENT_TYPE, "application/json")
+                            .withBody(enOverordnetEnhetUtenStatistikkJson(overordnetEnhet = enOverordnetEnhetUtenStatistikk)),
+                    ),
+            )
+            it.stubFor(
+                WireMock.get(WireMock.urlPathEqualTo("/enhetsregisteret/api/underenheter/${enUnderenhetUtenStatistikk.orgnr}"))
+                    .willReturn(
+                        WireMock.ok()
+                            .withHeader(CONTENT_TYPE, "application/json")
+                            .withBody(
+                                enUnderenhetUtenStatistikkJson(
+                                    underenhet = enUnderenhetUtenStatistikk,
+                                    overordnetEnhet = enOverordnetEnhetUtenStatistikk,
+                                ),
+                            ),
+                    ),
+            )
             it.stubFor(
                 WireMock.get(WireMock.urlPathEqualTo("/enhetsregisteret/api/enheter/${enOverordnetEnhetIAltinn.orgnr}"))
                     .willReturn(
