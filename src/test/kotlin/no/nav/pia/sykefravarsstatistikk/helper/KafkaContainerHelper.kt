@@ -8,9 +8,9 @@ import kotlinx.coroutines.time.withTimeout
 import kotlinx.coroutines.time.withTimeoutOrNull
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
-import no.nav.pia.sykefravarsstatistikk.helper.AltinnMockHelper.Companion.enVirksomhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import org.apache.kafka.clients.CommonClientConfigs
@@ -238,7 +238,7 @@ class KafkaContainerHelper(
     private fun enStandardVirksomhetsMelding(
         årstall: Int,
         kvartal: Int,
-        orgnr: String = enVirksomhetIAltinn.orgnr,
+        orgnr: String = enUnderenhetIAltinn.orgnr,
     ): JsonMelding =
         JsonMelding(
             kategori = Statistikkategori.VIRKSOMHET,

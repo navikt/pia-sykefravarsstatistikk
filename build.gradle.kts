@@ -5,6 +5,7 @@ val kotestVersion = "6.0.0.M1"
 val kotlinVersion = "2.1.10"
 val ktorVersion = "3.1.0"
 val logbackVersion = "1.5.16"
+val iaFellesVersion = "1.10.2"
 val logstashLogbackEncoderVersion = "8.0"
 val mockOAuth2ServerVersion = "2.1.10"
 val nimbusJoseJwtVersion = "10.0.1"
@@ -55,6 +56,9 @@ dependencies {
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation("org.flywaydb:flyway-database-postgresql:11.3.3")
     implementation("com.github.seratch:kotliquery:1.9.1")
+
+    // Felles definisjoner for IA-domenet
+    implementation("com.github.navikt:ia-felles:$iaFellesVersion")
 
     // Test
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")

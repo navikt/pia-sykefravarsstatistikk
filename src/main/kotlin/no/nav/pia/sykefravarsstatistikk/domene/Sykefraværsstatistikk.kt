@@ -6,4 +6,5 @@ sealed interface Sykefraværsstatistikk {
     val antallPersoner: Int
     val tapteDagsverk: Double
     val muligeDagsverk: Double
+    val prosent: Double
 }

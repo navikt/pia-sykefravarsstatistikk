@@ -4,6 +4,10 @@ import io.ktor.server.application.Application
 import io.ktor.server.engine.addShutdownHook
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlientConfig
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.ProxyConfig
+import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.VirksomhetMetadataConsumer
@@ -51,9 +55,22 @@ fun main() {
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
+    val altinnrettigheterProxyKlient = AltinnrettigheterProxyKlient(
+        AltinnrettigheterProxyKlientConfig(
+            ProxyConfig(
+                consumerId = "pia-sykefravarsstatistikk",
+                url = Systemmiljø.altinnRettigheterProxyUrl,
+            ),
+        ),
+    )
+
+    val enhetsregisteretService = EnhetsregisteretService()
+
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         configure(
             sykefraværsstatistikkService = sykefraværsstatistikkService,
+            altinnrettigheterProxyKlient = altinnrettigheterProxyKlient,
+            enhetsregisteretService = enhetsregisteretService,
         )
     }.also {
         // https://doc.nais.io/nais-application/good-practices/#handles-termination-gracefully
@@ -63,8 +80,16 @@ fun main() {
     }.start(wait = true)
 }
 
-fun Application.configure(sykefraværsstatistikkService: SykefraværsstatistikkService) {
+fun Application.configure(
+    sykefraværsstatistikkService: SykefraværsstatistikkService,
+    altinnrettigheterProxyKlient: AltinnrettigheterProxyKlient,
+    enhetsregisteretService: EnhetsregisteretService,
+) {
     configureMonitoring()
     configureSerialization()
-    configureRouting(sykefraværsstatistikkService = sykefraværsstatistikkService)
+    configureRouting(
+        sykefraværsstatistikkService = sykefraværsstatistikkService,
+        altinnrettigheterProxyKlient = altinnrettigheterProxyKlient,
+        enhetsregisteretService = enhetsregisteretService,
+    )
 }

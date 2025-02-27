@@ -10,7 +10,7 @@ data class SykefraværsstatistikkVirksomhet(
     override val antallPersoner: Int,
     override val tapteDagsverk: Double,
     override val muligeDagsverk: Double,
-    val prosent: Double,
+    override val prosent: Double,
     val rectype: String,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
@@ -22,7 +22,7 @@ data class SykefraværsstatistikkBransje(
     override val antallPersoner: Int,
     override val tapteDagsverk: Double,
     override val muligeDagsverk: Double,
-    val prosent: Double,
+    override val prosent: Double,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
@@ -33,7 +33,7 @@ data class SykefraværsstatistikkSektor(
     override val antallPersoner: Int,
     override val tapteDagsverk: Double,
     override val muligeDagsverk: Double,
-    val prosent: Double,
+    override val prosent: Double,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
@@ -44,6 +44,6 @@ data class SykefraværsstatistikkLand(
     override val antallPersoner: Int,
     override val tapteDagsverk: Double,
     override val muligeDagsverk: Double,
-    val prosent: Double,
+    override val prosent: Double,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk

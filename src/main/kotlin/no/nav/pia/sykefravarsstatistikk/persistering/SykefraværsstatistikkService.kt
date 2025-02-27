@@ -1,7 +1,5 @@
 package no.nav.pia.sykefravarsstatistikk.persistering
 
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.NAVNPÅVIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
@@ -67,17 +65,5 @@ class SykefraværsstatistikkService(
         return sykefraværsstatistikkLand.filter {
             ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
         }
-    }
-
-    fun hentKvartalsvisOverordnetEnhet(
-        orgnr: String,
-        førsteÅrstalOgKvartal: ÅrstallOgKvartal,
-    ): KvartalsvisSykefraværshistorikkDto {
-        logger.info("Henter kvartalsvis statistikk for overordnet enhet med orgnr: '$orgnr'")
-        return KvartalsvisSykefraværshistorikkDto(
-            type = "OVERORDNET_ENHET",
-            label = NAVNPÅVIRKSOMHET,
-            kvartalsvisSykefraværsprosent = emptyList(),
-        )
     }
 }
