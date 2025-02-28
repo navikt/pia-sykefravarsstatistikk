@@ -40,6 +40,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
@@ -63,8 +64,9 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
     testImplementation("org.testcontainers:kafka:$testcontainersVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+    testImplementation("org.testcontainers:mockserver:$testcontainersVersion")
+    testImplementation("org.mock-server:mockserver-client-java:5.15.0")
 
-    testImplementation("io.aiven:testcontainers-fake-gcs-server:0.2.0")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockStandaloneVersion")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 

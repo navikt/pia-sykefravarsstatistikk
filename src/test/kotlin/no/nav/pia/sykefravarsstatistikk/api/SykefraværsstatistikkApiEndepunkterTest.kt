@@ -11,12 +11,19 @@ import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.helper.AltinnMockHelper.Companion.enVirksomhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class SykefraværsstatistikkApiEndepunkterTest {
+    @BeforeTest
+    fun cleanUp() {
+        altinnTilgangerContainerHelper.slettAlleRettigheter()
+    }
+
     @Test
     fun `Bruker som når et ukjent endepunkt får '404 - Not found' returncode i response`() {
         runBlocking {
@@ -46,6 +53,10 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
             kafkaContainerHelper.sendVirksomhetsstatistikk()
             // TODO: Får feil om det mangler data, finn en bedre måte å håndtere dette på enn å sende masse data ?
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enVirksomhetIAltinn.orgnr,
+                altinn2Rettighet = "3403:1",
+            )
 
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${enVirksomhetIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",

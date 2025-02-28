@@ -4,6 +4,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.engine.addShutdownHook
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.VirksomhetMetadataConsumer
@@ -24,6 +25,7 @@ fun main() {
     val dataSource = createDataSource(database = naisEnvironment.database)
     runMigration(dataSource = dataSource)
 
+    val altinnTilgangerService = AltinnTilgangerService()
     val sykefraværsstatistikkService =
         SykefraværsstatistikkService(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
 
@@ -53,6 +55,7 @@ fun main() {
 
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         configure(
+            altinnTilgangerService = altinnTilgangerService,
             sykefraværsstatistikkService = sykefraværsstatistikkService,
         )
     }.also {
@@ -63,8 +66,14 @@ fun main() {
     }.start(wait = true)
 }
 
-fun Application.configure(sykefraværsstatistikkService: SykefraværsstatistikkService) {
+fun Application.configure(
+    altinnTilgangerService: AltinnTilgangerService,
+    sykefraværsstatistikkService: SykefraværsstatistikkService,
+) {
     configureMonitoring()
     configureSerialization()
-    configureRouting(sykefraværsstatistikkService = sykefraværsstatistikkService)
+    configureRouting(
+        altinnTilgangerService = altinnTilgangerService,
+        sykefraværsstatistikkService = sykefraværsstatistikkService,
+    )
 }

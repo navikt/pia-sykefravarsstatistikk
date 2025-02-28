@@ -29,10 +29,9 @@ class TestContainerHelper {
     companion object {
         val log: Logger = LoggerFactory.getLogger(TestContainerHelper::class.java)
         val network = Network.newNetwork()
+        val altinnTilgangerContainerHelper = AltinnTilgangerContainerHelper(network = network)
         val authContainerHelper = AuthContainerHelper(network = network)
-
         val postgresContainerHelper = PostgrestContainerHelper(network = network, log = log)
-
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
 
         val applikasjon: GenericContainer<*> =
@@ -40,6 +39,7 @@ class TestContainerHelper {
                 ImageFromDockerfile().withDockerfile(Path("./Dockerfile")),
             )
                 .dependsOn(
+                    altinnTilgangerContainerHelper.altinnTilgangerContainer,
                     kafkaContainerHelper.kafkaContainer,
                     postgresContainerHelper.postgresContainer,
                     authContainerHelper.authContainer,
@@ -85,6 +85,8 @@ class TestContainerHelper {
                                         "JAVA_TOOL_OPTIONS" to "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
                                         "ALTINN_RETTIGHETER_PROXY_URL" to "http://host.testcontainers.internal:${wireMock.port()}/altinn",
                                     ),
+                                ).plus(
+                                    altinnTilgangerContainerHelper.envVars(),
                                 ),
                         ),
                 )

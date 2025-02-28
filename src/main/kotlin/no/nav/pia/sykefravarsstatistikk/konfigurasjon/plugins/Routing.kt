@@ -20,6 +20,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.routing
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.AuthorizationPlugin
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
@@ -35,7 +36,10 @@ fun Route.medAltinnTilgang(authorizedRoutes: Route.() -> Unit) =
         authorizedRoutes()
     }
 
-fun Application.configureRouting(sykefraværsstatistikkService: SykefraværsstatistikkService) {
+fun Application.configureRouting(
+    altinnTilgangerService: AltinnTilgangerService,
+    sykefraværsstatistikkService: SykefraværsstatistikkService,
+) {
     routing {
         helse()
         install(StatusPages) {
@@ -90,7 +94,10 @@ fun Application.configureRouting(sykefraværsstatistikkService: Sykefraværsstat
         authenticate("tokenx") {
             // organisasjoner() TODO
             medAltinnTilgang {
-                sykefraværsstatistikk(sykefraværsstatistikkService = sykefraværsstatistikkService)
+                sykefraværsstatistikk(
+                    altinnTilgangerService = altinnTilgangerService,
+                    sykefraværsstatistikkService = sykefraværsstatistikkService,
+                )
             }
         }
     }
