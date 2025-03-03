@@ -1,4 +1,3 @@
-val altinnKlientVersion = "5.0.0"
 val arrowCoreVersion = "2.0.1"
 val kafkClientVersion = "3.9.0"
 val kotestVersion = "6.0.0.M1"
@@ -28,7 +27,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:altinn-rettigheter-proxy-klient:altinn-rettigheter-proxy-klient-$altinnKlientVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$nimbusJoseJwtVersion")
     implementation("io.arrow-kt:arrow-core:$arrowCoreVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
@@ -80,14 +78,6 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
-        implementation("commons-codec:commons-codec") {
-            version {
-                require("1.18.0")
-            }
-            because(
-                "altinn-rettigheter-proxy bruker codec 1.11 som har en sårbarhet",
-            )
-        }
         implementation("net.minidev:json-smart") {
             version {
                 require("2.5.2")
@@ -106,19 +96,19 @@ dependencies {
             version {
                 require("33.3.1-jre")
             }
-            because("Mockserver har sårbar versjon")
+            because("Mockserver har sårbar guava versjon")
         }
         testImplementation("org.bouncycastle:bcprov-jdk18on") {
             version {
                 require("1.80")
             }
-            because("bcprov-jdk18on har sårbar versjon")
+            because("bcprov-jdk18on in Mockserver har sårbar versjon")
         }
         testImplementation("org.xmlunit:xmlunit-core") {
             version {
-                require("2.10")
+                require("2.10.0")
             }
-            because("xmlunit-core har sårbar versjon")
+            because("xmlunit-core in Mockserver har sårbar versjon")
         }
         testImplementation("org.apache.commons:commons-compress") {
             version {

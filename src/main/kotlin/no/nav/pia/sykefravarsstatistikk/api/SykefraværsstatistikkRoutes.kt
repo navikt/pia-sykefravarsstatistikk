@@ -11,11 +11,9 @@ import no.nav.pia.sykefravarsstatistikk.api.auth.TilgangerKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.UnderenhetKey
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.tilDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.SamletAggregertStatistikkDto
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
-import no.nav.pia.sykefravarsstatistikk.http.orgnr
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
 
 fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: SykefraværsstatistikkService) {

@@ -30,6 +30,38 @@ class AltinnTilgangerService {
     private val altinnTilgangerUrl: String = altinnTilgangerProxyUrl
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
+    companion object {
+        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK = "3403:1"
+
+        fun AltinnTilganger?.virksomheterVedkommendeHarTilgangTil() =
+            this?.hierarki?.flatMap {
+                flatten(it) { o -> o.orgnr }
+            }?.toList() ?: emptyList()
+
+        fun AltinnTilganger?.harTilgangTilOrgnr(orgnr: String?) = this?.tilgangTilOrgNr?.contains(orgnr) ?: false
+
+        fun AltinnTilganger?.harEnkeltTilgang(
+            orgnr: String?,
+            altinn2Tilgang: String,
+        ) = this?.orgNrTilTilganger?.get(orgnr)?.contains(altinn2Tilgang) ?: false
+
+        fun AltinnTilganger?.harEnkeltTilgangOverordnetEnhet(
+            overordnetEnhet: String?,
+            altinn2Tilgang: String,
+        ) = this?.hierarki?.tilgangerOverordnetEnhet(orgnr = overordnetEnhet)?.altinn2Tilganger?.contains(altinn2Tilgang)
+            ?: false
+
+        private fun List<AltinnTilgang>.tilgangerOverordnetEnhet(orgnr: String?) = this.firstOrNull { it.orgnr == orgnr }
+
+        private fun <T> flatten(
+            altinnTilgang: AltinnTilgang,
+            mapFn: (AltinnTilgang) -> T,
+        ): Set<T> =
+            setOf(
+                mapFn(altinnTilgang),
+            ) + altinnTilgang.underenheter.flatMap { flatten(it, mapFn) }
+    }
+
     private fun getHttpClient(token: String): HttpClient =
         client.config {
             install(Auth) {
@@ -64,7 +96,7 @@ class AltinnTilgangerService {
         tjeneste: String,
     ) = hentAltinnTilganger(token).getOrNull()?.tilgangTilOrgNr?.get(key = orgnr)?.contains(tjeneste) == true
 
-    private suspend fun hentAltinnTilganger(token: String): Either<Feil, AltinnTilganger> =
+    suspend fun hentAltinnTilganger(token: String): Either<Feil, AltinnTilganger> =
         try {
             val client = getHttpClient(token)
             val response: HttpResponse = client.post {
@@ -101,12 +133,4 @@ class AltinnTilgangerService {
         val tilgangTilOrgNr: Map<String, Set<String>>,
         val error: Boolean,
     )
-
-    private fun <T> flatten(
-        altinnTilgang: AltinnTilgang,
-        mapFn: (AltinnTilgang) -> T,
-    ): Set<T> =
-        setOf(
-            mapFn(altinnTilgang),
-        ) + altinnTilgang.underenheter.flatMap { flatten(it, mapFn) }
 }
