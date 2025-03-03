@@ -7,6 +7,7 @@ import io.ktor.server.netty.Netty
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlientConfig
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.ProxyConfig
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit
 
 fun main() {
     val naisEnvironment = NaisEnvironment()
+    val altinnTilgangerService = AltinnTilgangerService()
     val applikasjonsHelse = ApplikasjonsHelse()
     val dataSource = createDataSource(database = naisEnvironment.database)
     runMigration(dataSource = dataSource)
@@ -68,6 +70,7 @@ fun main() {
 
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         configure(
+            altinnTilgangerService = altinnTilgangerService,
             sykefraværsstatistikkService = sykefraværsstatistikkService,
             altinnrettigheterProxyKlient = altinnrettigheterProxyKlient,
             enhetsregisteretService = enhetsregisteretService,
@@ -81,6 +84,7 @@ fun main() {
 }
 
 fun Application.configure(
+    altinnTilgangerService: AltinnTilgangerService,
     sykefraværsstatistikkService: SykefraværsstatistikkService,
     altinnrettigheterProxyKlient: AltinnrettigheterProxyKlient,
     enhetsregisteretService: EnhetsregisteretService,
@@ -88,6 +92,7 @@ fun Application.configure(
     configureMonitoring()
     configureSerialization()
     configureRouting(
+        altinnTilgangerService = altinnTilgangerService,
         sykefraværsstatistikkService = sykefraværsstatistikkService,
         altinnrettigheterProxyKlient = altinnrettigheterProxyKlient,
         enhetsregisteretService = enhetsregisteretService,

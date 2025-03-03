@@ -22,6 +22,7 @@ import io.ktor.server.routing.routing
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
@@ -41,6 +42,7 @@ fun Route.medAltinnTilgang(
 }
 
 fun Application.configureRouting(
+    altinnTilgangerService: AltinnTilgangerService,
     sykefraværsstatistikkService: SykefraværsstatistikkService,
     altinnrettigheterProxyKlient: AltinnrettigheterProxyKlient,
     enhetsregisteretService: EnhetsregisteretService,

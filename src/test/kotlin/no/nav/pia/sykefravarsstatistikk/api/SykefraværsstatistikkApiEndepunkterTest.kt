@@ -11,6 +11,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetUtenStatistikk
@@ -19,10 +20,16 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kaf
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 
 class SykefraværsstatistikkApiEndepunkterTest {
+    @BeforeTest
+    fun cleanUp() {
+        altinnTilgangerContainerHelper.slettAlleRettigheter()
+    }
+
     @Test
     fun `Bruker som når et ukjent endepunkt får '404 - Not found' returncode i response`() {
         runBlocking {
@@ -51,6 +58,11 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendBransjestatistikk(bransje = Bransje.SYKEHJEM)
             kafkaContainerHelper.sendVirksomhetsstatistikk(orgnr = enUnderenhetIAltinn.orgnr)
             // TODO: Returner en tom liste for virksomhet i stedet for feil
+
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enUnderenhetIAltinn.orgnr,
+                altinn2Rettighet = "3403:1",
+            )
 
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${enUnderenhetIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",
