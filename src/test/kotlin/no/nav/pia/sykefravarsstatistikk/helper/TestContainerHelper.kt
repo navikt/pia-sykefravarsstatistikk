@@ -88,8 +88,7 @@ class TestContainerHelper {
 
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
 
-        private val wiremockAltinn = AltinnMockHelper()
-        private val wiremockBrreg = BrregMockHelper()
+        private val wiremockContainerHelper = WiremockContainerHelper()
 
         val applikasjon: GenericContainer<*> =
             GenericContainer(
@@ -107,8 +106,7 @@ class TestContainerHelper {
                 ).withEnv(
                     postgresContainerHelper.envVars()
                         .plus(kafkaContainerHelper.envVars())
-                        .plus(wiremockAltinn.envVars())
-                        .plus(wiremockBrreg.envVars())
+                        .plus(wiremockContainerHelper.envVars())
                         .plus(
                             mapOf(
                                 "CONSUMER_LOOP_DELAY" to "1",

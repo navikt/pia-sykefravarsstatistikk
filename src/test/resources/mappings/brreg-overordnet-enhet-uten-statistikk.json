@@ -1,0 +1,13 @@
+{
+  "request" : {
+    "urlPathPattern" : "/enhetsregisteret/api/enheter/345678901",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName": "brreg-overordnet-enhet-uten-statistikk.json",
+    "headers" : {
+      "Content-Type" : "application/json"
+    }
+  }
+}
