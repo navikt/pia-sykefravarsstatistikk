@@ -1,0 +1,65 @@
+{
+  "organisasjonsnummer": "100000009",
+  "navn": "Overordnet Enhet Med Tilhørighet Uten Bransje 2",
+  "organisasjonsform": {
+    "kode": "AS",
+    "beskrivelse": "Aksjeselskap",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/AS"
+      }
+    }
+  },
+  "hjemmeside": "www.nettside.no",
+  "registreringsdatoEnhetsregisteret": "1992-09-18",
+  "registrertIMvaregisteret": true,
+  "naeringskode1": {
+    "kode": "03.211",
+    "beskrivelse": "Produksjon av matfisk og skalldyr i hav- og kystbasert fiskeoppdrett"
+  },
+  "antallAnsatte": 10,
+  "harRegistrertAntallAnsatte": true,
+  "registreringsdatoMerverdiavgiftsregisteret": "1992-09-18",
+  "registreringsdatoMerverdiavgiftsregisteretEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "1992-09-18",
+  "telefon": "10 20 30 40",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "BERGEN",
+    "kommunenummer": "4601"
+  },
+  "stiftelsesdato": "1992-09-18",
+  "institusjonellSektorkode": {
+    "kode": "2100",
+    "beskrivelse": "Private aksjeselskaper mv."
+  },
+  "registrertIForetaksregisteret": true,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "sisteInnsendteAarsregnskap": "1992",
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "vedtektsdato": "1992-09-18",
+  "vedtektsfestetFormaal": [
+    ""
+  ],
+  "aktivitet": [
+    ""
+  ],
+  "registreringsdatoForetaksregisteret": "1992-09-18",
+  "registrertIPartiregisteret": false,
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/100000009"
+    }
+  }
+}

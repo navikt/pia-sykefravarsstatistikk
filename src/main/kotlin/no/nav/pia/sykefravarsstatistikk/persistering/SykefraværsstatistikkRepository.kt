@@ -1,12 +1,15 @@
 package no.nav.pia.sykefravarsstatistikk.persistering
 
+import ia.felles.definisjoner.bransjer.Bransje
 import kotliquery.Row
 import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
+import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkNæring
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
 import org.slf4j.Logger
@@ -150,7 +153,7 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun hentSykefraværsstatistikkBransje(bransje: String): List<SykefraværsstatistikkBransje> =
+    fun hentSykefraværsstatistikkBransje(bransje: Bransje): List<SykefraværsstatistikkBransje> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
@@ -158,7 +161,19 @@ class SykefraværsstatistikkRepository(
                 }
             }
         } catch (e: Exception) {
-            logger.error("Feil ved uthenting av sykefraværsstatistikk for bransje $bransje", e)
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for bransje ${bransje.navn}", e)
+            throw e
+        }
+
+    fun hentSykefraværsstatistikkNæring(næring: Næring): List<SykefraværsstatistikkNæring> =
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentNæringsstatistikk(næring)
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for næring ${næring.navn}", e)
             throw e
         }
 
@@ -202,7 +217,19 @@ class SykefraværsstatistikkRepository(
 
     fun Row.tilBransjestatistikk(): SykefraværsstatistikkBransje =
         SykefraværsstatistikkBransje(
-            bransje = string("bransje"),
+            bransje = string("bransje"), // Kan vi hente ut bransjeobjektet her? kunne hatt fra(bransjenavn) i tilleg til fra(næringskode)
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = double("tapte_dagsverk"),
+            muligeDagsverk = double("mulige_dagsverk"),
+            prosent = double("prosent"),
+            opprettet = localDateTime("opprettet"),
+        )
+
+    fun Row.tilNæringstatistikk(): SykefraværsstatistikkNæring =
+        SykefraværsstatistikkNæring(
+            næring = Næring(string("naring")),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
@@ -236,7 +263,7 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    private fun TransactionalSession.hentBransjestatistikk(bransje: String): List<SykefraværsstatistikkBransje> {
+    private fun TransactionalSession.hentBransjestatistikk(bransje: Bransje): List<SykefraværsstatistikkBransje> {
         val query =
             """
             SELECT *
@@ -247,9 +274,26 @@ class SykefraværsstatistikkRepository(
             queryOf(
                 query,
                 mapOf(
-                    "bransje" to bransje,
+                    "bransje" to bransje.navn,
                 ),
             ).map { row -> row.tilBransjestatistikk() }.asList,
+        )
+    }
+
+    private fun TransactionalSession.hentNæringsstatistikk(næring: Næring): List<SykefraværsstatistikkNæring> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_naring
+            WHERE naring = :naring
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "naring" to næring.tosifferIdentifikator,
+                ),
+            ).map { row -> row.tilNæringstatistikk() }.asList,
         )
     }
 

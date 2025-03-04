@@ -1,0 +1,57 @@
+{
+  "organisasjonsnummer": "100000011",
+  "navn": "Overordnet Enhet Med Enkelrettighet Uten Bransje",
+  "organisasjonsform": {
+    "kode": "ENK",
+    "beskrivelse": "Enkeltpersonforetak",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/ENK"
+      }
+    }
+  },
+  "registreringsdatoEnhetsregisteret": "1992-09-18",
+  "registrertIMvaregisteret": true,
+  "naeringskode1": {
+    "kode": "02.100",
+    "beskrivelse": "Skogskjøtsel og andre skogbruksaktiviteter"
+  },
+  "antallAnsatte": 15,
+  "harRegistrertAntallAnsatte": true,
+  "registreringsdatoMerverdiavgiftsregisteret": "1992-09-18",
+  "registreringsdatoMerverdiavgiftsregisteretEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "1992-09-18",
+  "telefon": "12 34 56 78",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "BERGEN",
+    "kommunenummer": "4601"
+  },
+  "institusjonellSektorkode": {
+    "kode": "8200",
+    "beskrivelse": "Personlig næringsdrivende"
+  },
+  "registrertIForetaksregisteret": false,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Nynorsk",
+  "aktivitet": [
+    ""
+  ],
+  "registrertIPartiregisteret": false,
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/100000011"
+    }
+  }
+}

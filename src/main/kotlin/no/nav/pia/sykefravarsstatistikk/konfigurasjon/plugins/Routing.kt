@@ -20,7 +20,9 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.routing
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
-import no.nav.pia.sykefravarsstatistikk.api.auth.AuthorizationPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
+import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
@@ -29,13 +31,25 @@ import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkServi
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-fun Route.medAltinnTilgang(authorizedRoutes: Route.() -> Unit) =
-    (this as RoutingNode).createChild(selector).apply {
-        install(AuthorizationPlugin)
-        authorizedRoutes()
-    }
+fun Route.medAltinnTilgang(
+    altinnTilgangerService: AltinnTilgangerService,
+    enhetsregisteretService: EnhetsregisteretService,
+    authorizedRoutes: Route.() -> Unit,
+) = (this as RoutingNode).createChild(selector).apply {
+    install(
+        AltinnAuthorizationPlugin(
+            altinnTilgangerService = altinnTilgangerService,
+            enhetsregisteretService = enhetsregisteretService,
+        ),
+    )
+    authorizedRoutes()
+}
 
-fun Application.configureRouting(sykefraværsstatistikkService: SykefraværsstatistikkService) {
+fun Application.configureRouting(
+    altinnTilgangerService: AltinnTilgangerService,
+    sykefraværsstatistikkService: SykefraværsstatistikkService,
+    enhetsregisteretService: EnhetsregisteretService,
+) {
     routing {
         helse()
         install(StatusPages) {
@@ -88,9 +102,13 @@ fun Application.configureRouting(sykefraværsstatistikkService: Sykefraværsstat
         }
         install(IgnoreTrailingSlash)
         authenticate("tokenx") {
-            // organisasjoner() TODO
-            medAltinnTilgang {
-                sykefraværsstatistikk(sykefraværsstatistikkService = sykefraværsstatistikkService)
+            medAltinnTilgang(
+                altinnTilgangerService = altinnTilgangerService,
+                enhetsregisteretService = enhetsregisteretService,
+            ) {
+                sykefraværsstatistikk(
+                    sykefraværsstatistikkService = sykefraværsstatistikkService,
+                )
             }
         }
     }

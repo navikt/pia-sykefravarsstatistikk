@@ -7,7 +7,6 @@ import io.ktor.server.request.path
 import io.ktor.server.request.receiveText
 import io.ktor.server.request.uri
 import io.ktor.util.toMap
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.AltinnReportee
 import no.nav.pia.sykefravarsstatistikk.Clusters
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import org.slf4j.LoggerFactory
@@ -42,33 +41,31 @@ private val applikasjonsLog = LoggerFactory.getLogger("applikasjonsLogger")
 
 fun ApplicationCall.auditLogVedUkjentOrgnummer(
     fnr: String,
-    virksomheter: List<AltinnReportee>,
 ) {
     this.auditLog(
         fnr = fnr,
         tillat = Tillat.Nei,
         beskrivelse = "finner ikke organisjasjonsnummeret i requesten fra bruker $fnr",
-        virksomheter = virksomheter,
+        virksomheter = emptyList(),
     )
 }
 
 fun ApplicationCall.auditLogVedUgyldigOrgnummer(
     fnr: String,
-    orgnr: String,
-    virksomheter: List<AltinnReportee>,
+    orgnr: String?,
 ) {
     this.auditLog(
         fnr = fnr,
         tillat = Tillat.Nei,
         beskrivelse = "ugyldig organisjasjonsnummer $orgnr i requesten fra bruker $fnr",
-        virksomheter = virksomheter,
+        virksomheter = emptyList(),
     )
 }
 
 fun ApplicationCall.auditLogVedIkkeTilgangTilOrg(
     fnr: String,
     orgnr: String,
-    virksomheter: List<AltinnReportee>,
+    virksomheter: List<String>,
 ) {
     this.auditLog(
         fnr = fnr,
@@ -81,14 +78,14 @@ fun ApplicationCall.auditLogVedIkkeTilgangTilOrg(
 
 suspend fun ApplicationCall.auditLogVedOkKall(
     fnr: String,
-    orgnummer: String,
-    virksomheter: List<AltinnReportee>,
+    orgnr: String,
+    virksomheter: List<String>,
 ) {
     this.auditLog(
         fnr = fnr,
-        orgnummer = orgnummer,
+        orgnummer = orgnr,
         tillat = Tillat.Ja,
-        beskrivelse = "$fnr har utført følgende kall mot organisajonsnummer $orgnummer " +
+        beskrivelse = "$fnr har utført følgende kall mot organisajonsnummer $orgnr " +
             "path: ${this.request.path()} " +
             "arg: ${this.request.queryParameters.toMap()} " +
             "body: ${this.receiveText()}",
@@ -101,14 +98,14 @@ private fun ApplicationCall.auditLog(
     orgnummer: String? = null,
     tillat: Tillat,
     beskrivelse: String,
-    virksomheter: List<AltinnReportee>,
+    virksomheter: List<String>,
 ) {
     val auditType = this.request.httpMethod.tilAuditType()
     val method = this.request.httpMethod.value
     val uri = this.request.uri
     val severity = if (orgnummer.isNullOrEmpty()) "WARN" else "INFO"
     val appIdentifikator = "pia-sykefravarsstatistikk"
-    val virksomheterSomBrukerRepresenterer = virksomheter.map { it.organizationNumber }.joinToString()
+    val virksomheterSomBrukerRepresenterer = virksomheter.joinToString()
     val logstring =
         "CEF:0|$appIdentifikator|auditLog|1.0|audit:${auditType.name}|Sporingslogg|$severity|end=${System.currentTimeMillis()} " +
             "suid=$fnr " +

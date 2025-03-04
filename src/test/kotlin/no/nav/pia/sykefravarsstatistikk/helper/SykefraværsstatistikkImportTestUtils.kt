@@ -2,7 +2,6 @@ package no.nav.pia.sykefravarsstatistikk.helper
 
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -115,6 +114,7 @@ class SykefraværsstatistikkImportTestUtils {
                 Statistikkategori.NÆRINGSKODE -> "næringskode"
                 Statistikkategori.BRANSJE -> "bransje"
                 Statistikkategori.SEKTOR -> "sektor"
+                Statistikkategori.OVERORDNET_ENHET -> "N/A"
             }
 
         private fun List<TapteDagsverkPerVarighet>.toJson() = Json.encodeToString(this)

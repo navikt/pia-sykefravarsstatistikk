@@ -4,6 +4,8 @@ import io.ktor.server.application.Application
 import io.ktor.server.engine.addShutdownHook
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
+import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.VirksomhetMetadataConsumer
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit
 
 fun main() {
     val naisEnvironment = NaisEnvironment()
+    val altinnTilgangerService = AltinnTilgangerService()
     val applikasjonsHelse = ApplikasjonsHelse()
     val dataSource = createDataSource(database = naisEnvironment.database)
     runMigration(dataSource = dataSource)
@@ -51,9 +54,13 @@ fun main() {
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
+    val enhetsregisteretService = EnhetsregisteretService()
+
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         configure(
+            altinnTilgangerService = altinnTilgangerService,
             sykefraværsstatistikkService = sykefraværsstatistikkService,
+            enhetsregisteretService = enhetsregisteretService,
         )
     }.also {
         // https://doc.nais.io/nais-application/good-practices/#handles-termination-gracefully
@@ -63,8 +70,16 @@ fun main() {
     }.start(wait = true)
 }
 
-fun Application.configure(sykefraværsstatistikkService: SykefraværsstatistikkService) {
+fun Application.configure(
+    altinnTilgangerService: AltinnTilgangerService,
+    sykefraværsstatistikkService: SykefraværsstatistikkService,
+    enhetsregisteretService: EnhetsregisteretService,
+) {
     configureMonitoring()
     configureSerialization()
-    configureRouting(sykefraværsstatistikkService = sykefraværsstatistikkService)
+    configureRouting(
+        altinnTilgangerService = altinnTilgangerService,
+        sykefraværsstatistikkService = sykefraværsstatistikkService,
+        enhetsregisteretService = enhetsregisteretService,
+    )
 }

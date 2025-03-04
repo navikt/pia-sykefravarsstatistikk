@@ -1,0 +1,106 @@
+[
+  {
+    "Name": "Overordnet Enhet Med Tilhørighet Uten Bransje",
+    "Type": "Business",
+    "OrganizationNumber": "100000003",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Med Tilhørighet Bransje Bygg",
+    "Type": "Business",
+    "OrganizationNumber": "100000004",
+    "ParentOrganizationNumber": "100000003",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Overordnet Enhet Med Enkelrettighet Bransje Barnehage",
+    "Type": "Business",
+    "OrganizationNumber": "100000001",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Med Enkelrettighet Bransje Barnehage",
+    "Type": "Business",
+    "OrganizationNumber": "100000002",
+    "ParentOrganizationNumber": "100000001",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Overordnet Enhet Med Enkelrettighet Uten Bransje",
+    "Type": "Business",
+    "OrganizationNumber": "100000011",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Med Enkelrettighet Uten Bransje 2",
+    "Type": "Business",
+    "OrganizationNumber": "100000012",
+    "ParentOrganizationNumber": "100000011",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Overordnet Enhet Med Tilhørighet Uten Bransje 2",
+    "Type": "Business",
+    "OrganizationNumber": "100000009",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Med Enkelrettighet Uten Bransje",
+    "Type": "Business",
+    "OrganizationNumber": "100000010",
+    "ParentOrganizationNumber": "100000009",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Overordnet Enhet Med Tilhørighet Bransje Sykehus",
+    "Type": "Business",
+    "OrganizationNumber": "100000005",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Med Enkelrettighet Bransje Sykehus",
+    "Type": "Business",
+    "OrganizationNumber": "100000006",
+    "ParentOrganizationNumber": "100000005",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Overordnet Enhet Med Tilhørighet Uten Bransje",
+    "Type": "Business",
+    "OrganizationNumber": "100000007",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Med Tilhørighet Uten Bransje",
+    "Type": "Business",
+    "OrganizationNumber": "100000008",
+    "ParentOrganizationNumber": "100000007",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Underenhet Uten Statistikk",
+    "Type": "Business",
+    "OrganizationNumber": "100000014",
+    "ParentOrganizationNumber": "123456789",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  }
+]
