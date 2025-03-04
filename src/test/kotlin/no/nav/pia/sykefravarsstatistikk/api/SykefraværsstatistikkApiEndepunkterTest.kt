@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
 import ia.felles.definisjoner.bransjer.Bransje
+import io.kotest.inspectors.shouldForNone
 import io.kotest.inspectors.shouldForOne
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -11,6 +12,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetIAltinn
@@ -28,11 +30,13 @@ import kotlin.test.Test
 class SykefraværsstatistikkApiEndepunkterTest {
     @BeforeTest
     fun cleanUp() {
-        altinnTilgangerContainerHelper.slettAlleRettigheter()
+        runBlocking {
+            altinnTilgangerContainerHelper.slettAlleRettigheter()
+        }
     }
 
     @Test
-    fun `Bruker som når et ukjent endepunkt får '404 - Not found' returncode i response`() {
+    fun `Bruker som når et ukjent endepunkt får '404 - Not found' i response`() {
         runBlocking {
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${enUnderenhetIAltinn.orgnr}/sykefravarshistorikk/alt",
@@ -42,12 +46,50 @@ class SykefraværsstatistikkApiEndepunkterTest {
     }
 
     @Test
-    fun `Bruker som ikke er innlogget burde få en '401 - Unauthorized' returncode i response`() {
+    fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response`() {
         runBlocking {
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${enUnderenhetIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",
             )
             resultat?.status shouldBe HttpStatusCode.Unauthorized
+        }
+    }
+
+    @Test
+    fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response`() {
+        runBlocking {
+            val resultat = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+            resultat?.status shouldBe HttpStatusCode.Forbidden
+        }
+    }
+
+    @Test
+    fun `Innlogget bruker uten enkelrettighet til virksomhet får '200 - OK', men ingen statistikk for virksomhet`() {
+        runBlocking {
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enUnderenhetUtenStatistikk.orgnr,
+                altinn2Rettighet = "ingen_tilgang_til_statistikk",
+            )
+            kafkaContainerHelper.sendLandsstatistikk()
+            kafkaContainerHelper.sendSektorstatistikk()
+            kafkaContainerHelper.sendBransjestatistikk(bransje = Bransje.BARNEHAGER)
+
+            val resultat = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+            resultat!!.status shouldBe HttpStatusCode.OK
+            val aggregertStatistikk: List<KvartalsvisSykefraværshistorikkDto> = resultat.body()
+
+            aggregertStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.LAND.name }
+            aggregertStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.SEKTOR.name }
+            aggregertStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.BRANSJE.name }
+
+            aggregertStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.VIRKSOMHET.name }
+            aggregertStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.OVERORDNET_ENHET.name }
         }
     }
 
@@ -71,7 +113,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             resultat.shouldNotBeNull()
-
             resultat.status shouldBe HttpStatusCode.OK
         }
     }
@@ -80,6 +121,11 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Får feil ved manglende statistikk`() {
         // TODO: mulig det ikke skal bli feil, men heller tom liste om statistikk mangler
         runBlocking {
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enUnderenhetUtenStatistikk.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+
             val responseManglerAltAvStatistikk = TestContainerHelper.applikasjon.performGet(
                 url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
                 config = withToken(),
