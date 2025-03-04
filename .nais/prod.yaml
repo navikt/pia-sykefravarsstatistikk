@@ -5,4 +5,4 @@ limitsCpu: 2000m
 limitsMemory: 2Gi
 requestsCpu: 100m
 requestsMemory: 512Mi
-serviceEdition: 2
+serviceEdition: "2"
