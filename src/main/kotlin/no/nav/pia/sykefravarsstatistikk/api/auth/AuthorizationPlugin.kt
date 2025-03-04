@@ -13,7 +13,6 @@ import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilganger
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltTilgang
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltTilgangOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.virksomheterVedkommendeHarTilgangTil
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
@@ -57,11 +56,15 @@ fun AltinnAuthorizationPlugin(
 
             val harTilgangTilOrgnr = altinnTilganger.harTilgangTilOrgnr(orgnr = underenhet.orgnr)
             val harEnkeltTilgang =
-                altinnTilganger.harEnkeltTilgang(orgnr = underenhet.orgnr, ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK)
-            val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltTilgangOverordnetEnhet(
-                overordnetEnhet = overordnetEnhet.orgnr,
-                altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
-            )
+                altinnTilganger.harEnkeltTilgang(
+                    orgnr = underenhet.orgnr,
+                    altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                )
+            val harEnkeltTilgangOverordnetEnhet =
+                altinnTilganger.harEnkeltTilgang(
+                    orgnr = overordnetEnhet.orgnr,
+                    altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                )
 
             if (!harTilgangTilOrgnr) {
                 call.respond(status = HttpStatusCode.Forbidden, "Bruker har ikke tilgang til virksomheten")

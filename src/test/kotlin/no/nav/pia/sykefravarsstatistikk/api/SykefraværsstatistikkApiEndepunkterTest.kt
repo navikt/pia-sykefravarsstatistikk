@@ -9,6 +9,7 @@ import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
@@ -61,7 +62,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = enUnderenhetIAltinn.orgnr,
-                altinn2Rettighet = "3403:1",
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
             val resultat = TestContainerHelper.applikasjon.performGet(

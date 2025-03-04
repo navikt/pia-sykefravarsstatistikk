@@ -33,25 +33,18 @@ class AltinnTilgangerService {
     companion object {
         const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK = "3403:1"
 
+        fun AltinnTilganger?.harTilgangTilOrgnr(orgnr: String?): Boolean =
+            this?.virksomheterVedkommendeHarTilgangTil()?.contains(orgnr) ?: false
+
         fun AltinnTilganger?.virksomheterVedkommendeHarTilgangTil() =
             this?.hierarki?.flatMap {
                 flatten(it) { o -> o.orgnr }
             }?.toList() ?: emptyList()
 
-        fun AltinnTilganger?.harTilgangTilOrgnr(orgnr: String?) = this?.tilgangTilOrgNr?.contains(orgnr) ?: false
-
         fun AltinnTilganger?.harEnkeltTilgang(
             orgnr: String?,
             altinn2Tilgang: String,
         ) = this?.orgNrTilTilganger?.get(orgnr)?.contains(altinn2Tilgang) ?: false
-
-        fun AltinnTilganger?.harEnkeltTilgangOverordnetEnhet(
-            overordnetEnhet: String?,
-            altinn2Tilgang: String,
-        ) = this?.hierarki?.tilgangerOverordnetEnhet(orgnr = overordnetEnhet)?.altinn2Tilganger?.contains(altinn2Tilgang)
-            ?: false
-
-        private fun List<AltinnTilgang>.tilgangerOverordnetEnhet(orgnr: String?) = this.firstOrNull { it.orgnr == orgnr }
 
         private fun <T> flatten(
             altinnTilgang: AltinnTilgang,
@@ -81,20 +74,6 @@ class AltinnTilgangerService {
                 }
             }
         }
-
-    suspend fun hentAlleOrgnr(token: String) =
-        hentAltinnTilganger(token).getOrNull()?.hierarki?.flatMap { flatten(it) { o -> o.orgnr } }?.toSet()
-
-    suspend fun hentAlleOrgnr(
-        token: String,
-        tilgang: String,
-    ) = hentAltinnTilganger(token).getOrNull()?.tilgangTilOrgNr?.get(key = tilgang) ?: emptySet()
-
-    suspend fun harTilgang(
-        token: String,
-        orgnr: String,
-        tjeneste: String,
-    ) = hentAltinnTilganger(token).getOrNull()?.tilgangTilOrgNr?.get(key = orgnr)?.contains(tjeneste) == true
 
     suspend fun hentAltinnTilganger(token: String): Either<Feil, AltinnTilganger> =
         try {
