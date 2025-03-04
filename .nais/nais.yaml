@@ -49,3 +49,5 @@ spec:
       value: "3403"
     - name: ALTINN_RETTIGHET_SERVICE_EDITION
       value: "1"
+    - name: ALTINN_TILGANGER_PROXY_URL
+      value: http://arbeidsgiver-altinn-tilganger.fager
