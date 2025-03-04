@@ -1,5 +1,8 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
+import ia.felles.definisjoner.bransjer.Bransje
+import io.kotest.inspectors.shouldForNone
+import io.kotest.inspectors.shouldForOne
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -7,8 +10,13 @@ import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enOverordnetEnhetIAltinn
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetIAltinn
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetUtenStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetEnhetMedEnkelrettighetBransjeBarnehage
@@ -25,11 +33,20 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.und
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedTilhørighetBransjeBygg
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedTilhørighetUtenBransje
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class SykefraværsstatistikkApiEndepunkterTest {
+    @BeforeTest
+    fun cleanUp() {
+        runBlocking {
+            altinnTilgangerContainerHelper.slettAlleRettigheter()
+        }
+    }
+
     @Test
-    fun `Bruker som når et ukjent endepunkt får '404 - Not found' returncode i response`() {
+    fun `Bruker som når et ukjent endepunkt får '404 - Not found' i response`() {
         runBlocking {
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/alt",
@@ -41,7 +58,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     }
 
     @Test
-    fun `Bruker som ikke er innlogget burde få en '401 - Unauthorized' returncode i response`() {
+    fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response`() {
         runBlocking {
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
@@ -52,9 +69,52 @@ class SykefraværsstatistikkApiEndepunkterTest {
     }
 
     @Test
+    fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response`() {
+        runBlocking {
+            val resultat = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetIAltinn.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+            resultat?.status shouldBe HttpStatusCode.Forbidden
+        }
+    }
+
+    @Test
+    fun `Innlogget bruker uten enkelrettighet til virksomhet får '200 - OK', men ingen statistikk for virksomhet`() {
+        runBlocking {
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enUnderenhetUtenStatistikk.orgnr,
+                altinn2Rettighet = "ingen_tilgang_til_statistikk",
+            )
+            kafkaContainerHelper.sendLandsstatistikk()
+            kafkaContainerHelper.sendSektorstatistikk()
+            kafkaContainerHelper.sendBransjestatistikk(bransje = Bransje.BARNEHAGER)
+
+            val resultat = TestContainerHelper.applikasjon.performGet(
+                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+                config = withToken(),
+            )
+            resultat!!.status shouldBe HttpStatusCode.OK
+            val aggregertStatistikk: List<KvartalsvisSykefraværshistorikkDto> = resultat.body()
+
+            aggregertStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.LAND.name }
+            aggregertStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.SEKTOR.name }
+            aggregertStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.BRANSJE.name }
+
+            aggregertStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.VIRKSOMHET.name }
+            aggregertStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.OVERORDNET_ENHET.name }
+        }
+    }
+
+    @Test
     fun `Innlogget bruker får en 200`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(listOf(underenhetMedTilhørighetUtenBransje, overordnetEnhetMedTilhørighetUtenBransje))
+
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enUnderenhetIAltinn.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
 
             val resultat = TestContainerHelper.applikasjon.performGet(
                 url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
@@ -71,6 +131,11 @@ class SykefraværsstatistikkApiEndepunkterTest {
         // TODO Det er usannsynlig at statistikk mangler for land, sektor og bransje, best at de for tom liste i stedet for feil
         // Bør ha helt egen virksomhet som ikke har statistikk lagret
         runBlocking {
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = enUnderenhetUtenStatistikk.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+
             val responseManglerAltAvStatistikk = TestContainerHelper.applikasjon.performGet(
                 url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
                 config = withToken(),

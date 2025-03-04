@@ -19,9 +19,9 @@ import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.routing
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
@@ -32,17 +32,22 @@ import java.net.URI
 import java.util.concurrent.TimeUnit
 
 fun Route.medAltinnTilgang(
-    altinnrettigheterProxyKlient: AltinnrettigheterProxyKlient,
+    altinnTilgangerService: AltinnTilgangerService,
     enhetsregisteretService: EnhetsregisteretService,
     authorizedRoutes: Route.() -> Unit,
 ) = (this as RoutingNode).createChild(selector).apply {
-    install(AltinnAuthorizationPlugin(altinnKlient = altinnrettigheterProxyKlient, enhetsregisteretService = enhetsregisteretService))
+    install(
+        AltinnAuthorizationPlugin(
+            altinnTilgangerService = altinnTilgangerService,
+            enhetsregisteretService = enhetsregisteretService,
+        ),
+    )
     authorizedRoutes()
 }
 
 fun Application.configureRouting(
+    altinnTilgangerService: AltinnTilgangerService,
     sykefraværsstatistikkService: SykefraværsstatistikkService,
-    altinnrettigheterProxyKlient: AltinnrettigheterProxyKlient,
     enhetsregisteretService: EnhetsregisteretService,
 ) {
     routing {
@@ -98,7 +103,7 @@ fun Application.configureRouting(
         install(IgnoreTrailingSlash)
         authenticate("tokenx") {
             medAltinnTilgang(
-                altinnrettigheterProxyKlient = altinnrettigheterProxyKlient,
+                altinnTilgangerService = altinnTilgangerService,
                 enhetsregisteretService = enhetsregisteretService,
             ) {
                 sykefraværsstatistikk(

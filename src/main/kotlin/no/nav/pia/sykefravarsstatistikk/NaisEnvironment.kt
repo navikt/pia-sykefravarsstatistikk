@@ -25,6 +25,7 @@ internal object Systemmiljø {
     val tokenXTokenEndpoint: String by lazy { System.getenv("TOKEN_X_TOKEN_ENDPOINT") }
     val altinnRettigheterProxyUrl: String by lazy { System.getenv("ALTINN_RETTIGHETER_PROXY_URL") }
     val altinnRettigheterProxyClientId: String by lazy { System.getenv("ALTINN_RETTIGHETER_PROXY_CLIENT_ID") }
+    val altinnTilgangerProxyUrl: String by lazy { System.getenv("ALTINN_TILGANGER_PROXY_URL") }
     val serviceCodeSykefraværsstatistikk: String by lazy { System.getenv("ALTINN_RETTIGHET_SERVICE_CODE") }
     val serviceEditionSykefraværsstatistikk: String by lazy { System.getenv("ALTINN_RETTIGHET_SERVICE_EDITION") }
     val brregUrl: String by lazy { System.getenv("BRREG_URL") }
