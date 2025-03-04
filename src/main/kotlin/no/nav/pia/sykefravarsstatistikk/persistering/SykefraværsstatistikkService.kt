@@ -1,7 +1,10 @@
 package no.nav.pia.sykefravarsstatistikk.persistering
 
+import ia.felles.definisjoner.bransjer.Bransje
+import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
+import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkNæring
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -34,7 +37,7 @@ class SykefraværsstatistikkService(
     }
 
     fun hentSykefraværsstatistikkBransje(
-        bransje: String,
+        bransje: Bransje,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<SykefraværsstatistikkBransje> {
         logger.info("Henter statistikk for bransje '$bransje' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
@@ -42,6 +45,17 @@ class SykefraværsstatistikkService(
             bransje = bransje,
         )
         return sykefraværsstatistikkTilBransje.filter {
+            ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
+        }
+    }
+
+    fun hentSykefraværsstatistikkNæring(
+        næring: Næring,
+        førsteÅrstalOgKvartal: ÅrstallOgKvartal,
+    ): List<SykefraværsstatistikkNæring> {
+        logger.info("Henter statistikk for næring '$næring' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
+        val sykefraværsstatistikkTilNæring = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
+        return sykefraværsstatistikkTilNæring.filter {
             ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
         }
     }

@@ -7,7 +7,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
 import kotlinx.coroutines.time.withTimeoutOrNull
+import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
+import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
@@ -170,14 +172,27 @@ class KafkaContainerHelper(
         return offsetMetadata[offsetMetadata.keys.firstOrNull { it.topic().contains(topic) }]?.offset() ?: -1
     }
 
+    fun sendStatistikk(virksomheter: List<Virksomhet>) {
+        for (virksomhet in virksomheter) {
+            sendLandsstatistikk()
+
+            sendSektorstatistikk()
+
+            virksomhet.bransje()?.let { bransje -> sendBransjestatistikk(bransje = bransje) }
+                ?: sendNæringsstatistikk(næring = virksomhet.næringskode.næring)
+
+            sendVirksomhetsstatistikk(virksomhet = virksomhet)
+        }
+    }
+
     fun sendVirksomhetsstatistikk(
-        orgnr: String,
+        virksomhet: Virksomhet,
         startÅr: Int = 2010,
         sluttÅr: Int = 2024,
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {
-                val virksomhetMelding = enStandardVirksomhetsMelding(årstall = år, kvartal = kvartal, orgnr = orgnr)
+                val virksomhetMelding = enStandardVirksomhetsMelding(årstall = år, kvartal = kvartal, virksomhet = virksomhet)
                 sendOgVentTilKonsumert(
                     nøkkel = virksomhetMelding.toJsonKey(),
                     melding = virksomhetMelding.toJsonValue(),
@@ -236,14 +251,31 @@ class KafkaContainerHelper(
         }
     }
 
+    fun sendNæringsstatistikk(
+        næring: Næring,
+        startÅr: Int = 2010,
+        sluttÅr: Int = 2024,
+    ) {
+        for (år in startÅr..sluttÅr) {
+            for (kvartal in 1..4) {
+                val bransjemelding = enStandardNæringMelding(årstall = år, kvartal = kvartal, næring = næring)
+                sendOgVentTilKonsumert(
+                    nøkkel = bransjemelding.toJsonKey(),
+                    melding = bransjemelding.toJsonValue(),
+                    topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+                )
+            }
+        }
+    }
+
     private fun enStandardVirksomhetsMelding(
         årstall: Int,
         kvartal: Int,
-        orgnr: String,
+        virksomhet: Virksomhet,
     ): JsonMelding =
         JsonMelding(
             kategori = Statistikkategori.VIRKSOMHET,
-            kode = orgnr,
+            kode = virksomhet.orgnr,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
             prosent = 28.3,
             tapteDagsverk = 154.5439,
@@ -300,6 +332,48 @@ class KafkaContainerHelper(
                 TapteDagsverkPerVarighet(
                     varighet = "F",
                     tapteDagsverk = 5835.970000,
+                ),
+            ),
+        )
+
+    private fun enStandardNæringMelding(
+        årstall: Int,
+        kvartal: Int,
+        næring: Næring,
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.NÆRING,
+            kode = næring.tosifferIdentifikator,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            prosent = 5.9,
+            tapteDagsverk = 73154.250363,
+            muligeDagsverk = 1239902.548524,
+            antallPersoner = 25122,
+            tapteDagsverGradert = 28655.128516,
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 7925.03,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "B",
+                    tapteDagsverk = 30269.75,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "C",
+                    tapteDagsverk = 474.21,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 11120.86,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "E",
+                    tapteDagsverk = 9487.93,
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "F",
+                    tapteDagsverk = 13876.47,
                 ),
             ),
         )

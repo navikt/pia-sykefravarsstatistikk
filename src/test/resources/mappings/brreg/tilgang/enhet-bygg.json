@@ -1,13 +1,15 @@
 {
   "request" : {
-    "urlPathPattern" : "/enhetsregisteret/api/underenheter/912998827",
+    "urlPathPattern" : "/enhetsregisteret/api/enheter/100000003",
     "method" : "GET"
   },
   "response" : {
     "status" : 200,
-    "bodyFileName": "brreg-underenhet.json",
+    "bodyFileName": "brreg/tilgang/enhet-bygg.json",
     "headers" : {
       "Content-Type" : "application/json"
     }
   }
 }
+
+

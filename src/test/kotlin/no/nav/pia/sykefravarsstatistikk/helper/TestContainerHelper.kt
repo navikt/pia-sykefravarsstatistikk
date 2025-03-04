@@ -29,57 +29,6 @@ import kotlin.io.path.Path
 
 class TestContainerHelper {
     companion object {
-        // TODO: testdata for bedre tester
-        // A - Ikke i bransje, B - i Bransje, C - Ikke i bransje med rettighet, D - i bransje med rettighet
-        // OverordnetEnhet A, B, C og D
-        // Underenhet med tilhørighet
-        // Underenhet med tilhørighet og enkelrettighet
-        // Underenhet med tilhørighet og enkelrettighet
-        // TODO: Send samme data til kafka som gis i tester
-
-//        val OverordnetEnhetIBransje = OverordnetEnhet()
-//        val OverordnetEnhetIkkeIBransje = OverordnetEnhet()
-//        val OverordnetEnhetIBransjeMedRettighet = OverordnetEnhet()
-//        val OverordnetEnhetIkkeIBransjeMedRettighet = OverordnetEnhet()
-
-        val enOverordnetEnhetUtenStatistikk = OverordnetEnhet(
-            orgnr = "345678901",
-            navn = "Overordnet Enhet Uten Statistikk",
-            næringskode = Næringskode.tilFemsiffer("88.911"),
-            antallAnsatte = 1000,
-        )
-
-        val enUnderenhetUtenStatistikk = Underenhet(
-            orgnr = "234567890",
-            navn = "Underenhet Uten Statistikk",
-            næringskode = Næringskode.tilFemsiffer("88.911"),
-            overordnetEnhetOrgnr = enOverordnetEnhetUtenStatistikk.orgnr,
-            antallAnsatte = 10,
-        )
-
-        val enOverordnetEnhetIAltinn = OverordnetEnhet(
-            orgnr = "889640782",
-            navn = "ARBEIDS- OG VELFERDSETATEN",
-            næringskode = Næringskode.tilFemsiffer("84.120"),
-            antallAnsatte = 1626,
-        )
-
-        val enUnderenhetIAltinn = Underenhet(
-            orgnr = "912998827",
-            navn = "ARBEIDS- OG VELFERDSDIREKTORATET AVD FYRSTIKKALLÉEN",
-            næringskode = Næringskode.tilFemsiffer("84.120"),
-            overordnetEnhetOrgnr = enOverordnetEnhetIAltinn.orgnr,
-            antallAnsatte = 1542,
-        )
-
-        val enVirksomhetUtenTilgangIAltinn = Underenhet(
-            orgnr = "931561847",
-            navn = "ARBEIDS- OG VELFERDSDIREKTORATET AVD MØLLENDALSVEIEN 8 BERGEN",
-            næringskode = Næringskode.tilFemsiffer("84.120"),
-            overordnetEnhetOrgnr = enOverordnetEnhetIAltinn.orgnr,
-            antallAnsatte = 0,
-        )
-
         val log: Logger = LoggerFactory.getLogger(TestContainerHelper::class.java)
         val network = Network.newNetwork()
         val authContainerHelper = AuthContainerHelper(network = network)
@@ -189,6 +138,137 @@ class TestContainerHelper {
             subject = subject,
             audience = audience,
             claims = claims,
+        )
+
+        val overordnetEnhetMedEnkelrettighetBransjeBarnehage =
+            OverordnetEnhet(
+                orgnr = "100000001",
+                navn = "Overordnet Enhet Med Enkelrettighet Bransje Barnehage",
+                næringskode = Næringskode.tilFemsiffer("88.911"),
+                antallAnsatte = 33,
+            )
+
+        val underenhetMedEnkelrettighetBransjeBarnehage =
+            Underenhet(
+                orgnr = "100000002",
+                navn = "Underenhet Med Enkelrettighet Bransje Barnehage",
+                antallAnsatte = 33,
+                næringskode = Næringskode.tilFemsiffer("88.911"),
+                overordnetEnhetOrgnr = overordnetEnhetMedEnkelrettighetBransjeBarnehage.orgnr,
+            )
+
+        val overordnetEnhetMedTilhørighetBransjeSykehus =
+            OverordnetEnhet(
+                orgnr = "100000005",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehus",
+                næringskode = Næringskode.tilFemsiffer("86.101"),
+                antallAnsatte = 14152,
+            )
+
+        val underenhetMedEnkelrettighetBransjeSykehus =
+            Underenhet(
+                orgnr = "100000006",
+                navn = "Underenhet Med Enkelrettighet Bransje Sykehus",
+                antallAnsatte = 9045,
+                næringskode = Næringskode.tilFemsiffer("86.101"),
+                overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeSykehus.orgnr,
+            )
+
+        val overordnetEnhetMedTilhørighetBransjeBygg =
+            OverordnetEnhet(
+                orgnr = "100000003",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg",
+                næringskode = Næringskode.tilFemsiffer("41.200"),
+                antallAnsatte = 33,
+            )
+
+        val underenhetMedTilhørighetBransjeBygg =
+            Underenhet(
+                orgnr = "100000004",
+                navn = "Underenhet Med Tilhørighet Bransje Bygg",
+                antallAnsatte = 33,
+                næringskode = Næringskode.tilFemsiffer("41.200"),
+                overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeBygg.orgnr,
+            )
+
+        val overordnetEnhetMedEnkelrettighetUtenBransje =
+            OverordnetEnhet(
+                orgnr = "100000011",
+                navn = "Overordnet Enhet Med Enkelrettighet Uten Bransje",
+                næringskode = Næringskode.tilFemsiffer("02.100"),
+                antallAnsatte = 6,
+            )
+
+        val underenhetMedEnkelrettighetUtenBransje2 = Underenhet(
+            orgnr = "100000012",
+            navn = "Underenhet Med Enkelrettighet Uten Bransje 2",
+            antallAnsatte = 6,
+            næringskode = Næringskode.tilFemsiffer("02.100"),
+            overordnetEnhetOrgnr = overordnetEnhetMedEnkelrettighetUtenBransje.orgnr,
+        )
+
+        val overordnetEnhetMedTilhørighetUtenBransje2 =
+            OverordnetEnhet(
+                orgnr = "100000009",
+                navn = "Overordnet Enhet Med Tilhørighet Uten Bransje 2",
+                næringskode = Næringskode.tilFemsiffer("03.211"),
+                antallAnsatte = 6,
+            )
+
+        val underenhetMedEnkelrettighetUtenBransje = Underenhet(
+            orgnr = "100000010",
+            navn = "Underenhet Med Enkelrettighet Uten Bransje",
+            antallAnsatte = 6,
+            næringskode = Næringskode.tilFemsiffer("03.211"),
+            overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetUtenBransje2.orgnr,
+        )
+
+        val overordnetEnhetMedTilhørighetUtenBransje =
+            OverordnetEnhet(
+                orgnr = "100000007",
+                navn = "Overordnet Enhet Med Tilhørighet Uten Bransje",
+                næringskode = Næringskode.tilFemsiffer("68.209"),
+                antallAnsatte = 18,
+            )
+
+        val underenhetMedTilhørighetUtenBransje = Underenhet(
+            orgnr = "100000008",
+            navn = "Underenhet Med Tilhørighet Uten Bransje",
+            antallAnsatte = 18,
+            næringskode = Næringskode.tilFemsiffer("68.209"),
+            overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetUtenBransje.orgnr,
+        )
+
+        val overordnetEnhetUtenStatistikk =
+            OverordnetEnhet(
+                orgnr = "100000013",
+                navn = "Overordnet Enhet Uten Statistikk",
+                næringskode = Næringskode.tilFemsiffer("42.110"),
+                antallAnsatte = 14,
+            )
+
+        val enUnderenhetUtenStatistikk = Underenhet(
+            orgnr = "100000014",
+            navn = "Underenhet Uten Statistikk",
+            antallAnsatte = 14,
+            næringskode = Næringskode.tilFemsiffer("42.110"),
+            overordnetEnhetOrgnr = overordnetEnhetUtenStatistikk.orgnr,
+        )
+
+        val overordnetEnhetUtenTilgang =
+            OverordnetEnhet(
+                orgnr = "100000015",
+                navn = "Overordnet Enhet Uten Tilgang",
+                næringskode = Næringskode.tilFemsiffer("05.100"),
+                antallAnsatte = 14,
+            )
+
+        val underenhetUtenTilgang = Underenhet(
+            orgnr = "100000016",
+            navn = "Underenhet Uten Tilgang",
+            antallAnsatte = 72,
+            næringskode = Næringskode.tilFemsiffer("05.100"),
+            overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
         )
     }
 }

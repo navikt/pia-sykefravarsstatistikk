@@ -1,0 +1,73 @@
+{
+  "organisasjonsnummer": "100000015",
+  "navn": "Overordnet Enhet Uten Tilgang",
+  "organisasjonsform": {
+    "kode": "AS",
+    "beskrivelse": "Aksjeselskap",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/AS"
+      }
+    }
+  },
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "SVALBARD",
+    "kommunenummer": "2100"
+  },
+  "registreringsdatoEnhetsregisteret": "1992-09-18",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "kode": "09.109",
+    "beskrivelse": "Andre tjenester tilknyttet utvinning av råolje og naturgass"
+  },
+  "antallAnsatte": 50,
+  "harRegistrertAntallAnsatte": true,
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "1992-09-18",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "SVALBARD",
+    "kommunenummer": "2100"
+  },
+  "stiftelsesdato": "1992-09-18",
+  "institusjonellSektorkode": {
+    "kode": "1120",
+    "beskrivelse": "Statlig eide aksjeselskaper mv."
+  },
+  "registrertIForetaksregisteret": true,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "sisteInnsendteAarsregnskap": "1992",
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "vedtektsdato": "1992-09-18",
+  "vedtektsfestetFormaal": [
+    ""
+  ],
+  "aktivitet": [
+    ""
+  ],
+  "registreringsdatoForetaksregisteret": "1992-09-18",
+  "registrertIPartiregisteret": false,
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/100000015"
+    }
+  },
+  "respons_klasse": "Enhet"
+}

@@ -1,0 +1,13 @@
+{
+  "request" : {
+    "urlPathPattern" : "/enhetsregisteret/api/underenheter/100000008",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName": "brreg/tilgang/underenhet-uten-bransje.json",
+    "headers" : {
+      "Content-Type" : "application/json"
+    }
+  }
+}
