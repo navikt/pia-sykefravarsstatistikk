@@ -3,7 +3,9 @@ package no.nav.pia.sykefravarsstatistikk.api.auditlog
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
@@ -11,13 +13,27 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.sho
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedTilhørighetUtenBransje
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetUtenTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class AuditlogTest {
+    @BeforeTest
+    fun cleanUp() {
+        runBlocking {
+            altinnTilgangerContainerHelper.slettAlleRettigheter()
+        }
+    }
+
     @Test
     fun `auditlogger autorisert uthenting av kvartalsvis sykefraværsstatistikk`() {
-        kafkaContainerHelper.sendStatistikk(listOf(underenhetMedTilhørighetUtenBransje))
         runBlocking {
+            kafkaContainerHelper.sendStatistikk(listOf(underenhetMedTilhørighetUtenBransje))
+
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+
             val resultat =
                 applikasjon.performGet(
                     url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",

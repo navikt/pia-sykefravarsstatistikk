@@ -60,7 +60,7 @@ class AltinnTilgangerContainerHelper(
     internal fun leggTilRettigheter(
         overordnetEnhet: String = OVERORDNET_ENHET,
         underenhet: String,
-        altinn2Rettighet: String,
+        altinn2Rettighet: String = "",
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
     ) {
         log.debug(
