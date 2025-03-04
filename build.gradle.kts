@@ -69,9 +69,6 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:mockserver:$testcontainersVersion")
     testImplementation("org.mock-server:mockserver-client-java:$testMockServerVersion")
-    // Warning:(73, 24)  Provides transitive vulnerable dependency maven:com.google.guava:guava:31.1-jre CVE-2023-2976 5.5 Files or Directories Accessible to External Parties  Results powered by Mend.io
-// Warning:(73, 24)  Provides transitive vulnerable dependency maven:org.bouncycastle:bcprov-jdk18on:1.72 CVE-2024-29857 7.5 Uncontrolled Resource Consumption ('Resource Exhaustion') CVE-2024-30172 7.5 Loop with Unreachable Exit Condition ('Infinite Loop') CVE-2024-30171 5.9 Observable Discrepancy CVE-2023-33202 5.5 Uncontrolled Resource Consumption ('Resource Exhaustion') CVE-2023-33201 5.3 Improper Certificate Validation  Results powered by Mend.io
-    // Warning:(73, 24)  Provides transitive vulnerable dependency maven:org.xmlunit:xmlunit-core:2.9.1 CVE-2024-31573 5.6 Insufficient Information  Results powered by Mend.io
 
     testImplementation("io.aiven:testcontainers-fake-gcs-server:0.2.0")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockStandaloneVersion")
