@@ -6,6 +6,7 @@ interface Virksomhet {
     val orgnr: String
     val navn: String
     val næringskode: Næringskode
+    val antallAnsatte: Int
 
     fun bransje(): Bransje? = Bransje.fra(næringskode = næringskode.femsifferIdentifikator)
 }

@@ -2,11 +2,13 @@ package no.nav.pia.sykefravarsstatistikk.persistering
 
 import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkNæring
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
+import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,14 +24,14 @@ class SykefraværsstatistikkService(
     }
 
     fun hentSykefraværsstatistikkVirksomhet(
-        orgnr: String,
+        virksomhet: Virksomhet,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<SykefraværsstatistikkVirksomhet> {
         logger.info(
-            "Henter statistikk for virksomhet med orgnr: '$orgnr' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}",
+            "Henter statistikk for virksomhet med orgnr: '${virksomhet.orgnr}' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}",
         )
         val sykefraværsstatistikkTilVirksomhet = sykefraværsstatistikkRepository.hentSykefraværsstatistikkVirksomhet(
-            orgnr = orgnr,
+            virksomhet = virksomhet,
         )
         return sykefraværsstatistikkTilVirksomhet.filter {
             ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
@@ -61,7 +63,7 @@ class SykefraværsstatistikkService(
     }
 
     fun hentSykefraværsstatistikkSektor(
-        sektor: String,
+        sektor: Sektor,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<SykefraværsstatistikkSektor> {
         logger.info("Henter statistikk for sektor '$sektor' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")

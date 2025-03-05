@@ -13,7 +13,10 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.time.withTimeoutOrNull
-import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
+import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto
+import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto.Companion.tilDomene
+import no.nav.pia.sykefravarsstatistikk.domene.BrregNæringskodeDto
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilDomene
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
@@ -136,16 +139,26 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000001",
                 navn = "Overordnet Enhet Med Enkelrettighet Bransje Barnehage",
-                næringskode = Næringskode.tilFemsiffer("88.911"),
-                antallAnsatte = 33,
+                antallAnsatte = 50,
+                næringskode = BrregNæringskodeDto(
+                    kode = "88.911",
+                    beskrivelse = "Barnehager",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "2100",
+                    beskrivelse = "Private aksjeselskaper mv.",
+                ).tilDomene(),
             )
 
         val underenhetMedEnkelrettighetBransjeBarnehage =
             Underenhet(
                 orgnr = "100000002",
                 navn = "Underenhet Med Enkelrettighet Bransje Barnehage",
-                antallAnsatte = 33,
-                næringskode = Næringskode.tilFemsiffer("88.911"),
+                antallAnsatte = 50,
+                næringskode = BrregNæringskodeDto(
+                    kode = "88.911",
+                    beskrivelse = "Barnehager",
+                ).tilDomene(),
                 overordnetEnhetOrgnr = overordnetEnhetMedEnkelrettighetBransjeBarnehage.orgnr,
             )
 
@@ -153,16 +166,26 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000005",
                 navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehus",
-                næringskode = Næringskode.tilFemsiffer("86.101"),
-                antallAnsatte = 14152,
+                antallAnsatte = 100,
+                næringskode = BrregNæringskodeDto(
+                    kode = "86.101",
+                    beskrivelse = "Alminnelige somatiske sykehus",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "6100",
+                    beskrivelse = "Statsforvaltningen",
+                ).tilDomene(),
             )
 
         val underenhetMedEnkelrettighetBransjeSykehus =
             Underenhet(
                 orgnr = "100000006",
                 navn = "Underenhet Med Enkelrettighet Bransje Sykehus",
-                antallAnsatte = 9045,
-                næringskode = Næringskode.tilFemsiffer("86.101"),
+                antallAnsatte = 100,
+                næringskode = BrregNæringskodeDto(
+                    kode = "86.101",
+                    beskrivelse = "Alminnelige somatiske sykehus",
+                ).tilDomene(),
                 overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeSykehus.orgnr,
             )
 
@@ -170,16 +193,26 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000003",
                 navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg",
-                næringskode = Næringskode.tilFemsiffer("41.200"),
-                antallAnsatte = 33,
+                antallAnsatte = 150,
+                næringskode = BrregNæringskodeDto(
+                    kode = "41.200",
+                    beskrivelse = "Oppføring av bygninger",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "2100",
+                    beskrivelse = "Private aksjeselskaper mv.",
+                ).tilDomene(),
             )
 
         val underenhetMedTilhørighetBransjeBygg =
             Underenhet(
                 orgnr = "100000004",
                 navn = "Underenhet Med Tilhørighet Bransje Bygg",
-                antallAnsatte = 33,
-                næringskode = Næringskode.tilFemsiffer("41.200"),
+                antallAnsatte = 150,
+                næringskode = BrregNæringskodeDto(
+                    kode = "41.200",
+                    beskrivelse = "Oppføring av bygninger",
+                ).tilDomene(),
                 overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeBygg.orgnr,
             )
 
@@ -187,15 +220,25 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000011",
                 navn = "Overordnet Enhet Med Enkelrettighet Uten Bransje",
-                næringskode = Næringskode.tilFemsiffer("02.100"),
-                antallAnsatte = 6,
+                antallAnsatte = 200,
+                næringskode = BrregNæringskodeDto(
+                    kode = "02.100",
+                    beskrivelse = "Skogskjøtsel og andre skogbruksaktiviteter",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "8200",
+                    beskrivelse = "Personlig næringsdrivende",
+                ).tilDomene(),
             )
 
         val underenhetMedEnkelrettighetUtenBransje2 = Underenhet(
             orgnr = "100000012",
             navn = "Underenhet Med Enkelrettighet Uten Bransje 2",
-            antallAnsatte = 6,
-            næringskode = Næringskode.tilFemsiffer("02.100"),
+            antallAnsatte = 200,
+            næringskode = BrregNæringskodeDto(
+                kode = "02.100",
+                beskrivelse = "Skogskjøtsel og andre skogbruksaktiviteter",
+            ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetMedEnkelrettighetUtenBransje.orgnr,
         )
 
@@ -203,15 +246,25 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000009",
                 navn = "Overordnet Enhet Med Tilhørighet Uten Bransje 2",
-                næringskode = Næringskode.tilFemsiffer("03.211"),
-                antallAnsatte = 6,
+                antallAnsatte = 250,
+                næringskode = BrregNæringskodeDto(
+                    kode = "03.211",
+                    beskrivelse = "Produksjon av matfisk og skalldyr i hav- og kystbasert fiskeoppdrett",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "2100",
+                    beskrivelse = "Private aksjeselskaper mv.",
+                ).tilDomene(),
             )
 
         val underenhetMedEnkelrettighetUtenBransje = Underenhet(
             orgnr = "100000010",
             navn = "Underenhet Med Enkelrettighet Uten Bransje",
-            antallAnsatte = 6,
-            næringskode = Næringskode.tilFemsiffer("03.211"),
+            antallAnsatte = 250,
+            næringskode = BrregNæringskodeDto(
+                kode = "03.211",
+                beskrivelse = "Produksjon av matfisk og skalldyr i hav- og kystbasert fiskeoppdrett",
+            ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetUtenBransje2.orgnr,
         )
 
@@ -219,15 +272,25 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000007",
                 navn = "Overordnet Enhet Med Tilhørighet Uten Bransje",
-                næringskode = Næringskode.tilFemsiffer("68.209"),
-                antallAnsatte = 18,
+                næringskode = BrregNæringskodeDto(
+                    kode = "68.209",
+                    beskrivelse = "Utleie av egen eller leid fast eiendom ellers",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "2100",
+                    beskrivelse = "Private aksjeselskaper mv.",
+                ).tilDomene(),
+                antallAnsatte = 300,
             )
 
         val underenhetMedTilhørighetUtenBransje = Underenhet(
             orgnr = "100000008",
             navn = "Underenhet Med Tilhørighet Uten Bransje",
-            antallAnsatte = 18,
-            næringskode = Næringskode.tilFemsiffer("68.209"),
+            antallAnsatte = 300,
+            næringskode = BrregNæringskodeDto(
+                kode = "68.209",
+                beskrivelse = "Utleie av egen eller leid fast eiendom ellers",
+            ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetUtenBransje.orgnr,
         )
 
@@ -235,15 +298,25 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000013",
                 navn = "Overordnet Enhet Uten Statistikk",
-                næringskode = Næringskode.tilFemsiffer("42.110"),
-                antallAnsatte = 14,
+                antallAnsatte = 350,
+                næringskode = BrregNæringskodeDto(
+                    kode = "42.110",
+                    beskrivelse = "Bygging av veier og motorveier",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "2100",
+                    beskrivelse = "Private aksjeselskaper mv.",
+                ).tilDomene(),
             )
 
         val enUnderenhetUtenStatistikk = Underenhet(
             orgnr = "100000014",
             navn = "Underenhet Uten Statistikk",
-            antallAnsatte = 14,
-            næringskode = Næringskode.tilFemsiffer("42.110"),
+            antallAnsatte = 350,
+            næringskode = BrregNæringskodeDto(
+                kode = "42.110",
+                beskrivelse = "Bygging av veier og motorveier",
+            ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetUtenStatistikk.orgnr,
         )
 
@@ -251,15 +324,25 @@ class TestContainerHelper {
             OverordnetEnhet(
                 orgnr = "100000015",
                 navn = "Overordnet Enhet Uten Tilgang",
-                næringskode = Næringskode.tilFemsiffer("05.100"),
-                antallAnsatte = 14,
+                antallAnsatte = 400,
+                næringskode = BrregNæringskodeDto(
+                    kode = "09.109",
+                    beskrivelse = "Andre tjenester tilknyttet utvinning av råolje og naturgass",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "1120",
+                    beskrivelse = "Statlig eide aksjeselskaper mv.",
+                ).tilDomene(),
             )
 
         val underenhetUtenTilgang = Underenhet(
             orgnr = "100000016",
             navn = "Underenhet Uten Tilgang",
-            antallAnsatte = 72,
-            næringskode = Næringskode.tilFemsiffer("05.100"),
+            antallAnsatte = 400,
+            næringskode = BrregNæringskodeDto(
+                kode = "09.109",
+                beskrivelse = "Andre tjenester tilknyttet utvinning av råolje og naturgass",
+            ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
         )
     }

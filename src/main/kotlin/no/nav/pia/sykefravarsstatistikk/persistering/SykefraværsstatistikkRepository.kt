@@ -7,11 +7,13 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkNæring
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
 import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
+import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -140,16 +142,16 @@ class SykefraværsstatistikkRepository(
             }
         }
 
-    fun hentSykefraværsstatistikkVirksomhet(orgnr: String): List<SykefraværsstatistikkVirksomhet> =
+    fun hentSykefraværsstatistikkVirksomhet(virksomhet: Virksomhet): List<SykefraværsstatistikkVirksomhet> =
 
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentSykefraværsstatistikk(orgnr)
+                    tx.hentSykefraværsstatistikk(virksomhet)
                 }
             }
         } catch (e: Exception) {
-            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet $orgnr", e)
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet ${virksomhet.orgnr}", e)
             throw e
         }
 
@@ -177,7 +179,7 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun hentSykefraværsstatistikkSektor(sektor: String): List<SykefraværsstatistikkSektor> =
+    fun hentSykefraværsstatistikkSektor(sektor: Sektor): List<SykefraværsstatistikkSektor> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
@@ -297,7 +299,7 @@ class SykefraværsstatistikkRepository(
         )
     }
 
-    private fun TransactionalSession.hentSektorstatistikk(sektor: String): List<SykefraværsstatistikkSektor> {
+    private fun TransactionalSession.hentSektorstatistikk(sektor: Sektor): List<SykefraværsstatistikkSektor> {
         val query =
             """
             SELECT *
@@ -308,7 +310,7 @@ class SykefraværsstatistikkRepository(
             queryOf(
                 query,
                 mapOf(
-                    "sektor" to sektor,
+                    "sektor" to sektor.kode,
                 ),
             ).map { row -> row.tilSektorstatistikk() }.asList,
         )
@@ -331,7 +333,7 @@ class SykefraværsstatistikkRepository(
         )
     }
 
-    private fun TransactionalSession.hentSykefraværsstatistikk(orgnr: String): List<SykefraværsstatistikkVirksomhet> {
+    private fun TransactionalSession.hentSykefraværsstatistikk(virksomhet: Virksomhet): List<SykefraværsstatistikkVirksomhet> {
         val query =
             """
             SELECT *
@@ -342,7 +344,7 @@ class SykefraværsstatistikkRepository(
             queryOf(
                 query,
                 mapOf(
-                    "orgnr" to orgnr,
+                    "orgnr" to virksomhet.orgnr,
                 ),
             ).map { row -> row.tilVirksomhetsstatistikk() }.asList,
         )

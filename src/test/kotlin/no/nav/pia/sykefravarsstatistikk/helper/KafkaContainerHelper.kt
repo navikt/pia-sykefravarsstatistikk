@@ -8,7 +8,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
 import kotlinx.coroutines.time.withTimeoutOrNull
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
+import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
@@ -172,17 +175,19 @@ class KafkaContainerHelper(
         return offsetMetadata[offsetMetadata.keys.firstOrNull { it.topic().contains(topic) }]?.offset() ?: -1
     }
 
-    fun sendStatistikk(virksomheter: List<Virksomhet>) {
-        for (virksomhet in virksomheter) {
-            sendLandsstatistikk()
+    fun sendStatistikk(
+        underenhet: Underenhet,
+        overordnetEnhet: OverordnetEnhet,
+    ) {
+        sendLandsstatistikk()
 
-            sendSektorstatistikk()
+        sendSektorstatistikk(overordnetEnhet.sektor)
 
-            virksomhet.bransje()?.let { bransje -> sendBransjestatistikk(bransje = bransje) }
-                ?: sendNæringsstatistikk(næring = virksomhet.næringskode.næring)
+        underenhet.bransje()?.let { bransje -> sendBransjestatistikk(bransje = bransje) }
+            ?: sendNæringsstatistikk(næring = underenhet.næringskode.næring)
 
-            sendVirksomhetsstatistikk(virksomhet = virksomhet)
-        }
+        sendVirksomhetsstatistikk(virksomhet = underenhet)
+        sendVirksomhetsstatistikk(virksomhet = overordnetEnhet)
     }
 
     fun sendVirksomhetsstatistikk(
@@ -219,12 +224,17 @@ class KafkaContainerHelper(
     }
 
     fun sendSektorstatistikk(
+        sektor: Sektor,
         startÅr: Int = 2010,
         sluttÅr: Int = 2024,
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {
-                val sektormelding = enStandardSektorMelding(år, kvartal)
+                val sektormelding = enStandardSektorMelding(
+                    årstall = år,
+                    kvartal = kvartal,
+                    sektor = sektor,
+                )
                 sendOgVentTilKonsumert(
                     nøkkel = sektormelding.toJsonKey(),
                     melding = sektormelding.toJsonValue(),
@@ -381,11 +391,11 @@ class KafkaContainerHelper(
     private fun enStandardSektorMelding(
         årstall: Int,
         kvartal: Int,
-        sektor: String = "1",
+        sektor: Sektor,
     ): JsonMelding =
         JsonMelding(
             kategori = Statistikkategori.SEKTOR,
-            kode = sektor,
+            kode = sektor.kode,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
             tapteDagsverk = 1275292.330000,
             muligeDagsverk = 19790049.740000,

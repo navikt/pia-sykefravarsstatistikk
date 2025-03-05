@@ -1,5 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
+import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -10,10 +11,12 @@ import no.nav.pia.sykefravarsstatistikk.api.auth.TilgangerKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.UnderenhetKey
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.tilDto
+import no.nav.pia.sykefravarsstatistikk.api.dto.SamletAggregertStatistikkDto
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.LAND
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.http.orgnr
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
 
 fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: SykefraværsstatistikkService) {
@@ -24,8 +27,6 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 val underenhet = call.attributes[UnderenhetKey]
                 val overordnetEnhet = call.attributes[OverordnetEnhetKey]
 
-                // TODO: Hvordan finne sektor
-                val sektor = "1"
                 // TODO: Hvordan finne inneværende kvartal? Bare kall til db og sjekk høyeste årstall+kvartal?
                 val årstall = 2024
                 val kvartal = 4
@@ -44,13 +45,13 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 response.add(landstatistikk.tilDto(type = LAND.name, label = "Norge"))
 
                 val sektorstatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkSektor(
-                    sektor = sektor,
+                    sektor = overordnetEnhet.sektor,
                     førsteÅrstalOgKvartal = førsteKvartal,
                 ).ifEmpty {
                     call.respond(message = "Ingen sektorstatistikk funnet", status = HttpStatusCode.BadRequest)
                     return@get
                 }
-                response.add(sektorstatistikk.tilDto(type = SEKTOR.name, label = sektor))
+                response.add(sektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.kode))
 
                 val bransje = underenhet.bransje()
                 if (bransje != null) {
@@ -79,7 +80,7 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 response.add(
                     if (tilganger.harEnkeltTilgang) {
                         val virksomhetsstatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
-                            orgnr = underenhet.orgnr,
+                            virksomhet = underenhet,
                             førsteÅrstalOgKvartal = førsteKvartal,
                         )
                             .ifEmpty {
@@ -103,7 +104,7 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 response.add(
                     if (tilganger.harEnkeltTilgangOverordnetEnhet) {
                         val overordnetEnhetStatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
-                            orgnr = overordnetEnhet.orgnr,
+                            virksomhet = overordnetEnhet,
                             førsteÅrstalOgKvartal = førsteKvartal,
                         ).ifEmpty {
                             call.respond(

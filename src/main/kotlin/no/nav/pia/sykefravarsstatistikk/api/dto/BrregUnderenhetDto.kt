@@ -1,16 +1,9 @@
 package no.nav.pia.sykefravarsstatistikk.api.dto
 
 import kotlinx.serialization.Serializable
-import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
+import no.nav.pia.sykefravarsstatistikk.domene.BrregNæringskodeDto
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilDomene
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
-
-@Serializable
-data class BrregNæringskodeDto(
-    val kode: String,
-    val beskrivelse: String,
-) {
-    fun tilDomene(): Næringskode = Næringskode.tilFemsiffer(kode)
-}
 
 @Serializable
 data class BrregUnderenhetDto(

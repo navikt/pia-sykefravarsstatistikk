@@ -4,8 +4,10 @@ package no.nav.pia.sykefravarsstatistikk.domene
 class Næringskode private constructor(
     val femsifferIdentifikator: String,
 ) {
-    companion object Factory {
-        fun tilFemsiffer(kode: String): Næringskode = Næringskode(kode.replace(".", ""))
+    companion object {
+        private fun tilFemsiffer(kode: String): Næringskode = Næringskode(kode.replace(".", ""))
+
+        fun BrregNæringskodeDto.tilDomene(): Næringskode = tilFemsiffer(this.kode)
     }
 
     init {

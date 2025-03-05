@@ -8,6 +8,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetEnhetMedTilhørighetUtenBransje
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedTilhørighetUtenBransje
@@ -27,7 +28,10 @@ class AuditlogTest {
     @Test
     fun `auditlogger autorisert uthenting av kvartalsvis sykefraværsstatistikk`() {
         runBlocking {
-            kafkaContainerHelper.sendStatistikk(listOf(underenhetMedTilhørighetUtenBransje))
+            kafkaContainerHelper.sendStatistikk(
+                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
+                underenhet = underenhetMedTilhørighetUtenBransje,
+            )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
