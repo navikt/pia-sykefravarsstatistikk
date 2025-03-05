@@ -42,6 +42,9 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
+    logging:
+      destinations:
+        - id: loki
   env:
     - name: BRREG_URL
       value: "https://data.brreg.no/"
