@@ -56,8 +56,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response`() {
         runBlocking {
-            val resultat = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
             )
             resultat.shouldNotBeNull()
             resultat.status shouldBe HttpStatusCode.Unauthorized
@@ -67,11 +67,12 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response`() {
         runBlocking {
-            val resultat = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                 config = withToken(),
             )
-            resultat?.status shouldBe HttpStatusCode.Forbidden
+            resultat.shouldNotBeNull()
+            resultat.status shouldBe HttpStatusCode.Forbidden
         }
     }
 
@@ -87,8 +88,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
             )
 
-            val resultat = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedEnkelrettighetBransjeBarnehage.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedEnkelrettighetBransjeBarnehage.orgnr,
                 config = withToken(),
             )
             resultat.shouldNotBeNull()
@@ -128,8 +129,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
-            val resultat = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                 config = withToken(),
             )
 
@@ -149,8 +150,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
-            val responseManglerAltAvStatistikk = TestContainerHelper.applikasjon.performGet(
-                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val responseManglerAltAvStatistikk: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = enUnderenhetUtenStatistikk.orgnr,
                 config = withToken(),
             )
 
@@ -159,8 +160,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             kafkaContainerHelper.sendLandsstatistikk()
 
-            val responseManglerAltUtenomLand = TestContainerHelper.applikasjon.performGet(
-                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val responseManglerAltUtenomLand: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = enUnderenhetUtenStatistikk.orgnr,
                 config = withToken(),
             )
 
@@ -169,8 +170,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             kafkaContainerHelper.sendSektorstatistikk(sektor = overordnetEnhetUtenStatistikk.sektor)
 
-            val responseManglerAltUtenomLandOgSektor = TestContainerHelper.applikasjon.performGet(
-                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val responseManglerAltUtenomLandOgSektor: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = enUnderenhetUtenStatistikk.orgnr,
                 config = withToken(),
             )
 
@@ -185,8 +186,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 kafkaContainerHelper.sendNæringsstatistikk(næring = enUnderenhetUtenStatistikk.næringskode.næring)
             }
 
-            val responseManglerVirksomhet = TestContainerHelper.applikasjon.performGet(
-                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val responseManglerVirksomhet: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = enUnderenhetUtenStatistikk.orgnr,
                 config = withToken(),
             )
 
@@ -195,8 +196,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             kafkaContainerHelper.sendVirksomhetsstatistikk(virksomhet = enUnderenhetUtenStatistikk)
 
-            val harAltAvStatistikk = TestContainerHelper.applikasjon.performGet(
-                url = "/${enUnderenhetUtenStatistikk.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val harAltAvStatistikk: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = enUnderenhetUtenStatistikk.orgnr,
                 config = withToken(),
             )
 
@@ -216,8 +217,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                 config = withToken(),
             )
 
@@ -274,8 +275,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 underenhet = underenhetMedTilhørighetBransjeBygg,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetBransjeBygg.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedTilhørighetBransjeBygg.orgnr,
                 config = withToken(),
             )
 
@@ -334,8 +335,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedEnkelrettighetUtenBransje.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedEnkelrettighetUtenBransje.orgnr,
                 config = withToken(),
             )
 
@@ -395,8 +396,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 underenhet = underenhetMedEnkelrettighetBransjeSykehus,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedEnkelrettighetBransjeSykehus.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedEnkelrettighetBransjeSykehus.orgnr,
                 config = withToken(),
             )
 
@@ -457,8 +458,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 underenhet = underenhetMedEnkelrettighetUtenBransje2,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedEnkelrettighetUtenBransje2.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedEnkelrettighetUtenBransje2.orgnr,
                 config = withToken(),
             )
 
@@ -524,8 +525,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedEnkelrettighetBransjeBarnehage.orgnr}/sykefravarshistorikk/kvartalsvis",
+            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedEnkelrettighetBransjeBarnehage.orgnr,
                 config = withToken(),
             )
 

@@ -98,6 +98,14 @@ class TestContainerHelper {
             method = HttpMethod.Get
         }
 
+        suspend fun hentKvartalsvisStatistikk(
+            orgnr: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ) = applikasjon.performGet(
+            url = "/sykefravarsstatistikk/$orgnr/historikk/kvartalsvis",
+            config = config,
+        )
+
         private val httpClient = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json()

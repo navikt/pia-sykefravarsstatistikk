@@ -16,12 +16,16 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.LAND
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
-import no.nav.pia.sykefravarsstatistikk.http.orgnr
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
 
 fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: SykefraværsstatistikkService) {
-    route("/{orgnr}/sykefravarshistorikk") {
-        route("/kvartalsvis") {
+//    route("/sykefravarsstatistikk/{orgnr}") {
+//        route("/siste4kvartaler/aggregert") {}
+//        route("/historiskk/kvartalsvis") {
+//            get {
+
+    route("/sykefravarsstatistikk/{orgnr}") {
+        route("/historikk/kvartalsvis") {
             get {
                 val tilganger = call.attributes[TilgangerKey]
                 val underenhet = call.attributes[UnderenhetKey]
@@ -126,6 +130,69 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 call.respond(
                     status = HttpStatusCode.OK,
                     message = response,
+                )
+            }
+        }
+
+        route("/siste4kvartaler/aggregert") {
+            get {
+                val tilganger = call.attributes[TilgangerKey]
+                val underenhet = call.attributes[UnderenhetKey]
+                val overordnetEnhet = call.attributes[OverordnetEnhetKey]
+                val årstall = 2024
+                val kvartal = 4
+                val bransje = Bransje.SYKEHJEM
+                val inneværendeKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal)
+                val førsteKvartal = inneværendeKvartal.minusKvartaler(4) // 4 siste kvartaler
+
+                val overordnetEnhetStatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
+                    virksomhet = overordnetEnhet,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                )
+                val statistikkVirksomhet = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
+                    virksomhet = underenhet,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                )
+                val statistikkBransje = sykefraværsstatistikkService.hentSykefraværsstatistikkBransje(
+                    bransje = bransje,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                )
+                val sektorstatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkSektor(
+                    sektor = overordnetEnhet.sektor,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                )
+                val statistikkLand = sykefraværsstatistikkService.hentSykefraværsstatistikkLand(førsteKvartal)
+
+                if (statistikkVirksomhet.isEmpty()) {
+                    call.respond(message = "Ingen virksomhetsstatistikk funnet", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                if (statistikkBransje.isEmpty()) {
+                    call.respond(message = "Ingen bransjestatistikk funnet", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                if (sektorstatistikk.isEmpty()) {
+                    call.respond(message = "Ingen sektorstatistikk funnet", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                if (statistikkLand.isEmpty()) {
+                    call.respond(message = "Ingen landstatistikk funnet", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                val aggregertStatistikk: SamletAggregertStatistikkDto = SamletAggregertStatistikkDto.lagAggregertStatistikk(
+                    statistikkLand = statistikkLand,
+                    bransje = bransje,
+                    statistikkBransje = statistikkBransje,
+                    statistikkVirksomhet = statistikkVirksomhet,
+                )
+
+                call.respond(
+                    HttpStatusCode.OK,
+                    message = aggregertStatistikk,
                 )
             }
         }
