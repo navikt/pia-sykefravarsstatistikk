@@ -1,6 +1,5 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
-import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -19,11 +18,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
 
 fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: SykefraværsstatistikkService) {
-//    route("/sykefravarsstatistikk/{orgnr}") {
-//        route("/siste4kvartaler/aggregert") {}
-//        route("/historiskk/kvartalsvis") {
-//            get {
-
     route("/sykefravarsstatistikk/{orgnr}") {
         route("/historikk/kvartalsvis") {
             get {
@@ -141,7 +135,6 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 val overordnetEnhet = call.attributes[OverordnetEnhetKey]
                 val årstall = 2024
                 val kvartal = 4
-                val bransje = Bransje.SYKEHJEM
                 val inneværendeKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal)
                 val førsteKvartal = inneværendeKvartal.minusKvartaler(4) // 4 siste kvartaler
 
@@ -154,7 +147,7 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                     førsteÅrstalOgKvartal = førsteKvartal,
                 )
                 val statistikkBransje = sykefraværsstatistikkService.hentSykefraværsstatistikkBransje(
-                    bransje = bransje,
+                    bransje = underenhet.bransje()!!,
                     førsteÅrstalOgKvartal = førsteKvartal,
                 )
                 val sektorstatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkSektor(
@@ -185,7 +178,7 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
 
                 val aggregertStatistikk: SamletAggregertStatistikkDto = SamletAggregertStatistikkDto.lagAggregertStatistikk(
                     statistikkLand = statistikkLand,
-                    bransje = bransje,
+                    bransje = underenhet.bransje()!!,
                     statistikkBransje = statistikkBransje,
                     statistikkVirksomhet = statistikkVirksomhet,
                 )
