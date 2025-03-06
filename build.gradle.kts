@@ -2,16 +2,16 @@ val arrowCoreVersion = "2.0.1"
 val kafkClientVersion = "3.9.0"
 val kotestVersion = "6.0.0.M1"
 val kotlinVersion = "2.1.10"
-val ktorVersion = "3.1.0"
-val logbackVersion = "1.5.16"
+val ktorVersion = "3.1.1"
+val logbackVersion = "1.5.17"
 val iaFellesVersion = "1.10.2"
 val logstashLogbackEncoderVersion = "8.0"
 val mockOAuth2ServerVersion = "2.1.10"
-val nimbusJoseJwtVersion = "10.0.1"
+val nimbusJoseJwtVersion = "10.0.2"
 val prometeusVersion = "1.14.4"
-val testcontainersVersion = "1.20.4"
+val testcontainersVersion = "1.20.6"
 val testMockServerVersion = "5.15.0"
-val wiremockStandaloneVersion = "3.12.0"
+val wiremockStandaloneVersion = "3.12.1"
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -54,7 +54,7 @@ dependencies {
     // Database
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("com.zaxxer:HikariCP:6.2.1")
-    implementation("org.flywaydb:flyway-database-postgresql:11.3.3")
+    implementation("org.flywaydb:flyway-database-postgresql:11.3.4")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Felles definisjoner for IA-domenet
@@ -85,13 +85,13 @@ dependencies {
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.1.118.Final")
+                require("4.1.119.Final")
             }
             because("From Ktor version: 2.3.5 -> io.netty:netty-codec-http2 vulnerable to HTTP/2 Rapid Reset Attack")
         }
         testImplementation("com.google.guava:guava") {
             version {
-                require("33.3.1-jre")
+                require("33.4.0-jre")
             }
             because("Mockserver har sårbar guava versjon")
         }
