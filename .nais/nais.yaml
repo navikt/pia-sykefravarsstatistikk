@@ -50,7 +50,9 @@ spec:
         - id: elastic
   accessPolicy:
     inbound:
-      - application: min-ia
+      rules:
+        - application: min-ia
+          namespace: pia
     outbound:
       rules:
         - application: altinn-tilganger
