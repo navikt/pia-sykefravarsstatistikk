@@ -48,6 +48,13 @@ spec:
       destinations:
         - id: loki
         - id: elastic
+  accessPolicy:
+    inbound:
+      - application: min-ia
+    outbound:
+      rules:
+        - application: altinn-tilganger
+          namespace: fager
   env:
     - name: BRREG_URL
       value: "https://data.brreg.no/"
