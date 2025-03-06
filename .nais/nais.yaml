@@ -44,10 +44,10 @@ spec:
       runtime: java
       destinations:
         - id: "grafana-lgtm"
-  logging:
-    destinations:
-      - id: loki
-      - id: elastic
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
   env:
     - name: BRREG_URL
       value: "https://data.brreg.no/"
