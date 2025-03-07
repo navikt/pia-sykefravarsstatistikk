@@ -16,11 +16,15 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: SykefraværsstatistikkService) {
+    val logger: Logger = LoggerFactory.getLogger(this::class.java)
     route("/sykefravarsstatistikk/{orgnr}") {
         route("/historikk/kvartalsvis") {
             get {
+                logger.info("Henter kvartalsvis statistikk")
                 val tilganger = call.attributes[TilgangerKey]
                 val underenhet = call.attributes[UnderenhetKey]
                 val overordnetEnhet = call.attributes[OverordnetEnhetKey]
@@ -57,7 +61,10 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                         bransje = bransje,
                         førsteÅrstalOgKvartal = førsteKvartal,
                     ).ifEmpty {
-                        call.respond(message = "Ingen statistikk funnet or bransje '${bransje.navn}'", status = HttpStatusCode.BadRequest)
+                        call.respond(
+                            message = "Ingen statistikk funnet or bransje '${bransje.navn}'",
+                            status = HttpStatusCode.BadRequest,
+                        )
                         return@get
                     }
                     response.add(bransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
@@ -72,7 +79,12 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                         )
                         return@get
                     }
-                    response.add(næringsstatistikk.tilDto(type = "NÆRING", label = underenhet.næringskode.næring.tosifferIdentifikator))
+                    response.add(
+                        næringsstatistikk.tilDto(
+                            type = "NÆRING",
+                            label = underenhet.næringskode.næring.tosifferIdentifikator,
+                        ),
+                    )
                 }
 
                 response.add(
@@ -101,16 +113,17 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
 
                 response.add(
                     if (tilganger.harEnkeltTilgangOverordnetEnhet) {
-                        val overordnetEnhetStatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
-                            virksomhet = overordnetEnhet,
-                            førsteÅrstalOgKvartal = førsteKvartal,
-                        ).ifEmpty {
-                            call.respond(
-                                message = "Ingen virksomhetsstatistikk funnet for overordnet enhet '${overordnetEnhet.orgnr}'",
-                                status = HttpStatusCode.BadRequest,
-                            )
-                            return@get
-                        }
+                        val overordnetEnhetStatistikk =
+                            sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
+                                virksomhet = overordnetEnhet,
+                                førsteÅrstalOgKvartal = førsteKvartal,
+                            ).ifEmpty {
+                                call.respond(
+                                    message = "Ingen virksomhetsstatistikk funnet for overordnet enhet '${overordnetEnhet.orgnr}'",
+                                    status = HttpStatusCode.BadRequest,
+                                )
+                                return@get
+                            }
                         overordnetEnhetStatistikk.tilDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn)
                     } else {
                         KvartalsvisSykefraværshistorikkDto(
@@ -130,6 +143,7 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
 
         route("/siste4kvartaler/aggregert") {
             get {
+                logger.info("Henter aggregert statistikk siste fire kvartaler")
                 val tilganger = call.attributes[TilgangerKey]
                 val underenhet = call.attributes[UnderenhetKey]
                 val overordnetEnhet = call.attributes[OverordnetEnhetKey]
@@ -138,14 +152,26 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                 val inneværendeKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal)
                 val førsteKvartal = inneværendeKvartal.minusKvartaler(4) // 4 siste kvartaler
 
-                val overordnetEnhetStatistikk = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
-                    virksomhet = overordnetEnhet,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                )
-                val statistikkVirksomhet = sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
-                    virksomhet = underenhet,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                )
+                val overordnetEnhetStatistikk =
+                    if (tilganger.harEnkeltTilgangOverordnetEnhet) {
+                        sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
+                            virksomhet = overordnetEnhet,
+                            førsteÅrstalOgKvartal = førsteKvartal,
+                        )
+                    } else {
+                        emptyList()
+                    }
+
+                val statistikkVirksomhet =
+                    if (tilganger.harEnkeltTilgangOverordnetEnhet) {
+                        sykefraværsstatistikkService.hentSykefraværsstatistikkVirksomhet(
+                            virksomhet = underenhet,
+                            førsteÅrstalOgKvartal = førsteKvartal,
+                        )
+                    } else {
+                        emptyList()
+                    }
+
                 val statistikkBransje = sykefraværsstatistikkService.hentSykefraværsstatistikkBransje(
                     bransje = underenhet.bransje()!!,
                     førsteÅrstalOgKvartal = førsteKvartal,
@@ -176,12 +202,13 @@ fun Route.sykefraværsstatistikk(sykefraværsstatistikkService: Sykefraværsstat
                     return@get
                 }
 
-                val aggregertStatistikk: SamletAggregertStatistikkDto = SamletAggregertStatistikkDto.lagAggregertStatistikk(
-                    statistikkLand = statistikkLand,
-                    bransje = underenhet.bransje()!!,
-                    statistikkBransje = statistikkBransje,
-                    statistikkVirksomhet = statistikkVirksomhet,
-                )
+                val aggregertStatistikk: SamletAggregertStatistikkDto =
+                    SamletAggregertStatistikkDto.lagAggregertStatistikk(
+                        statistikkLand = statistikkLand,
+                        bransje = underenhet.bransje()!!,
+                        statistikkBransje = statistikkBransje,
+                        statistikkVirksomhet = statistikkVirksomhet,
+                    )
 
                 call.respond(
                     HttpStatusCode.OK,

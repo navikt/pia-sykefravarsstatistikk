@@ -77,6 +77,7 @@ class AltinnTilgangerService {
 
     suspend fun hentAltinnTilganger(token: String): Either<Feil, AltinnTilganger> =
         try {
+            logger.info("henter Altinn tilganger på URL $altinnTilgangerUrl")
             val client = getHttpClient(token)
             val response: HttpResponse = client.post {
                 url(altinnTilgangerUrl)

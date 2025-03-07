@@ -27,6 +27,7 @@ object TokenExchanger {
         audience: String,
     ): String =
         try {
+            logger.info("exchangeToken for audience '$audience'")
             HttpClient.client.post(URI.create(tokenXTokenEndpoint).toURL()) {
                 val now = Instant.now()
                 val clientAssertion = JWT.create().apply {
