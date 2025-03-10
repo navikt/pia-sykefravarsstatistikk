@@ -41,7 +41,7 @@ class AltinnTilgangerServiceUnitTest {
                 overordnetEnhet to emptySet(),
             ),
             tilgangTilOrgNr = emptyMap(),
-            error = false,
+            isError = false,
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe false
@@ -77,7 +77,7 @@ class AltinnTilgangerServiceUnitTest {
                 overordnetEnhet to emptySet(),
             ),
             tilgangTilOrgNr = emptyMap(),
-            error = false,
+            isError = false,
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
@@ -114,7 +114,7 @@ class AltinnTilgangerServiceUnitTest {
             tilgangTilOrgNr = mapOf(
                 ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK to setOf(underenhet),
             ),
-            error = false,
+            isError = false,
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
@@ -152,7 +152,7 @@ class AltinnTilgangerServiceUnitTest {
             tilgangTilOrgNr = mapOf(
                 ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK to setOf(underenhet, overordnetEnhet),
             ),
-            error = false,
+            isError = false,
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true

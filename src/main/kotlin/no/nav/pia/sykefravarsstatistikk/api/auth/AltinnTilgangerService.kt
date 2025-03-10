@@ -110,6 +110,6 @@ class AltinnTilgangerService {
         val hierarki: List<AltinnTilgang>,
         val orgNrTilTilganger: Map<String, Set<String>>,
         val tilgangTilOrgNr: Map<String, Set<String>>,
-        val error: Boolean,
+        val isError: Boolean,
     )
 }
