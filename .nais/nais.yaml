@@ -61,7 +61,7 @@ spec:
         - host: {{ enhetsregisteretHost }}
   env:
     - name: ENHETSREGISTERET_URL
-      value: {{ enhetsregisteretHost }}
+      value: {{ enhetsregisteretUrl }}
     - name: ALTINN_RETTIGHET_SERVICE_CODE
       value: "3403"
     - name: ALTINN_RETTIGHET_SERVICE_EDITION
