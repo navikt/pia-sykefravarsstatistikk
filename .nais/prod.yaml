@@ -6,3 +6,5 @@ limitsMemory: 2Gi
 requestsCpu: 100m
 requestsMemory: 512Mi
 serviceEdition: 2
+enhetsregisteretHost: data.brreg.no
+enhetsregisteretUrl: https://data.brreg.no

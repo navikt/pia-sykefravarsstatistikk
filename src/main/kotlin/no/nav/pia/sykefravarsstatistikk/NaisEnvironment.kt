@@ -24,7 +24,7 @@ internal object Systemmiljø {
     val tokenxPrivateJwk: String by lazy { System.getenv("TOKEN_X_PRIVATE_JWK") }
     val tokenXTokenEndpoint: String by lazy { System.getenv("TOKEN_X_TOKEN_ENDPOINT") }
     val altinnTilgangerProxyUrl: String by lazy { System.getenv("ALTINN_TILGANGER_PROXY_URL") }
-    val brregUrl: String by lazy { System.getenv("BRREG_URL") }
+    val enhetsregisteretUrl: String by lazy { System.getenv("ENHETSREGISTERET_URL") }
     val cluster: String by lazy { System.getenv("NAIS_CLUSTER_NAME") }
 }
 

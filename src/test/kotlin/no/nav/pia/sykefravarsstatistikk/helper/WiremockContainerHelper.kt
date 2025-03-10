@@ -30,7 +30,7 @@ class WiremockContainerHelper {
 
     fun envVars() =
         mapOf(
-            "BRREG_URL" to "http://host.testcontainers.internal:${brregMock.port()}",
+            "ENHETSREGISTERET_URL" to "http://host.testcontainers.internal:${brregMock.port()}",
             "ALTINN_RETTIGHETER_PROXY_CLIENT_ID" to "hei",
             "ALTINN_RETTIGHET_SERVICE_CODE" to SERVICE_CODE,
             "ALTINN_RETTIGHET_SERVICE_EDITION" to SERVICE_EDITION,
