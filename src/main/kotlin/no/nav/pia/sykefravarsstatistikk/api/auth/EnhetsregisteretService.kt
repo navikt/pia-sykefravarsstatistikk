@@ -18,12 +18,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class EnhetsregisteretService {
-    private val brregUrl: String = Systemmiljø.brregUrl
+    private val enhetsregisteretApi: String = "${Systemmiljø.enhetsregisteretUrl}/enhetsregisteret/api"
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     suspend fun hentUnderEnhet(orgnr: String): Either<Feil, Underenhet> {
         try {
-            val url = "$brregUrl/enhetsregisteret/api/underenheter/$orgnr"
+            val url = "$enhetsregisteretApi/underenheter/$orgnr"
 
             val response: HttpResponse = HttpClient.client.get(url)
             val underenhet = response.body<BrregUnderenhetDto>()
@@ -39,7 +39,7 @@ class EnhetsregisteretService {
 
     suspend fun hentEnhet(orgnr: String): Either<Feil, OverordnetEnhet> {
         try {
-            val url = "$brregUrl/enhetsregisteret/api/enheter/$orgnr"
+            val url = "$enhetsregisteretApi/enheter/$orgnr"
             val response: HttpResponse = HttpClient.client.get(url)
             val overordnetEnhet = response.body<BrregEnhetDto>()
             return overordnetEnhet.tilDomene().right()

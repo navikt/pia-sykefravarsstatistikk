@@ -57,9 +57,11 @@ spec:
       rules:
         - application: arbeidsgiver-altinn-tilganger
           namespace: fager
+      external:
+        - host: {{ enhetsregisteretHost }}
   env:
-    - name: BRREG_URL
-      value: "https://data.brreg.no/"
+    - name: ENHETSREGISTERET_URL
+      value: {{ enhetsregisteretHost }}
     - name: ALTINN_RETTIGHET_SERVICE_CODE
       value: "3403"
     - name: ALTINN_RETTIGHET_SERVICE_EDITION
