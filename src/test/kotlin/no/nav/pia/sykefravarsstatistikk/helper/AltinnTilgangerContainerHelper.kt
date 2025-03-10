@@ -46,7 +46,7 @@ class AltinnTilgangerContainerHelper(
 
     fun envVars() =
         mapOf(
-            "ALTINN_TILGANGER_PROXY_URL" to "http://$networkAlias:$port/altinn-tilganger",
+            "ALTINN_TILGANGER_PROXY_URL" to "http://$networkAlias:$port",
         )
 
     internal fun slettAlleRettigheter() {
