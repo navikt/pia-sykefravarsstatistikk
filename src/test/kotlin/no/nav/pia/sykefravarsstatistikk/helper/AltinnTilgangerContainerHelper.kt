@@ -120,7 +120,7 @@ class AltinnTilgangerContainerHelper(
                           "$underenhet"
                         ]
                       },
-                      "error": false
+                      "isError": false
                     }
                     """.trimIndent(),
                 ),
