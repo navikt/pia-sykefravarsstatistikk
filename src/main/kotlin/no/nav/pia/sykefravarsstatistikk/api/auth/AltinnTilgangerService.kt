@@ -27,7 +27,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class AltinnTilgangerService {
-    private val altinnTilgangerUrl: String = altinnTilgangerProxyUrl
+    private val altinnTilgangerUrl: String = "$altinnTilgangerProxyUrl/altinn-tilganger"
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {
