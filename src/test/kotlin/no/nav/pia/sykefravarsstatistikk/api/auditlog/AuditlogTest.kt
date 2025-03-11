@@ -1,9 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.api.auditlog
 
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldBe
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
+import io.kotest.assertions.shouldFailWithMessage
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
@@ -40,14 +37,11 @@ class AuditlogTest {
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
-            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
+            TestContainerHelper.hentKvartalsvisStatistikk(
                 orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                 config = withToken(),
             )
 
-            resultat.shouldNotBeNull()
-
-            resultat.status shouldBe HttpStatusCode.OK
             applikasjon shouldContainLog "CEF:0\\|pia-sykefravarsstatistikk\\|auditLog\\|1.0\\|audit:access\\|Sporingslogg\\|INFO".toRegex()
             applikasjon shouldContainLog
                 "msg=$FNR har utført følgende kall mot organisajonsnummer ${underenhetMedTilhørighetUtenBransje.orgnr} path: ".toRegex()
@@ -57,13 +51,13 @@ class AuditlogTest {
     @Test
     fun `auditlogger feil ved manglende rettigheter`() {
         runBlocking {
-            val resultat: HttpResponse? = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetUtenTilgang.orgnr,
-                config = withToken(),
-            )
+            shouldFailWithMessage("Feil ved henting av kvartalsvis statistikk: 403, Bruker har ikke tilgang til virksomheten") {
+                TestContainerHelper.hentKvartalsvisStatistikk(
+                    orgnr = underenhetUtenTilgang.orgnr,
+                    config = withToken(),
+                )
+            }
 
-            resultat.shouldNotBeNull()
-            resultat.status shouldBe HttpStatusCode.Forbidden
             applikasjon shouldContainLog "CEF:0\\|pia-sykefravarsstatistikk\\|auditLog".toRegex()
             applikasjon shouldContainLog
                 "msg=$FNR har ikke tilgang til organisasjonsnummer ${underenhetUtenTilgang.orgnr}".toRegex()

@@ -1,24 +1,13 @@
 package no.nav.pia.sykefravarsstatistikk.api.dto
 
-import ia.felles.definisjoner.bransjer.Bransje
 import kotlinx.serialization.Serializable
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.muligeDagsverkTotalt
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentGradert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentKortTid
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentLangTid
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.tapteDagsverkTotalt
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.tilTrendTotalt
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.KvartalIBeregning.Companion.tilKvartalIBeregning
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.BRANSJE
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
 
 @Serializable
-data class SamletAggregertStatistikkDto(
+data class AggregertStatistikkResponseDto(
     val prosentSiste4KvartalerTotalt: List<AggregertStatistikkDto>,
     val prosentSiste4KvartalerGradert: List<AggregertStatistikkDto>,
     val prosentSiste4KvartalerKorttid: List<AggregertStatistikkDto>,
@@ -26,122 +15,111 @@ data class SamletAggregertStatistikkDto(
     val trendTotalt: List<AggregertStatistikkDto>,
     val tapteDagsverkTotalt: List<AggregertStatistikkDto>,
     val muligeDagsverkTotalt: List<AggregertStatistikkDto>,
-) {
-    companion object {
-        fun lagAggregertStatistikk(
-            statistikkLand: List<SykefraværsstatistikkLand>,
-            statistikkBransje: List<SykefraværsstatistikkBransje>,
-            statistikkVirksomhet: List<SykefraværsstatistikkVirksomhet>,
-            bransje: Bransje,
-            virksomhetsNavn: String = "SPISS SJOKKERT TIGER AS", // TODO: Hente fra enhetsregisteret ?
-        ) = SamletAggregertStatistikkDto(
-            prosentSiste4KvartalerTotalt = listOf(), // Virksomhet, Bransje, Land
-            prosentSiste4KvartalerGradert = listOf(
-                statistikkVirksomhet.prosentGradert(statistikkategori = VIRKSOMHET, label = virksomhetsNavn),
-                statistikkBransje.prosentGradert(statistikkategori = BRANSJE, label = bransje.navn),
-            ), // Virksomhet, Bransje
-            prosentSiste4KvartalerKorttid = listOf(
-                statistikkVirksomhet.prosentKortTid(statistikkategori = VIRKSOMHET, label = virksomhetsNavn),
-                statistikkBransje.prosentKortTid(statistikkategori = BRANSJE, label = bransje.navn),
-            ), // Virksomhet, Bransje
-            prosentSiste4KvartalerLangtid = listOf(
-                statistikkVirksomhet.prosentLangTid(statistikkategori = VIRKSOMHET, label = virksomhetsNavn),
-                statistikkBransje.prosentLangTid(statistikkategori = BRANSJE, label = bransje.navn),
-            ), // Virksomhet, Bransje
-            trendTotalt = listOf(statistikkBransje.tilTrendTotalt(label = bransje.navn)), // Bransje
-            tapteDagsverkTotalt = listOf(statistikkVirksomhet.tapteDagsverkTotalt(label = virksomhetsNavn)), // Virksomhet
-            muligeDagsverkTotalt = listOf(statistikkVirksomhet.muligeDagsverkTotalt(label = virksomhetsNavn)), // Virksomhet
-        )
-    }
-}
+)
 
 @Serializable
 data class AggregertStatistikkDto(
     val statistikkategori: String,
     val label: String,
-    val verdi: Double,
+    val verdi: String,
     val antallPersonerIBeregningen: Int,
     val kvartalerIBeregningen: List<KvartalIBeregning>,
 ) {
     companion object {
-        // TODO: Alle disse utregningene er feil, kontroller
         // TODO: På sikt, flytt til ia-felles og ha det i en private/sealed klasse
-        private fun List<Sykefraværsstatistikk>.beregnMuligeDagsverkTotalt() = this.sumOf { it.muligeDagsverk }
+        private fun List<Sykefraværsstatistikk>.muligeDagsverkTotalt() = sumOf { it.muligeDagsverk }
 
-        private fun List<Sykefraværsstatistikk>.beregnTapteDagsverkTotalt() = this.sumOf { it.tapteDagsverk }
+        private fun List<Sykefraværsstatistikk>.tapteDagsverkTotalt() = sumOf { it.tapteDagsverk }
 
-        private fun List<Sykefraværsstatistikk>.beregnProsentLangTid() = this.map { it.prosent }.average()
+        private fun List<Sykefraværsstatistikk>.prosentLangTid() = this.map { it.prosent }.average()
 
-        private fun List<Sykefraværsstatistikk>.beregnProsentKortTid() = this.map { it.prosent }.average()
+        private fun List<Sykefraværsstatistikk>.prosentKortTid() = this.map { it.prosent }.average()
 
-        private fun List<Sykefraværsstatistikk>.beregnProsentGradert() = this.map { it.prosent }.average()
+        private fun List<Sykefraværsstatistikk>.prosentGradert() = this.map { it.prosent }.average()
 
-        private fun List<Sykefraværsstatistikk>.beregnTrendTotalt() = -1.0
+        private fun List<Sykefraværsstatistikk>.personerIBeregning() = this.sumOf { it.antallPersoner }
 
-        fun List<Sykefraværsstatistikk>.prosentGradert(
+        private fun List<Sykefraværsstatistikk>.trendTotalt() = -1.0
+
+        private fun List<Sykefraværsstatistikk>.prosentTotalt() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
+
+        private fun List<Sykefraværsstatistikk>.kvartalerIBeregning() = this.map { KvartalIBeregning(it.årstall, it.kvartal) }
+
+        fun List<Sykefraværsstatistikk>.prosentTotaltAggregert(
             statistikkategori: Statistikkategori,
             label: String,
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = beregnProsentGradert(),
-            antallPersonerIBeregningen = this.sumOf { it.antallPersoner },
-            kvartalerIBeregningen = this.map { KvartalIBeregning(it.årstall, it.kvartal) },
+            verdi = "%.1f".format(prosentTotalt()),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
         )
 
-        fun List<Sykefraværsstatistikk>.prosentKortTid(
+        fun List<Sykefraværsstatistikk>.prosentGradertAggregert(
             statistikkategori: Statistikkategori,
             label: String,
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = beregnProsentKortTid(),
-            antallPersonerIBeregningen = this.sumOf { it.antallPersoner },
-            kvartalerIBeregningen = this.map { KvartalIBeregning(it.årstall, it.kvartal) },
+            verdi = prosentGradert().toString(),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
         )
 
-        fun List<Sykefraværsstatistikk>.prosentLangTid(
+        fun List<Sykefraværsstatistikk>.prosentKortTidAggregert(
             statistikkategori: Statistikkategori,
             label: String,
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = beregnProsentLangTid(),
-            antallPersonerIBeregningen = this.sumOf { it.antallPersoner },
-            kvartalerIBeregningen = this.map { KvartalIBeregning(it.årstall, it.kvartal) },
+            verdi = prosentKortTid().toString(),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
         )
 
-        fun List<Sykefraværsstatistikk>.tilTrendTotalt(
+        fun List<Sykefraværsstatistikk>.prosentLangTidAggregert(
+            statistikkategori: Statistikkategori,
+            label: String,
+        ) = AggregertStatistikkDto(
+            statistikkategori = statistikkategori.name,
+            label = label,
+            verdi = prosentLangTid().toString(),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
+        )
+
+        fun List<Sykefraværsstatistikk>.trendTotaltAggregert(
             statistikkategori: Statistikkategori = BRANSJE,
             label: String,
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = beregnTrendTotalt(),
-            antallPersonerIBeregningen = this.sumOf { it.antallPersoner },
-            kvartalerIBeregningen = this.map { KvartalIBeregning(it.årstall, it.kvartal) },
+            verdi = trendTotalt().toString(),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
         )
 
-        fun List<Sykefraværsstatistikk>.tapteDagsverkTotalt(
+        fun List<Sykefraværsstatistikk>.tapteDagsverkTotaltAggregert(
             statistikkategori: Statistikkategori = VIRKSOMHET,
             label: String,
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = beregnTapteDagsverkTotalt(),
-            antallPersonerIBeregningen = this.sumOf { it.antallPersoner },
-            kvartalerIBeregningen = this.map { KvartalIBeregning(it.årstall, it.kvartal) },
+            verdi = tapteDagsverkTotalt().toString(),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
         )
 
-        fun List<Sykefraværsstatistikk>.muligeDagsverkTotalt(
+        fun List<Sykefraværsstatistikk>.muligeDagsverkTotaltAggregert(
             statistikkategori: Statistikkategori = VIRKSOMHET,
             label: String,
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = beregnMuligeDagsverkTotalt(),
-            antallPersonerIBeregningen = this.sumOf { it.antallPersoner },
-            kvartalerIBeregningen = this.tilKvartalIBeregning(),
+            verdi = muligeDagsverkTotalt().toString(),
+            antallPersonerIBeregningen = personerIBeregning(),
+            kvartalerIBeregningen = kvartalerIBeregning(),
         )
     }
 
@@ -149,9 +127,5 @@ data class AggregertStatistikkDto(
     data class KvartalIBeregning(
         val årstall: Int,
         val kvartal: Int,
-    ) {
-        companion object {
-            fun List<Sykefraværsstatistikk>.tilKvartalIBeregning() = this.map { KvartalIBeregning(it.årstall, it.kvartal) }
-        }
-    }
+    )
 }

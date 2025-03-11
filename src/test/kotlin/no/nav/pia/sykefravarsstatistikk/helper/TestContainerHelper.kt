@@ -2,19 +2,24 @@ package no.nav.pia.sykefravarsstatistikk.helper
 
 import io.kotest.matchers.string.shouldContain
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.request
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.time.withTimeoutOrNull
+import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto.Companion.tilDomene
+import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.domene.BrregNæringskodeDto
 import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilDomene
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
@@ -29,6 +34,7 @@ import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
 import org.testcontainers.images.builder.ImageFromDockerfile
 import java.time.Duration
 import kotlin.io.path.Path
+import kotlin.test.fail
 
 class TestContainerHelper {
     companion object {
@@ -98,13 +104,33 @@ class TestContainerHelper {
             method = HttpMethod.Get
         }
 
+        suspend fun hentAggregertStatistikk(
+            orgnr: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ): AggregertStatistikkResponseDto =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/$orgnr/siste4kvartaler/aggregert",
+                config = config,
+            )?.let { response ->
+                if (response.status != HttpStatusCode.OK) {
+                    fail("Feil ved henting av aggregert statistikk: ${response.status.value}")
+                }
+                response.body()
+            } ?: fail("Feil ved henting av aggregert statistikk, mottok ikke respons")
+
         suspend fun hentKvartalsvisStatistikk(
             orgnr: String,
             config: HttpRequestBuilder.() -> Unit = {},
-        ) = applikasjon.performGet(
-            url = "/sykefravarsstatistikk/$orgnr/historikk/kvartalsvis",
-            config = config,
-        )
+        ): List<KvartalsvisSykefraværshistorikkDto> =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/$orgnr/historikk/kvartalsvis",
+                config = config,
+            )?.let { response ->
+                if (response.status != HttpStatusCode.OK) {
+                    fail("Feil ved henting av kvartalsvis statistikk: ${response.status.value}, ${response.bodyAsText()}")
+                }
+                response.body()
+            } ?: fail("Feil ved henting av kvartalsvis statistikk, mottok ikke respons")
 
         private val httpClient = HttpClient(CIO) {
             install(ContentNegotiation) {
