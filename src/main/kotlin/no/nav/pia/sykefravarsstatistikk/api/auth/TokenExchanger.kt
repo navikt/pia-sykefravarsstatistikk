@@ -12,7 +12,6 @@ import no.nav.pia.sykefravarsstatistikk.Systemmiljø.tokenXTokenEndpoint
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.tokenxClientId
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.tokenxPrivateJwk
 import no.nav.pia.sykefravarsstatistikk.http.HttpClient
-import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Instant
 import java.util.Date
@@ -20,14 +19,12 @@ import java.util.UUID
 
 object TokenExchanger {
     private val privateKey = RSAKey.parse(tokenxPrivateJwk).toRSAPrivateKey()
-    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     internal suspend fun exchangeToken(
         token: String,
         audience: String,
     ): String =
         try {
-            logger.info("exchangeToken for audience '$audience'")
             HttpClient.client.post(URI.create(tokenXTokenEndpoint).toURL()) {
                 val now = Instant.now()
                 val clientAssertion = JWT.create().apply {
