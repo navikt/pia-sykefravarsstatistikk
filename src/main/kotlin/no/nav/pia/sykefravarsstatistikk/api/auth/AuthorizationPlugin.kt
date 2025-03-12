@@ -54,17 +54,19 @@ fun AltinnAuthorizationPlugin(
             val overordnetEnhet: OverordnetEnhet = enhetsregisteretService.hentEnhet(underenhet.overordnetEnhetOrgnr)
                 .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
 
-            val harTilgangTilOrgnr = altinnTilganger.harTilgangTilOrgnr(orgnr = underenhet.orgnr)
-            val harEnkeltTilgang =
-                altinnTilganger.harEnkeltTilgang(
-                    orgnr = underenhet.orgnr,
-                    altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
-                )
-            val harEnkeltTilgangOverordnetEnhet =
-                altinnTilganger.harEnkeltTilgang(
-                    orgnr = overordnetEnhet.orgnr,
-                    altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
-                )
+            val harTilgangTilOrgnr = altinnTilganger.harTilgangTilOrgnr(
+                orgnr = underenhet.orgnr,
+            )
+
+            val harEnkeltTilgang = altinnTilganger.harEnkeltTilgang(
+                orgnr = underenhet.orgnr,
+                altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+
+            val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltTilgang(
+                orgnr = overordnetEnhet.orgnr,
+                altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
 
             if (!harTilgangTilOrgnr) {
                 call.respond(status = HttpStatusCode.Forbidden, "Bruker har ikke tilgang til virksomheten")

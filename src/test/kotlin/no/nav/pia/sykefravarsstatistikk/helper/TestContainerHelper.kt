@@ -113,7 +113,7 @@ class TestContainerHelper {
                 config = config,
             )?.let { response ->
                 if (response.status != HttpStatusCode.OK) {
-                    fail("Feil ved henting av aggregert statistikk: ${response.status.value}")
+                    fail("Feil ved henting av aggregert statistikk, status: ${response.status}, message: ${response.bodyAsText()}")
                 }
                 response.body()
             } ?: fail("Feil ved henting av aggregert statistikk, mottok ikke respons")
@@ -127,7 +127,7 @@ class TestContainerHelper {
                 config = config,
             )?.let { response ->
                 if (response.status != HttpStatusCode.OK) {
-                    fail("Feil ved henting av kvartalsvis statistikk: ${response.status.value}, ${response.bodyAsText()}")
+                    fail("Feil ved henting av kvartalsvis statistikk, status: ${response.status}, message: ${response.bodyAsText()}")
                 }
                 response.body()
             } ?: fail("Feil ved henting av kvartalsvis statistikk, mottok ikke respons")

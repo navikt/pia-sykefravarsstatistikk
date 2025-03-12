@@ -53,7 +53,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response`() {
         runBlocking {
-            shouldFailWithMessage("Feil ved henting av kvartalsvis statistikk: 401, ") {
+            shouldFailWithMessage("Feil ved henting av kvartalsvis statistikk, status: 401 Unauthorized, message: ") {
                 TestContainerHelper.hentKvartalsvisStatistikk(
                     orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                 )
@@ -64,7 +64,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response`() {
         runBlocking {
-            shouldFailWithMessage("Feil ved henting av kvartalsvis statistikk: 403, Bruker har ikke tilgang til virksomheten") {
+            shouldFailWithMessage(
+                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, message: Bruker har ikke tilgang til virksomheten",
+            ) {
                 TestContainerHelper.hentKvartalsvisStatistikk(
                     orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                     config = withToken(),
@@ -139,8 +141,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
+            // TODO: burde ikke feile, men heller sende en tom liste?
             shouldFailWithMessage(
-                "Feil ved henting av kvartalsvis statistikk: 400, Ingen statistikk funnet for bransje '${enUnderenhetUtenStatistikk.bransje()!!.navn}'",
+                "Feil ved henting av kvartalsvis statistikk, status: 400 Bad Request, message: Ingen bransjestatistikk funnet for bransje '${enUnderenhetUtenStatistikk.bransje()!!.navn}'",
             ) {
                 TestContainerHelper.hentKvartalsvisStatistikk(
                     orgnr = enUnderenhetUtenStatistikk.orgnr,
@@ -148,8 +151,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 )
             }
 
-            // TODO: Vanskelig å teste om bransjen allerede har blitt sendt på kafka
             val bransje = enUnderenhetUtenStatistikk.bransje()
+            // Får ikke testet manglende statistikk om denne bransjen allerede har blitt sendt på kafka, som også er sannsynlig
 
             if (bransje != null) {
                 kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
@@ -157,8 +160,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 kafkaContainerHelper.sendNæringsstatistikk(næring = enUnderenhetUtenStatistikk.næringskode.næring)
             }
 
+            // TODO: burde ikke feile, men heller sende en tom liste?
             shouldFailWithMessage(
-                "Feil ved henting av kvartalsvis statistikk: 400, Ingen virksomhetsstatistikk funnet for underenhet '${enUnderenhetUtenStatistikk.orgnr}'",
+                "Feil ved henting av kvartalsvis statistikk, status: 400 Bad Request, message: Ingen virksomhetsstatistikk funnet for underenhet '${enUnderenhetUtenStatistikk.orgnr}'",
             ) {
                 TestContainerHelper.hentKvartalsvisStatistikk(
                     orgnr = enUnderenhetUtenStatistikk.orgnr,
