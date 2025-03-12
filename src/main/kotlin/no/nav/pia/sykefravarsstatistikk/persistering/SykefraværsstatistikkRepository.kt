@@ -203,7 +203,7 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun Row.tilUmaskertStatistikkVirksomhet(): UmaskertSykefraværsstatistikkForEttKvartalVirksomhet =
+    private fun Row.tilUmaskertStatistikkVirksomhet(): UmaskertSykefraværsstatistikkForEttKvartalVirksomhet =
         UmaskertSykefraværsstatistikkForEttKvartalVirksomhet(
             orgnr = string("orgnr"),
             årstall = int("arstall"),
@@ -217,7 +217,7 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilUmaskertBransjeStatistikk(): UmaskertSykefraværsstatistikkForEttKvartalBransje =
+    private fun Row.tilUmaskertBransjeStatistikk(): UmaskertSykefraværsstatistikkForEttKvartalBransje =
         UmaskertSykefraværsstatistikkForEttKvartalBransje(
             bransje = Bransje.entries.find { it.navn == string("bransje") }!!,
             årstall = int("arstall"),
@@ -229,7 +229,7 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilUmaskertNæringstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalNæring =
+    private fun Row.tilUmaskertNæringstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalNæring =
         UmaskertSykefraværsstatistikkForEttKvartalNæring(
             næring = Næring(string("naring")),
             årstall = int("arstall"),
@@ -241,7 +241,7 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilUmaskertSektorstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalSektor =
+    private fun Row.tilUmaskertSektorstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalSektor =
         UmaskertSykefraværsstatistikkForEttKvartalSektor(
             sektor = string("sektor"),
             årstall = int("arstall"),
@@ -253,7 +253,7 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilUmaskertLandstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalLand =
+    private fun Row.tilUmaskertLandstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalLand =
         UmaskertSykefraværsstatistikkForEttKvartalLand(
             land = if (string("land") == "NO") "Norge" else "Ukjent",
             årstall = int("arstall"),
