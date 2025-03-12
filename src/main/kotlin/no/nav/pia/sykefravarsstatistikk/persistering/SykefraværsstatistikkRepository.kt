@@ -8,11 +8,11 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkNæring
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -142,7 +142,7 @@ class SykefraværsstatistikkRepository(
             }
         }
 
-    fun hentSykefraværsstatistikkVirksomhet(virksomhet: Virksomhet): List<SykefraværsstatistikkVirksomhet> =
+    fun hentSykefraværsstatistikkVirksomhet(virksomhet: Virksomhet): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
 
         try {
             using(sessionOf(dataSource)) { session ->
@@ -155,11 +155,11 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun hentSykefraværsstatistikkBransje(bransje: Bransje): List<SykefraværsstatistikkBransje> =
+    fun hentSykefraværsstatistikkBransje(bransje: Bransje): List<UmaskertSykefraværsstatistikkForEttKvartalBransje> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentBransjestatistikk(bransje)
+                    tx.hentUmaskertBransjestatistikk(bransje)
                 }
             }
         } catch (e: Exception) {
@@ -167,11 +167,11 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun hentSykefraværsstatistikkNæring(næring: Næring): List<SykefraværsstatistikkNæring> =
+    fun hentSykefraværsstatistikkNæring(næring: Næring): List<UmaskertSykefraværsstatistikkForEttKvartalNæring> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentNæringsstatistikk(næring)
+                    tx.hentUmaskertNæringsstatistikk(næring)
                 }
             }
         } catch (e: Exception) {
@@ -179,11 +179,11 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun hentSykefraværsstatistikkSektor(sektor: Sektor): List<SykefraværsstatistikkSektor> =
+    fun hentSykefraværsstatistikkSektor(sektor: Sektor): List<UmaskertSykefraværsstatistikkForEttKvartalSektor> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentSektorstatistikk(sektor)
+                    tx.hentUmaskertSektorstatistikk(sektor)
                 }
             }
         } catch (e: Exception) {
@@ -191,11 +191,11 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun hentSykefraværsstatistikkLand(): List<SykefraværsstatistikkLand> =
+    fun hentSykefraværsstatistikkLand(): List<UmaskertSykefraværsstatistikkForEttKvartalLand> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentLandstatistikk()
+                    tx.hentUmaskertLandstatistikk()
                 }
             }
         } catch (e: Exception) {
@@ -203,8 +203,8 @@ class SykefraværsstatistikkRepository(
             throw e
         }
 
-    fun Row.tilVirksomhetsstatistikk(): SykefraværsstatistikkVirksomhet =
-        SykefraværsstatistikkVirksomhet(
+    fun Row.tilUmaskertStatistikkVirksomhet(): UmaskertSykefraværsstatistikkForEttKvartalVirksomhet =
+        UmaskertSykefraværsstatistikkForEttKvartalVirksomhet(
             orgnr = string("orgnr"),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
@@ -217,9 +217,9 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilBransjestatistikk(): SykefraværsstatistikkBransje =
-        SykefraværsstatistikkBransje(
-            bransje = string("bransje"), // Kan vi hente ut bransjeobjektet her? kunne hatt fra(bransjenavn) i tilleg til fra(næringskode)
+    fun Row.tilUmaskertBransjeStatistikk(): UmaskertSykefraværsstatistikkForEttKvartalBransje =
+        UmaskertSykefraværsstatistikkForEttKvartalBransje(
+            bransje = Bransje.entries.find { it.navn == string("bransje") }!!,
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
@@ -229,8 +229,8 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilNæringstatistikk(): SykefraværsstatistikkNæring =
-        SykefraværsstatistikkNæring(
+    fun Row.tilUmaskertNæringstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalNæring =
+        UmaskertSykefraværsstatistikkForEttKvartalNæring(
             næring = Næring(string("naring")),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
@@ -241,8 +241,8 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilSektorstatistikk(): SykefraværsstatistikkSektor =
-        SykefraværsstatistikkSektor(
+    fun Row.tilUmaskertSektorstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalSektor =
+        UmaskertSykefraværsstatistikkForEttKvartalSektor(
             sektor = string("sektor"),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
@@ -253,8 +253,8 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    fun Row.tilLandstatistikk(): SykefraværsstatistikkLand =
-        SykefraværsstatistikkLand(
+    fun Row.tilUmaskertLandstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalLand =
+        UmaskertSykefraværsstatistikkForEttKvartalLand(
             land = if (string("land") == "NO") "Norge" else "Ukjent",
             årstall = int("arstall"),
             kvartal = int("kvartal"),
@@ -265,7 +265,9 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
-    private fun TransactionalSession.hentBransjestatistikk(bransje: Bransje): List<SykefraværsstatistikkBransje> {
+    private fun TransactionalSession.hentUmaskertBransjestatistikk(
+        bransje: Bransje,
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalBransje> {
         val query =
             """
             SELECT *
@@ -278,11 +280,11 @@ class SykefraværsstatistikkRepository(
                 mapOf(
                     "bransje" to bransje.navn,
                 ),
-            ).map { row -> row.tilBransjestatistikk() }.asList,
+            ).map { row -> row.tilUmaskertBransjeStatistikk() }.asList,
         )
     }
 
-    private fun TransactionalSession.hentNæringsstatistikk(næring: Næring): List<SykefraværsstatistikkNæring> {
+    private fun TransactionalSession.hentUmaskertNæringsstatistikk(næring: Næring): List<UmaskertSykefraværsstatistikkForEttKvartalNæring> {
         val query =
             """
             SELECT *
@@ -295,11 +297,11 @@ class SykefraværsstatistikkRepository(
                 mapOf(
                     "naring" to næring.tosifferIdentifikator,
                 ),
-            ).map { row -> row.tilNæringstatistikk() }.asList,
+            ).map { row -> row.tilUmaskertNæringstatistikk() }.asList,
         )
     }
 
-    private fun TransactionalSession.hentSektorstatistikk(sektor: Sektor): List<SykefraværsstatistikkSektor> {
+    private fun TransactionalSession.hentUmaskertSektorstatistikk(sektor: Sektor): List<UmaskertSykefraværsstatistikkForEttKvartalSektor> {
         val query =
             """
             SELECT *
@@ -312,11 +314,11 @@ class SykefraværsstatistikkRepository(
                 mapOf(
                     "sektor" to sektor.kode,
                 ),
-            ).map { row -> row.tilSektorstatistikk() }.asList,
+            ).map { row -> row.tilUmaskertSektorstatistikk() }.asList,
         )
     }
 
-    private fun TransactionalSession.hentLandstatistikk(land: String = "NO"): List<SykefraværsstatistikkLand> {
+    private fun TransactionalSession.hentUmaskertLandstatistikk(land: String = "NO"): List<UmaskertSykefraværsstatistikkForEttKvartalLand> {
         val query =
             """
             SELECT *
@@ -329,11 +331,13 @@ class SykefraværsstatistikkRepository(
                 mapOf(
                     "land" to land,
                 ),
-            ).map { row -> row.tilLandstatistikk() }.asList,
+            ).map { row -> row.tilUmaskertLandstatistikk() }.asList,
         )
     }
 
-    private fun TransactionalSession.hentSykefraværsstatistikk(virksomhet: Virksomhet): List<SykefraværsstatistikkVirksomhet> {
+    private fun TransactionalSession.hentSykefraværsstatistikk(
+        virksomhet: Virksomhet,
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
         val query =
             """
             SELECT *
@@ -346,7 +350,7 @@ class SykefraværsstatistikkRepository(
                 mapOf(
                     "orgnr" to virksomhet.orgnr,
                 ),
-            ).map { row -> row.tilVirksomhetsstatistikk() }.asList,
+            ).map { row -> row.tilUmaskertStatistikkVirksomhet() }.asList,
         )
     }
 

@@ -12,7 +12,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kaf
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import kotlin.test.Test
 
-class KvartalsvisSykefraværsstatistikkVirksomhetConsumerTest {
+class SykefraværstatistikkConsumerTest {
     @Test
     fun `Melding om sykefraværsstatistikk i Kafka for virksomhet blir lagret i DB`() {
         val sykefraværsstatistikk = JsonMelding(

@@ -1,8 +1,9 @@
 package no.nav.pia.sykefravarsstatistikk.domene
 
+import ia.felles.definisjoner.bransjer.Bransje
 import java.time.LocalDateTime
 
-data class SykefraværsstatistikkLand(
+data class UmaskertSykefraværsstatistikkForEttKvartalLand(
     val land: String,
     override val årstall: Int,
     override val kvartal: Int,
@@ -13,7 +14,7 @@ data class SykefraværsstatistikkLand(
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
-data class SykefraværsstatistikkSektor(
+data class UmaskertSykefraværsstatistikkForEttKvartalSektor(
     val sektor: String,
     override val årstall: Int,
     override val kvartal: Int,
@@ -24,7 +25,7 @@ data class SykefraværsstatistikkSektor(
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
-data class SykefraværsstatistikkNæring(
+data class UmaskertSykefraværsstatistikkForEttKvartalNæring(
     val næring: Næring,
     override val årstall: Int,
     override val kvartal: Int,
@@ -35,8 +36,8 @@ data class SykefraværsstatistikkNæring(
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
-data class SykefraværsstatistikkBransje(
-    val bransje: String,
+data class UmaskertSykefraværsstatistikkForEttKvartalBransje(
+    val bransje: Bransje,
     override val årstall: Int,
     override val kvartal: Int,
     override val antallPersoner: Int,
@@ -46,7 +47,7 @@ data class SykefraværsstatistikkBransje(
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
-data class SykefraværsstatistikkVirksomhet(
+data class UmaskertSykefraværsstatistikkForEttKvartalVirksomhet(
     val orgnr: String,
     override val årstall: Int,
     override val kvartal: Int,

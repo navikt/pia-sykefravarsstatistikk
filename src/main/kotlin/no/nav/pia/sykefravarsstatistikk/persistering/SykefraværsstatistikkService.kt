@@ -26,11 +26,11 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.LAND
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkBransje
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkLand
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkNæring
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkSektor
-import no.nav.pia.sykefravarsstatistikk.domene.SykefraværsstatistikkVirksomhet
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -50,7 +50,7 @@ class SykefraværsstatistikkService(
     fun hentSykefraværsstatistikkVirksomhet(
         virksomhet: Virksomhet,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
-    ): List<SykefraværsstatistikkVirksomhet> {
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
         logger.info(
             "Henter statistikk for virksomhet med orgnr: '${virksomhet.orgnr}' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}",
         )
@@ -65,7 +65,7 @@ class SykefraværsstatistikkService(
     fun hentSykefraværsstatistikkBransje(
         bransje: Bransje,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
-    ): List<SykefraværsstatistikkBransje> {
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalBransje> {
         logger.info("Henter statistikk for bransje '$bransje' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
         val sykefraværsstatistikkTilBransje = sykefraværsstatistikkRepository.hentSykefraværsstatistikkBransje(
             bransje = bransje,
@@ -78,7 +78,7 @@ class SykefraværsstatistikkService(
     fun hentSykefraværsstatistikkNæring(
         næring: Næring,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
-    ): List<SykefraværsstatistikkNæring> {
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalNæring> {
         logger.info("Henter statistikk for næring '$næring' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
         val sykefraværsstatistikkTilNæring = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
         return sykefraværsstatistikkTilNæring.filter {
@@ -89,7 +89,7 @@ class SykefraværsstatistikkService(
     fun hentSykefraværsstatistikkSektor(
         sektor: Sektor,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
-    ): List<SykefraværsstatistikkSektor> {
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalSektor> {
         logger.info("Henter statistikk for sektor '$sektor' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
         val sykefraværsstatistikkTilSektor = sykefraværsstatistikkRepository.hentSykefraværsstatistikkSektor(
             sektor = sektor,
@@ -99,7 +99,7 @@ class SykefraværsstatistikkService(
         }
     }
 
-    fun hentSykefraværsstatistikkLand(førsteÅrstalOgKvartal: ÅrstallOgKvartal): List<SykefraværsstatistikkLand> {
+    fun hentSykefraværsstatistikkLand(førsteÅrstalOgKvartal: ÅrstallOgKvartal): List<UmaskertSykefraværsstatistikkForEttKvartalLand> {
         logger.info("Henter statistikk for land  fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
         val sykefraværsstatistikkLand = sykefraværsstatistikkRepository.hentSykefraværsstatistikkLand()
         return sykefraværsstatistikkLand.filter {
