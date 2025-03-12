@@ -31,19 +31,19 @@ data class AggregertStatistikkDto(
 
         private fun List<Sykefraværsstatistikk>.tapteDagsverkTotalt() = sumOf { it.tapteDagsverk }
 
-        private fun List<Sykefraværsstatistikk>.prosentLangTid() = this.map { it.prosent }.average()
+        private fun List<Sykefraværsstatistikk>.prosentLangTid() = map { it.prosent }.average()
 
-        private fun List<Sykefraværsstatistikk>.prosentKortTid() = this.map { it.prosent }.average()
+        private fun List<Sykefraværsstatistikk>.prosentKortTid() = map { it.prosent }.average()
 
-        private fun List<Sykefraværsstatistikk>.prosentGradert() = this.map { it.prosent }.average()
+        private fun List<Sykefraværsstatistikk>.prosentGradert() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
 
-        private fun List<Sykefraværsstatistikk>.personerIBeregning() = this.sumOf { it.antallPersoner }
+        private fun List<Sykefraværsstatistikk>.personerIBeregning() = map { it.antallPersoner }.average().toInt()
 
         private fun List<Sykefraværsstatistikk>.trendTotalt() = -1.0
 
         private fun List<Sykefraværsstatistikk>.prosentTotalt() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
 
-        private fun List<Sykefraværsstatistikk>.kvartalerIBeregning() = this.map { KvartalIBeregning(it.årstall, it.kvartal) }
+        private fun List<Sykefraværsstatistikk>.kvartalerIBeregning() = map { KvartalIBeregning(it.årstall, it.kvartal) }
 
         fun List<Sykefraværsstatistikk>.prosentTotaltAggregert(
             statistikkategori: Statistikkategori,
@@ -62,7 +62,7 @@ data class AggregertStatistikkDto(
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = prosentGradert().toString(),
+            verdi = "%.1f".format(prosentGradert()),
             antallPersonerIBeregningen = personerIBeregning(),
             kvartalerIBeregningen = kvartalerIBeregning(),
         )
@@ -73,7 +73,7 @@ data class AggregertStatistikkDto(
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = prosentKortTid().toString(),
+            verdi = "%.1f".format(prosentKortTid()),
             antallPersonerIBeregningen = personerIBeregning(),
             kvartalerIBeregningen = kvartalerIBeregning(),
         )
@@ -84,7 +84,7 @@ data class AggregertStatistikkDto(
         ) = AggregertStatistikkDto(
             statistikkategori = statistikkategori.name,
             label = label,
-            verdi = prosentLangTid().toString(),
+            verdi = "%.1f".format(prosentLangTid()),
             antallPersonerIBeregningen = personerIBeregning(),
             kvartalerIBeregningen = kvartalerIBeregning(),
         )

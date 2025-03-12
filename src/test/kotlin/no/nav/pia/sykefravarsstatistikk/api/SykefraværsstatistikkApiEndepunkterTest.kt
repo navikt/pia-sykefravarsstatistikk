@@ -537,7 +537,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val bransje = underenhetMedEnkelrettighetBransjeBarnehage.bransje()!!
 
-            // Totalt:
             val landStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
                 .firstOrNull { it.statistikkategori == "LAND" }
             landStatistikk.shouldNotBeNull()
@@ -546,7 +545,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.kvartalerIBeregningen.forAll { it.årstall shouldBe 2024 }
             // TODO: finn en mer robust måte å teste hvilke kvartaler som er med i beregning, sjekk over flere år?
             landStatistikk.verdi shouldBe "6.4"
-            landStatistikk.antallPersonerIBeregningen shouldBe 13460648
+            landStatistikk.antallPersonerIBeregningen shouldBe 3365162
 
             val bransjeStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
                 .firstOrNull { it.statistikkategori == "BRANSJE" }
@@ -555,7 +554,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             bransjeStatistikk.kvartalerIBeregningen.size shouldBe 4 // skal være ett år
             bransjeStatistikk.kvartalerIBeregningen.forAll { it.årstall shouldBe 2024 }
             bransjeStatistikk.verdi shouldBe "5.8"
-            bransjeStatistikk.antallPersonerIBeregningen shouldBe 354252
+            bransjeStatistikk.antallPersonerIBeregningen shouldBe 88563
 
             val virksomhetStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
                 .firstOrNull { it.statistikkategori == "VIRKSOMHET" }
