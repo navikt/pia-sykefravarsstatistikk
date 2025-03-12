@@ -47,7 +47,7 @@ class SykefraværsstatistikkService(
         sykefraværsstatistikkRepository.insertSykefraværsstatistikk(statistikk)
     }
 
-    fun hentSykefraværsstatistikkVirksomhet(
+    private fun hentSykefraværsstatistikkVirksomhet(
         virksomhet: Virksomhet,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
@@ -62,7 +62,7 @@ class SykefraværsstatistikkService(
         }
     }
 
-    fun hentSykefraværsstatistikkBransje(
+    private fun hentSykefraværsstatistikkBransje(
         bransje: Bransje,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<UmaskertSykefraværsstatistikkForEttKvartalBransje> {
@@ -75,7 +75,7 @@ class SykefraværsstatistikkService(
         }
     }
 
-    fun hentSykefraværsstatistikkNæring(
+    private fun hentSykefraværsstatistikkNæring(
         næring: Næring,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<UmaskertSykefraværsstatistikkForEttKvartalNæring> {
@@ -86,7 +86,7 @@ class SykefraværsstatistikkService(
         }
     }
 
-    fun hentSykefraværsstatistikkSektor(
+    private fun hentSykefraværsstatistikkSektor(
         sektor: Sektor,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<UmaskertSykefraværsstatistikkForEttKvartalSektor> {
@@ -99,7 +99,9 @@ class SykefraværsstatistikkService(
         }
     }
 
-    fun hentSykefraværsstatistikkLand(førsteÅrstalOgKvartal: ÅrstallOgKvartal): List<UmaskertSykefraværsstatistikkForEttKvartalLand> {
+    private fun hentSykefraværsstatistikkLand(
+        førsteÅrstalOgKvartal: ÅrstallOgKvartal,
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalLand> {
         logger.info("Henter statistikk for land  fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
         val sykefraværsstatistikkLand = sykefraværsstatistikkRepository.hentSykefraværsstatistikkLand()
         return sykefraværsstatistikkLand.filter {
@@ -123,7 +125,7 @@ class SykefraværsstatistikkService(
 
         // Todo: Vi lager liste av dtoer, burde egt lage domeneobjekter og kjøre tilDto() i route
 
-        val landstatistikk = hentSykefraværsstatistikkLand(
+        val umaskertLandsstatistikk = hentSykefraværsstatistikkLand(
             førsteÅrstalOgKvartal = førsteKvartal,
         ).ifEmpty {
             return Feil(
@@ -132,11 +134,11 @@ class SykefraværsstatistikkService(
             ).left()
         }
 
-        prosentSiste4KvartalerTotalt.add(landstatistikk.prosentTotaltAggregert(statistikkategori = LAND, label = "Norge"))
+        prosentSiste4KvartalerTotalt.add(umaskertLandsstatistikk.prosentTotaltAggregert(statistikkategori = LAND, label = "Norge"))
 
         val bransje = underenhet.bransje()
         if (bransje != null) {
-            val bransjestatistikk = hentSykefraværsstatistikkBransje(
+            val umaskertBransjestatistikk = hentSykefraværsstatistikkBransje(
                 bransje = bransje,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
@@ -146,23 +148,23 @@ class SykefraværsstatistikkService(
                 ).left()
             }
             prosentSiste4KvartalerTotalt.add(
-                bransjestatistikk.prosentTotaltAggregert(statistikkategori = BRANSJE, label = bransje.navn),
+                umaskertBransjestatistikk.prosentTotaltAggregert(statistikkategori = BRANSJE, label = bransje.navn),
             )
             prosentSiste4KvartalerGradert.add(
-                bransjestatistikk.prosentGradertAggregert(statistikkategori = BRANSJE, label = bransje.navn),
+                umaskertBransjestatistikk.prosentGradertAggregert(statistikkategori = BRANSJE, label = bransje.navn),
             )
             prosentSiste4KvartalerKorttid.add(
-                bransjestatistikk.prosentKortTidAggregert(statistikkategori = BRANSJE, label = bransje.navn),
+                umaskertBransjestatistikk.prosentKortTidAggregert(statistikkategori = BRANSJE, label = bransje.navn),
             )
             prosentSiste4KvartalerLangtid.add(
-                bransjestatistikk.prosentLangTidAggregert(statistikkategori = BRANSJE, label = bransje.navn),
+                umaskertBransjestatistikk.prosentLangTidAggregert(statistikkategori = BRANSJE, label = bransje.navn),
             )
             trendTotalt.add(
-                bransjestatistikk.trendTotaltAggregert(statistikkategori = BRANSJE, label = bransje.navn),
+                umaskertBransjestatistikk.trendTotaltAggregert(statistikkategori = BRANSJE, label = bransje.navn),
             )
         } else {
             val næring = underenhet.næringskode.næring
-            val næringsstatistikk = hentSykefraværsstatistikkNæring(
+            val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
                 næring = næring,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
@@ -172,24 +174,24 @@ class SykefraværsstatistikkService(
                 ).left()
             }
             prosentSiste4KvartalerTotalt.add(
-                næringsstatistikk.prosentTotaltAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentTotaltAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
             )
             prosentSiste4KvartalerGradert.add(
-                næringsstatistikk.prosentGradertAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentGradertAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
             )
             prosentSiste4KvartalerKorttid.add(
-                næringsstatistikk.prosentKortTidAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentKortTidAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
             )
             prosentSiste4KvartalerLangtid.add(
-                næringsstatistikk.prosentLangTidAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentLangTidAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
             )
             trendTotalt.add(
-                næringsstatistikk.trendTotaltAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.trendTotaltAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
             )
         }
 
         if (harEnkeltTilgang) {
-            val virksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
+            val umaskertVirksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
                 virksomhet = underenhet,
                 førsteÅrstalOgKvartal = førsteKvartal,
             )
@@ -201,22 +203,22 @@ class SykefraværsstatistikkService(
                 }
 
             prosentSiste4KvartalerTotalt.add(
-                virksomhetsstatistikk.prosentTotaltAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
+                umaskertVirksomhetsstatistikk.prosentTotaltAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
             )
             prosentSiste4KvartalerGradert.add(
-                virksomhetsstatistikk.prosentGradertAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
+                umaskertVirksomhetsstatistikk.prosentGradertAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
             )
             prosentSiste4KvartalerKorttid.add(
-                virksomhetsstatistikk.prosentKortTidAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
+                umaskertVirksomhetsstatistikk.prosentKortTidAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
             )
             prosentSiste4KvartalerLangtid.add(
-                virksomhetsstatistikk.prosentLangTidAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
+                umaskertVirksomhetsstatistikk.prosentLangTidAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
             )
             tapteDagsverkTotalt.add(
-                virksomhetsstatistikk.tapteDagsverkTotaltAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
+                umaskertVirksomhetsstatistikk.tapteDagsverkTotaltAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
             )
             muligeDagsverkTotalt.add(
-                virksomhetsstatistikk.muligeDagsverkTotaltAggregert(
+                umaskertVirksomhetsstatistikk.muligeDagsverkTotaltAggregert(
                     statistikkategori = VIRKSOMHET,
                     label = underenhet.navn,
                 ),
@@ -246,7 +248,7 @@ class SykefraværsstatistikkService(
 
         val response: MutableList<KvartalsvisSykefraværshistorikkDto> = mutableListOf()
 
-        val landstatistikk = hentSykefraværsstatistikkLand(
+        val umaskertLandstatistikk = hentSykefraværsstatistikkLand(
             førsteKvartal,
         ).ifEmpty {
             return Feil(
@@ -254,9 +256,9 @@ class SykefraværsstatistikkService(
                 httpStatusCode = HttpStatusCode.BadRequest,
             ).left()
         }
-        response.add(landstatistikk.tilDto(type = LAND.name, label = "Norge"))
+        response.add(umaskertLandstatistikk.tilDto(type = LAND.name, label = "Norge"))
 
-        val sektorstatistikk = hentSykefraværsstatistikkSektor(
+        val umaskertSektorstatistikk = hentSykefraværsstatistikkSektor(
             sektor = overordnetEnhet.sektor,
             førsteÅrstalOgKvartal = førsteKvartal,
         ).ifEmpty {
@@ -265,11 +267,11 @@ class SykefraværsstatistikkService(
                 httpStatusCode = HttpStatusCode.BadRequest,
             ).left()
         }
-        response.add(sektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.kode))
+        response.add(umaskertSektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.kode))
 
         val bransje = underenhet.bransje()
         if (bransje != null) {
-            val bransjestatistikk = hentSykefraværsstatistikkBransje(
+            val umaskertBransjestatistikk = hentSykefraværsstatistikkBransje(
                 bransje = bransje,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
@@ -278,9 +280,9 @@ class SykefraværsstatistikkService(
                     httpStatusCode = HttpStatusCode.BadRequest,
                 ).left()
             }
-            response.add(bransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
+            response.add(umaskertBransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
         } else {
-            val næringsstatistikk = hentSykefraværsstatistikkNæring(
+            val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
                 næring = underenhet.næringskode.næring,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
@@ -290,55 +292,42 @@ class SykefraværsstatistikkService(
                 ).left()
             }
             response.add(
-                næringsstatistikk.tilDto(
+                umaskertNæringsstatistikk.tilDto(
                     type = "NÆRING",
                     label = underenhet.næringskode.næring.tosifferIdentifikator,
                 ),
             )
         }
 
-        response.add(
-            if (tilganger.harEnkeltTilgang) {
-                val virksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
-                    virksomhet = underenhet,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                ).ifEmpty {
-                    return Feil(
-                        feilmelding = "Ingen virksomhetsstatistikk funnet for underenhet '${underenhet.orgnr}'",
-                        httpStatusCode = HttpStatusCode.BadRequest,
-                    ).left()
-                }
+        if (tilganger.harEnkeltTilgang) {
+            val umaskertVirksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
+                virksomhet = underenhet,
+                førsteÅrstalOgKvartal = førsteKvartal,
+            ).ifEmpty {
+                return Feil(
+                    feilmelding = "Ingen virksomhetsstatistikk funnet for underenhet '${underenhet.orgnr}'",
+                    httpStatusCode = HttpStatusCode.BadRequest,
+                ).left()
+            }
 
-                virksomhetsstatistikk.tilDto(type = VIRKSOMHET.name, label = underenhet.navn)
-            } else {
-                KvartalsvisSykefraværshistorikkDto(
-                    type = VIRKSOMHET.name,
-                    label = underenhet.navn,
-                    kvartalsvisSykefraværsprosent = emptyList(),
-                )
-            },
-        )
+            response.add(umaskertVirksomhetsstatistikk.tilDto(type = VIRKSOMHET.name, label = underenhet.navn))
+        }
 
-        response.add(
-            if (tilganger.harEnkeltTilgangOverordnetEnhet) {
-                val overordnetEnhetStatistikk = hentSykefraværsstatistikkVirksomhet(
-                    virksomhet = overordnetEnhet,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                ).ifEmpty {
-                    return Feil(
-                        feilmelding = "Ingen virksomhetsstatistikk funnet for overordnet enhet '${overordnetEnhet.orgnr}'",
-                        httpStatusCode = HttpStatusCode.BadRequest,
-                    ).left()
-                }
-                overordnetEnhetStatistikk.tilDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn)
-            } else {
-                KvartalsvisSykefraværshistorikkDto(
-                    type = "OVERORDNET_ENHET",
-                    label = overordnetEnhet.navn,
-                    kvartalsvisSykefraværsprosent = emptyList(),
-                )
-            },
-        )
+        if (tilganger.harEnkeltTilgangOverordnetEnhet) {
+            val umaskertVirksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
+                virksomhet = overordnetEnhet,
+                førsteÅrstalOgKvartal = førsteKvartal,
+            ).ifEmpty {
+                return Feil(
+                    feilmelding = "Ingen virksomhetsstatistikk funnet for overordnet enhet '${overordnetEnhet.orgnr}'",
+                    httpStatusCode = HttpStatusCode.BadRequest,
+                ).left()
+            }
+            response.add(
+                umaskertVirksomhetsstatistikk.tilDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn),
+            )
+        }
+
         return response.toList().right()
     }
 }
