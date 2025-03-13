@@ -3,10 +3,14 @@ package no.nav.pia.sykefravarsstatistikk.api
 import ia.felles.definisjoner.bransjer.Bransje
 import io.kotest.inspectors.shouldForNone
 import io.kotest.inspectors.shouldForOne
+import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
+import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
+import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværsprosentDto
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -48,282 +52,350 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 underenhet = underenhet.orgnr,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
-            lagLandStatistikkTestCase()
-            lagSektorStatistikkTestCase()
-            lagBransjeStatistikkTestCase()
-            lagVirksomhetStatistikkTestCase()
+            val expectedStatistikkLand = lagLandStatistikkTestCase()
+            val expectedStatistikkSektor = lagSektorStatistikkTestCase()
+            val expectedStatistikkBransje = lagBransjeStatistikkTestCase()
+            val expectedStatistikkVirksomhet = lagVirksomhetStatistikkTestCase()
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
                 orgnr = underenhet.orgnr,
                 config = withToken(),
             )
+            println("Result:  ${Json.encodeToString(kvartalsvisStatistikk)} ")
 
-            kvartalsvisStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.LAND.name }
-            kvartalsvisStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.SEKTOR.name }
-            kvartalsvisStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.BRANSJE.name }
-
-            kvartalsvisStatistikk.shouldForOne { statistikk -> statistikk.type shouldBe Statistikkategori.VIRKSOMHET.name }
-
-            val underenhetStatistikk =
-                kvartalsvisStatistikk.firstOrNull { it.type == Statistikkategori.VIRKSOMHET.name }
-            underenhetStatistikk.shouldNotBeNull()
-            /*
-            Expected :"Underenhet Sykehjem Med Tilgang (privat sektor)"
-            Actual   :"Underenhet Med Enkelrettighet Bransje Sykehjem"
-             */
-            underenhetStatistikk.label shouldBe underenhetSykehjemMedTilgang.navn
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 4
+            kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkLand, Statistikkategori.LAND, "Norge")
+            // TODO: Sektor label er feil, skal være "Privat og offentlig næringsvirksomhet"
+            kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkSektor, Statistikkategori.SEKTOR, "3")
+            kvartalsvisStatistikk.shoudBeEqualForKategori(
+                expectedStatistikkBransje,
+                Statistikkategori.BRANSJE,
+                Bransje.SYKEHJEM.navn,
+            )
+            kvartalsvisStatistikk.shoudBeEqualForKategori(
+                expectedStatistikkVirksomhet,
+                Statistikkategori.VIRKSOMHET,
+                underenhetSykehjemMedTilgang.navn,
+            )
 
             kvartalsvisStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.OVERORDNET_ENHET.name }
         }
     }
 
-    private fun lagVirksomhetStatistikkTestCase() {
+    private fun List<KvartalsvisSykefraværshistorikkDto>.shoudBeEqualForKategori(
+        expectedStatistikkForKategori: List<KvartalsvisSykefraværsprosentDto>,
+        statistikkategori: Statistikkategori,
+        label: String,
+    ) {
+        this.shouldForOne { statistikk -> statistikk.type shouldBe statistikkategori.name }
+        val actualStatistikkForKategori =
+            this.firstOrNull { it.type == statistikkategori.name }
+        actualStatistikkForKategori.shouldNotBeNull()
+        actualStatistikkForKategori.label shouldBe label
+        actualStatistikkForKategori.kvartalsvisSykefraværsprosent.shouldBeEqual(expectedStatistikkForKategori)
+    }
+
+    private fun List<KvartalsvisSykefraværsprosentDto>.shouldBeEqual(expectedStatistikk: List<KvartalsvisSykefraværsprosentDto>) {
+        this.size shouldBe expectedStatistikk.size
+        this.forEachIndexed { index, kvartalsvisSykefraværsprosentDto ->
+            val expected = expectedStatistikk[index]
+            kvartalsvisSykefraværsprosentDto.tapteDagsverk bigDecimalShouldBeEqual expected.tapteDagsverk
+            kvartalsvisSykefraværsprosentDto.muligeDagsverk bigDecimalShouldBeEqual expected.muligeDagsverk
+            kvartalsvisSykefraværsprosentDto.prosent bigDecimalShouldBeEqual expected.prosent
+            kvartalsvisSykefraværsprosentDto.årstall shouldBeEqual expected.årstall
+            kvartalsvisSykefraværsprosentDto.kvartal shouldBeEqual expected.kvartal
+        }
+    }
+
+    private infix fun BigDecimal.bigDecimalShouldBeEqual(expected: BigDecimal) {
+        (this.compareTo(expected) == 0) shouldBe true
+    }
+
+    private fun lagVirksomhetStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
         // Data er tatt fra sykefravar_statistikk_virksomhet_med_gradering (i dev)
         // tapteDv = sykefravar_statistikk_virksomhet_med_gradering.tapte_dagsverk
         //  men det kunne også har vært sum av tapteDV i tapteDagsverkMedVarighet lista
         // tapteDagsverGradert = = sykefravar_statistikk_virksomhet_med_gradering.tapte_dagsverk_gradert_sykemelding
         // antallPersoner = = sykefravar_statistikk_virksomhet_med_gradering.antall_personer
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.VIRKSOMHET,
-            kode = underenhetSykehjemMedTilgang.orgnr,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
-            tapteDagsverk = 440.0.toBigDecimal(),
-            muligeDagsverk = 1254.0.toBigDecimal(),
-            antallPersoner = 22,
-            tapteDagsverGradert = 387.710000.toBigDecimal(),
-            tapteDagsverkMedVarighet = listOf(
-                TapteDagsverkPerVarighet(
-                    varighet = "A",
-                    tapteDagsverk = 21.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "B",
-                    tapteDagsverk = 37.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "C",
-                    tapteDagsverk = 24.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "D",
-                    tapteDagsverk = 27.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "E",
-                    tapteDagsverk = 67.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "F",
-                    tapteDagsverk = 2.0.toBigDecimal(),
-                ),
-            ),
-        )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.VIRKSOMHET,
-            kode = underenhetSykehjemMedTilgang.orgnr,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
-            tapteDagsverk = 85.0.toBigDecimal(),
-            muligeDagsverk = 1653.0.toBigDecimal(),
-            antallPersoner = 29,
-            tapteDagsverGradert = 79.258500.toBigDecimal(),
-            tapteDagsverkMedVarighet = listOf(
-                TapteDagsverkPerVarighet(
-                    varighet = "A",
-                    tapteDagsverk = 3.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "B",
-                    tapteDagsverk = 11.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "D",
-                    tapteDagsverk = 12.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "E",
-                    tapteDagsverk = 13.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "F",
-                    tapteDagsverk = 6.0.toBigDecimal(),
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.VIRKSOMHET,
+                kode = underenhetSykehjemMedTilgang.orgnr,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                tapteDagsverk = 440.0.toBigDecimal(),
+                muligeDagsverk = 1254.0.toBigDecimal(),
+                antallPersoner = 22,
+                tapteDagsverGradert = 387.710000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 21.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "B",
+                        tapteDagsverk = 37.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "C",
+                        tapteDagsverk = 24.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 27.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 67.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "F",
+                        tapteDagsverk = 2.0.toBigDecimal(),
+                    ),
                 ),
             ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.VIRKSOMHET,
-            kode = underenhetSykehjemMedTilgang.orgnr,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
-            tapteDagsverk = 118.0.toBigDecimal(),
-            muligeDagsverk = 1197.0.toBigDecimal(),
-            antallPersoner = 21,
-            tapteDagsverGradert = 100.936000.toBigDecimal(),
-            tapteDagsverkMedVarighet = listOf(
-                TapteDagsverkPerVarighet(
-                    varighet = "A",
-                    tapteDagsverk = 2.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "B",
-                    tapteDagsverk = 11.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "D",
-                    tapteDagsverk = 18.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "E",
-                    tapteDagsverk = 14.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "F",
-                    tapteDagsverk = 13.0.toBigDecimal(),
-                ),
-            ),
-        )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.VIRKSOMHET,
-            kode = underenhetSykehjemMedTilgang.orgnr,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
-            tapteDagsverk = 41.0.toBigDecimal(),
-            muligeDagsverk = 1140.0.toBigDecimal(),
-            antallPersoner = 20,
-            tapteDagsverGradert = 15.850700.toBigDecimal(),
-            tapteDagsverkMedVarighet = listOf(
-                TapteDagsverkPerVarighet(
-                    varighet = "A",
-                    tapteDagsverk = 5.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "B",
-                    tapteDagsverk = 3.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "C",
-                    tapteDagsverk = 5.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "D",
-                    tapteDagsverk = 3.0.toBigDecimal(),
-                ),
-                TapteDagsverkPerVarighet(
-                    varighet = "E",
-                    tapteDagsverk = 3.0.toBigDecimal(),
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.VIRKSOMHET,
+                kode = underenhetSykehjemMedTilgang.orgnr,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                tapteDagsverk = 85.0.toBigDecimal(),
+                muligeDagsverk = 1653.0.toBigDecimal(),
+                antallPersoner = 29,
+                tapteDagsverGradert = 79.258500.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 3.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "B",
+                        tapteDagsverk = 11.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 12.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 13.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "F",
+                        tapteDagsverk = 6.0.toBigDecimal(),
+                    ),
                 ),
             ),
         )
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.VIRKSOMHET,
+                kode = underenhetSykehjemMedTilgang.orgnr,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                tapteDagsverk = 118.0.toBigDecimal(),
+                muligeDagsverk = 1197.0.toBigDecimal(),
+                antallPersoner = 21,
+                tapteDagsverGradert = 100.936000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 2.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "B",
+                        tapteDagsverk = 11.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 18.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 14.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "F",
+                        tapteDagsverk = 13.0.toBigDecimal(),
+                    ),
+                ),
+            ),
+        )
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.VIRKSOMHET,
+                kode = underenhetSykehjemMedTilgang.orgnr,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                tapteDagsverk = 41.0.toBigDecimal(),
+                muligeDagsverk = 1140.0.toBigDecimal(),
+                antallPersoner = 20,
+                tapteDagsverGradert = 15.850700.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 5.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "B",
+                        tapteDagsverk = 3.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "C",
+                        tapteDagsverk = 5.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 3.0.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 3.0.toBigDecimal(),
+                    ),
+                ),
+            ),
+        )
+        return statistikk
     }
 
-    fun lagBransjeStatistikkTestCase() {
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.BRANSJE,
-            kode = Bransje.SYKEHJEM.navn,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
-            tapteDagsverk = 330864.7.toBigDecimal(),
-            muligeDagsverk = 3331505.8.toBigDecimal(),
-            prosent = 9.9.toBigDecimal(),
-            antallPersoner = 1000,
+    private fun lagBransjeStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.BRANSJE,
+                kode = Bransje.SYKEHJEM.navn,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                tapteDagsverk = 330864.7.toBigDecimal(),
+                muligeDagsverk = 3331505.8.toBigDecimal(),
+                prosent = 9.9.toBigDecimal(),
+                antallPersoner = 1000,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.BRANSJE,
-            kode = Bransje.SYKEHJEM.navn,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
-            tapteDagsverk = 312606.4.toBigDecimal(),
-            muligeDagsverk = 3245624.8.toBigDecimal(),
-            prosent = 9.6.toBigDecimal(),
-            antallPersoner = 1000,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.BRANSJE,
+                kode = Bransje.SYKEHJEM.navn,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                tapteDagsverk = 312606.4.toBigDecimal(),
+                muligeDagsverk = 3245624.8.toBigDecimal(),
+                prosent = 9.6.toBigDecimal(),
+                antallPersoner = 1000,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.BRANSJE,
-            kode = Bransje.SYKEHJEM.navn,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
-            tapteDagsverk = 311214.1.toBigDecimal(),
-            muligeDagsverk = 3782127.8.toBigDecimal(),
-            prosent = 8.2.toBigDecimal(),
-            antallPersoner = 1000,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.BRANSJE,
+                kode = Bransje.SYKEHJEM.navn,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                tapteDagsverk = 311214.1.toBigDecimal(),
+                muligeDagsverk = 3782127.8.toBigDecimal(),
+                prosent = 8.2.toBigDecimal(),
+                antallPersoner = 1000,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.BRANSJE,
-            kode = Bransje.SYKEHJEM.navn,
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
-            tapteDagsverk = 327662.8.toBigDecimal(),
-            muligeDagsverk = 3511634.6.toBigDecimal(),
-            prosent = 9.3.toBigDecimal(),
-            antallPersoner = 1000,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.BRANSJE,
+                kode = Bransje.SYKEHJEM.navn,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                tapteDagsverk = 327662.8.toBigDecimal(),
+                muligeDagsverk = 3511634.6.toBigDecimal(),
+                prosent = 9.3.toBigDecimal(),
+                antallPersoner = 1000,
+            ),
         )
+        return statistikk
     }
 
-    fun lagSektorStatistikkTestCase() {
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.SEKTOR,
-            kode = "3",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
-            tapteDagsverk = 5300255.308034.toBigDecimal(),
-            muligeDagsverk = 94813876.585998.toBigDecimal(),
-            antallPersoner = 2047614,
+    private fun lagSektorStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.SEKTOR,
+                kode = "3",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                tapteDagsverk = 5300255.308034.toBigDecimal(),
+                muligeDagsverk = 94813876.585998.toBigDecimal(),
+                antallPersoner = 2047614,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.SEKTOR,
-            kode = "3",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
-            tapteDagsverk = 4814260.178576.toBigDecimal(),
-            muligeDagsverk = 92474907.299356.toBigDecimal(),
-            antallPersoner = 2092081,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.SEKTOR,
+                kode = "3",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                tapteDagsverk = 4814260.178576.toBigDecimal(),
+                muligeDagsverk = 92474907.299356.toBigDecimal(),
+                antallPersoner = 2092081,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.SEKTOR,
-            kode = "3",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
-            tapteDagsverk = 4905415.411417.toBigDecimal(),
-            muligeDagsverk = 103456981.055736.toBigDecimal(),
-            antallPersoner = 2174010,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.SEKTOR,
+                kode = "3",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                tapteDagsverk = 4905415.411417.toBigDecimal(),
+                muligeDagsverk = 103456981.055736.toBigDecimal(),
+                antallPersoner = 2174010,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.SEKTOR,
-            kode = "3",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
-            tapteDagsverk = 5276690.149223.toBigDecimal(),
-            muligeDagsverk = 99698415.989531.toBigDecimal(),
-            antallPersoner = 2106935,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.SEKTOR,
+                kode = "3",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                tapteDagsverk = 5276690.149223.toBigDecimal(),
+                muligeDagsverk = 99698415.989531.toBigDecimal(),
+                antallPersoner = 2106935,
+            ),
         )
+        return statistikk
     }
 
-    fun lagLandStatistikkTestCase() {
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.LAND,
-            kode = "NO",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
-            tapteDagsverk = 8894430.toBigDecimal(),
-            muligeDagsverk = 142947000.toBigDecimal(),
-            antallPersoner = 3124427,
+    fun lagLandStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.LAND,
+                kode = "NO",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                tapteDagsverk = 8894430.000000.toBigDecimal(),
+                muligeDagsverk = 142947000.000000.toBigDecimal(),
+                antallPersoner = 3124427,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.LAND,
-            kode = "NO",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
-            tapteDagsverk = 8152210.toBigDecimal(),
-            muligeDagsverk = 139269000.toBigDecimal(),
-            antallPersoner = 3166683,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.LAND,
+                kode = "NO",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                tapteDagsverk = 8152210.000000.toBigDecimal(),
+                muligeDagsverk = 139269000.000000.toBigDecimal(),
+                antallPersoner = 3166683,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.LAND,
-            kode = "NO",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
-            tapteDagsverk = 7988370.toBigDecimal(),
-            muligeDagsverk = 155487000.toBigDecimal(),
-            antallPersoner = 3303089,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.LAND,
+                kode = "NO",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                tapteDagsverk = 7988370.000000.toBigDecimal(),
+                muligeDagsverk = 155487000.000000.toBigDecimal(),
+                antallPersoner = 3303089,
+            ),
         )
-        sendSykefraværsstatistikk(
-            kategori = Statistikkategori.LAND,
-            kode = "NO",
-            årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
-            tapteDagsverk = 8774880.toBigDecimal(),
-            muligeDagsverk = 150138000.toBigDecimal(),
-            antallPersoner = 3190634,
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.LAND,
+                kode = "NO",
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                tapteDagsverk = 8774880.000000.toBigDecimal(),
+                muligeDagsverk = 150138000.000000.toBigDecimal(),
+                antallPersoner = 3190634,
+            ),
         )
+        return statistikk
     }
 
-    fun sendSykefraværsstatistikk(
+    private fun sendSykefraværsstatistikk(
         årstallOgKvartal: ÅrstallOgKvartal,
         kategori: Statistikkategori,
         kode: String,
@@ -332,7 +404,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         tapteDagsverGradert: BigDecimal = 0.0.toBigDecimal(),
         tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         antallPersoner: Int,
-    ) {
+    ): KvartalsvisSykefraværsprosentDto =
         sendSykefraværsstatistikk(
             årstallOgKvartal = årstallOgKvartal,
             kategori = kategori,
@@ -344,7 +416,6 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             prosent = sykefraværsprosent(tapteDagsverk = tapteDagsverk, muligeDagsverk = muligeDagsverk).toBigDecimal(),
             antallPersoner = antallPersoner,
         )
-    }
 
     fun sendSykefraværsstatistikk(
         årstallOgKvartal: ÅrstallOgKvartal,
@@ -356,7 +427,15 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         tapteDagsverGradert: BigDecimal = 0.0.toBigDecimal(),
         tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         antallPersoner: Int,
-    ) {
+    ): KvartalsvisSykefraværsprosentDto {
+        val dto = KvartalsvisSykefraværsprosentDto(
+            årstall = årstallOgKvartal.årstall,
+            kvartal = årstallOgKvartal.kvartal,
+            tapteDagsverk = tapteDagsverk,
+            muligeDagsverk = muligeDagsverk,
+            prosent = prosent,
+            erMaskert = antallPersoner < 4,
+        )
         val jsonMelding = JsonMelding(
             kategori = kategori,
             kode = kode,
@@ -373,6 +452,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             melding = jsonMelding.toJsonValue(),
             topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
+        return dto
     }
 
     private fun sykefraværsprosent(
