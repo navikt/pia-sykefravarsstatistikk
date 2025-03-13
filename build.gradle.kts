@@ -101,6 +101,12 @@ dependencies {
             }
             because("bcprov-jdk18on in Mockserver har sårbar versjon")
         }
+        testImplementation("org.bouncycastle:bcpkix-jdk18on") {
+            version {
+                require("1.80")
+            }
+            because("bcpkix-jdk18on in Mockserver har sårbar versjon")
+        }
         testImplementation("org.xmlunit:xmlunit-core") {
             version {
                 require("2.10.0")
