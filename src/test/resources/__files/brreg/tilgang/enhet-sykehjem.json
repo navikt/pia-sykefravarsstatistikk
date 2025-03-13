@@ -1,0 +1,81 @@
+{
+  "organisasjonsnummer": "100000017",
+  "navn": "Overordnet Enhet Med Tilhørighet Bransje Sykehjem",
+  "organisasjonsform": {
+    "kode": "SÆR",
+    "beskrivelse": "Annet foretak iflg. særskilt lov",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/S%C3%86R"
+      }
+    }
+  },
+  "hjemmeside": "www.nettside.no",
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "BERGEN",
+    "kommunenummer": "4601"
+  },
+  "registreringsdatoEnhetsregisteret": "1992-09-18",
+  "registrertIMvaregisteret": true,
+  "frivilligMvaRegistrertBeskrivelser": [
+    ""
+  ],
+  "naeringskode1": {
+    "kode": "87.102",
+    "beskrivelse": "Somatisk sykehjem"
+  },
+  "antallAnsatte": 100,
+  "harRegistrertAntallAnsatte": true,
+  "registreringsdatoFrivilligMerverdiavgiftsregisteret": "1992-09-18",
+  "registreringsdatoMerverdiavgiftsregisteret": "1992-09-18",
+  "registreringsdatoMerverdiavgiftsregisteretEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "1992-09-18",
+  "epostadresse": "epost@epost.no",
+  "telefon": "12 34 56 78",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "BERGEN",
+    "kommunenummer": "4601"
+  },
+  "stiftelsesdato": "1992-09-18",
+  "institusjonellSektorkode": {
+    "kode": "2100",
+    "beskrivelse": "Private aksjeselskaper mv."
+  },
+  "registrertIForetaksregisteret": true,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "sisteInnsendteAarsregnskap": "1992",
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "vedtektsdato": "1992-09-18",
+  "vedtektsfestetFormaal": [
+    ""
+  ],
+  "aktivitet": [
+    ""
+  ],
+  "registreringsdatoForetaksregisteret": "1992-09-18",
+  "registrertIPartiregisteret": false,
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/100000017"
+    }
+  }
+}

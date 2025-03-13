@@ -79,8 +79,9 @@ class SykefraværsstatistikkService(
         næring: Næring,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<UmaskertSykefraværsstatistikkForEttKvartalNæring> {
-        logger.info("Henter statistikk for næring '$næring' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
-        val sykefraværsstatistikkTilNæring = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
+        logger.info("Henter statistikk for næring '${næring.tosifferIdentifikator}' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
+        val sykefraværsstatistikkTilNæring =
+            sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
         return sykefraværsstatistikkTilNæring.filter {
             ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
         }
@@ -134,7 +135,12 @@ class SykefraværsstatistikkService(
             ).left()
         }
 
-        prosentSiste4KvartalerTotalt.add(umaskertLandsstatistikk.prosentTotaltAggregert(statistikkategori = LAND, label = "Norge"))
+        prosentSiste4KvartalerTotalt.add(
+            umaskertLandsstatistikk.prosentTotaltAggregert(
+                statistikkategori = LAND,
+                label = "Norge",
+            ),
+        )
 
         val bransje = underenhet.bransje()
         if (bransje != null) {
@@ -174,19 +180,34 @@ class SykefraværsstatistikkService(
                 ).left()
             }
             prosentSiste4KvartalerTotalt.add(
-                umaskertNæringsstatistikk.prosentTotaltAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentTotaltAggregert(
+                    statistikkategori = NÆRING,
+                    label = næring.tosifferIdentifikator,
+                ),
             )
             prosentSiste4KvartalerGradert.add(
-                umaskertNæringsstatistikk.prosentGradertAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentGradertAggregert(
+                    statistikkategori = NÆRING,
+                    label = næring.tosifferIdentifikator,
+                ),
             )
             prosentSiste4KvartalerKorttid.add(
-                umaskertNæringsstatistikk.prosentKortTidAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentKortTidAggregert(
+                    statistikkategori = NÆRING,
+                    label = næring.tosifferIdentifikator,
+                ),
             )
             prosentSiste4KvartalerLangtid.add(
-                umaskertNæringsstatistikk.prosentLangTidAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.prosentLangTidAggregert(
+                    statistikkategori = NÆRING,
+                    label = næring.tosifferIdentifikator,
+                ),
             )
             trendTotalt.add(
-                umaskertNæringsstatistikk.trendTotaltAggregert(statistikkategori = NÆRING, label = næring.tosifferIdentifikator),
+                umaskertNæringsstatistikk.trendTotaltAggregert(
+                    statistikkategori = NÆRING,
+                    label = næring.tosifferIdentifikator,
+                ),
             )
         }
 
@@ -215,7 +236,10 @@ class SykefraværsstatistikkService(
                 umaskertVirksomhetsstatistikk.prosentLangTidAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
             )
             tapteDagsverkTotalt.add(
-                umaskertVirksomhetsstatistikk.tapteDagsverkTotaltAggregert(statistikkategori = VIRKSOMHET, label = underenhet.navn),
+                umaskertVirksomhetsstatistikk.tapteDagsverkTotaltAggregert(
+                    statistikkategori = VIRKSOMHET,
+                    label = underenhet.navn,
+                ),
             )
             muligeDagsverkTotalt.add(
                 umaskertVirksomhetsstatistikk.muligeDagsverkTotaltAggregert(
@@ -287,7 +311,9 @@ class SykefraværsstatistikkService(
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
                 return Feil(
-                    feilmelding = "Ingen næringsstatistikk funnet for næring '${underenhet.næringskode.næring}'",
+                    feilmelding = "Ingen næringsstatistikk funnet for næring " +
+                        "med navn: '${underenhet.næringskode.næring.navn}' " +
+                        "og kode: '${underenhet.næringskode.næring.tosifferIdentifikator}'",
                     httpStatusCode = HttpStatusCode.BadRequest,
                 ).left()
             }

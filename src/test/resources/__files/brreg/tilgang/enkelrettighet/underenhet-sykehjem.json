@@ -1,0 +1,53 @@
+{
+  "organisasjonsnummer": "100000018",
+  "navn": "Underenhet Med Enkelrettighet Bransje Sykehjem",
+  "organisasjonsform": {
+    "kode": "BEDR",
+    "beskrivelse": "Underenhet til sykehjem",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/BEDR"
+      }
+    }
+  },
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [],
+    "kommune": "BERGEN",
+    "kommunenummer": "4601"
+  },
+  "registreringsdatoEnhetsregisteret": "1992-09-18",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "kode": "87.102",
+    "beskrivelse": "Somatisk sykehjem"
+  },
+  "antallAnsatte": 100,
+  "harRegistrertAntallAnsatte": true,
+  "overordnetEnhet": "100000017",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "1992-09-18",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "1992-09-18",
+  "datoEierskifte": "1992-09-18",
+  "beliggenhetsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "",
+    "poststed": "",
+    "adresse": [
+      ""
+    ],
+    "kommune": "BERGEN",
+    "kommunenummer": "4601"
+  },
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/underenheter/100000018"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/100000017"
+    }
+  }
+}

@@ -379,5 +379,30 @@ class TestContainerHelper {
             ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
         )
+        val overordnetSykehjemUtenTilgang =
+            OverordnetEnhet(
+                orgnr = "100000017",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehjem",
+                antallAnsatte = 400,
+                næringskode = BrregNæringskodeDto(
+                    kode = "87.102",
+                    beskrivelse = "Somatisk sykehjem",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "1120",
+                    beskrivelse = "Statlig eide aksjeselskaper mv.",
+                ).tilDomene(),
+            )
+
+        val underenhetSykehjemMedTilgang = Underenhet(
+            orgnr = "100000018",
+            navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
+            antallAnsatte = 400,
+            næringskode = BrregNæringskodeDto(
+                kode = "87.102",
+                beskrivelse = "Somatisk sykehjem",
+            ).tilDomene(),
+            overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
+        )
     }
 }
