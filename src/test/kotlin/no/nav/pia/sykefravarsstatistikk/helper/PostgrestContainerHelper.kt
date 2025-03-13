@@ -73,6 +73,29 @@ class PostgrestContainerHelper(
         }
     }
 
+    fun slettAllData(tabell: String) =
+        dataSource.connection.use { connection ->
+            val statement = connection.createStatement()
+            statement.execute("DELETE FROM $tabell")
+        }
+
+    fun slettAlleStatistikk() {
+        for (tabell in listOf(
+            "sykefravarsstatistikk_land",
+            "sykefravarsstatistikk_sektor",
+            "sykefravarsstatistikk_naring",
+            "sykefravarsstatistikk_naring_med_varighet",
+            "sykefravarsstatistikk_naringskode",
+            "sykefravarsstatistikk_naringskode_med_varighet",
+            "sykefravarsstatistikk_bransje",
+            "sykefravarsstatistikk_bransje_med_varighet",
+            "sykefravarsstatistikk_virksomhet",
+            "sykefravarsstatistikk_virksomhet_med_varighet",
+        )) {
+            slettAllData(tabell)
+        }
+    }
+
     fun envVars() =
         mapOf(
             "NAIS_DATABASE_PIA_SYKEFRAVARSSTATISTIKK_PIA_SYKEFRAVARSSTATISTIKK_DB_JDBC_URL" to

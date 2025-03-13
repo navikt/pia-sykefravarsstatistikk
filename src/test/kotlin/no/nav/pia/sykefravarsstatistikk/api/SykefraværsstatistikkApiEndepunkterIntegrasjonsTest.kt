@@ -7,7 +7,10 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
+import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto
+import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværsprosentDto
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
@@ -19,6 +22,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetSykehjemMedTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
@@ -32,6 +36,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
     fun cleanUp() {
         runBlocking {
             altinnTilgangerContainerHelper.slettAlleRettigheter()
+            postgresContainerHelper.slettAlleStatistikk()
         }
     }
 
@@ -41,6 +46,67 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             tapteDagsverk = 8894430.toBigDecimal(),
             muligeDagsverk = 142947000.toBigDecimal(),
         ) shouldBe 6.2
+    }
+
+    @Test
+    fun `Sjekk format og data fra aggregert statistikk`() {
+        val underenhet: Underenhet = underenhetSykehjemMedTilgang
+
+        runBlocking {
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhet.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+            lagLandStatistikkTestCase()
+            lagSektorStatistikkTestCase()
+            lagBransjeStatistikkTestCase()
+            lagVirksomhetStatistikkTestCase()
+
+            val aggregertStatistikk = TestContainerHelper.hentAggregertStatistikk(
+                orgnr = underenhet.orgnr,
+                config = withToken(),
+            )
+
+            aggregertStatistikk.alleTyperAggregerteStatistikk().forEach { aggregertStatistikkDto ->
+                aggregertStatistikkDto.shouldForNone { statistikk ->
+                    statistikk.statistikkategori shouldBe
+                        Statistikkategori.OVERORDNET_ENHET.name
+                }
+            }
+
+            aggregertStatistikk.prosentSiste4KvartalerTotalt.shouldHaveStatistikkForKategori(
+                statistikkategori = Statistikkategori.LAND,
+                label = "Norge",
+            )
+
+            listOf(
+                aggregertStatistikk.prosentSiste4KvartalerTotalt,
+                aggregertStatistikk.prosentSiste4KvartalerGradert,
+                aggregertStatistikk.prosentSiste4KvartalerKorttid,
+                aggregertStatistikk.prosentSiste4KvartalerLangtid,
+                aggregertStatistikk.trendTotalt,
+            ).onEach { aggregertStatistikkDto ->
+                aggregertStatistikkDto.shouldHaveStatistikkForKategori(
+                    statistikkategori = Statistikkategori.BRANSJE,
+                    label = Bransje.SYKEHJEM.navn,
+                )
+            }
+
+            listOf(
+                aggregertStatistikk.prosentSiste4KvartalerTotalt,
+                aggregertStatistikk.prosentSiste4KvartalerGradert,
+                aggregertStatistikk.prosentSiste4KvartalerKorttid,
+                aggregertStatistikk.prosentSiste4KvartalerLangtid,
+                aggregertStatistikk.tapteDagsverkTotalt,
+                aggregertStatistikk.muligeDagsverkTotalt,
+            ).onEach { aggregertStatistikkDto ->
+                aggregertStatistikkDto.shouldHaveStatistikkForKategori(
+                    statistikkategori = Statistikkategori.VIRKSOMHET,
+                    label = underenhetSykehjemMedTilgang.navn,
+                )
+            }
+            println("[DEBUG][Test] kvartalsvisStatistikk: '${Json.encodeToString(aggregertStatistikk)}'")
+        }
     }
 
     @Test
@@ -63,7 +129,11 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             )
 
             kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkLand, Statistikkategori.LAND, "Norge")
-            kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkSektor, Statistikkategori.SEKTOR, Sektor.PRIVAT.beskrivelse)
+            kvartalsvisStatistikk.shoudBeEqualForKategori(
+                expectedStatistikkSektor,
+                Statistikkategori.SEKTOR,
+                Sektor.PRIVAT.beskrivelse,
+            )
             kvartalsvisStatistikk.shoudBeEqualForKategori(
                 expectedStatistikkBransje,
                 Statistikkategori.BRANSJE,
@@ -77,6 +147,28 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
             kvartalsvisStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.OVERORDNET_ENHET.name }
         }
+    }
+
+    private fun AggregertStatistikkResponseDto.alleTyperAggregerteStatistikk() =
+        listOf(
+            prosentSiste4KvartalerTotalt,
+            prosentSiste4KvartalerGradert,
+            prosentSiste4KvartalerKorttid,
+            prosentSiste4KvartalerLangtid,
+            trendTotalt,
+            tapteDagsverkTotalt,
+            muligeDagsverkTotalt,
+        )
+
+    private fun List<AggregertStatistikkDto>.shouldHaveStatistikkForKategori(
+        statistikkategori: Statistikkategori,
+        label: String,
+    ) {
+        this.shouldForOne { statistikk -> statistikk.statistikkategori shouldBe statistikkategori.name }
+        val actualStatistikkForKategori =
+            this.firstOrNull { it.statistikkategori == statistikkategori.name }
+        actualStatistikkForKategori.shouldNotBeNull()
+        actualStatistikkForKategori.label shouldBe label
     }
 
     private fun List<KvartalsvisSykefraværshistorikkDto>.shoudBeEqualForKategori(
@@ -264,7 +356,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 330864.7.toBigDecimal(),
                 muligeDagsverk = 3331505.8.toBigDecimal(),
                 prosent = 9.9.toBigDecimal(),
-                antallPersoner = 1000,
+                antallPersoner = 96403,
             ),
         )
         statistikk.add(
@@ -275,7 +367,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 312606.4.toBigDecimal(),
                 muligeDagsverk = 3245624.8.toBigDecimal(),
                 prosent = 9.6.toBigDecimal(),
-                antallPersoner = 1000,
+                antallPersoner = 96711,
             ),
         )
         statistikk.add(
@@ -286,7 +378,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 311214.1.toBigDecimal(),
                 muligeDagsverk = 3782127.8.toBigDecimal(),
                 prosent = 8.2.toBigDecimal(),
-                antallPersoner = 1000,
+                antallPersoner = 104737,
             ),
         )
         statistikk.add(
@@ -297,7 +389,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 327662.8.toBigDecimal(),
                 muligeDagsverk = 3511634.6.toBigDecimal(),
                 prosent = 9.3.toBigDecimal(),
-                antallPersoner = 1000,
+                antallPersoner = 96778,
             ),
         )
         return statistikk
