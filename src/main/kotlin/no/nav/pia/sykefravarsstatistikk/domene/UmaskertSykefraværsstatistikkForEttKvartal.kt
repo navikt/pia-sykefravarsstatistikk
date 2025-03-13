@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.domene
 
 import ia.felles.definisjoner.bransjer.Bransje
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class UmaskertSykefraværsstatistikkForEttKvartalLand(
@@ -8,9 +9,9 @@ data class UmaskertSykefraværsstatistikkForEttKvartalLand(
     override val årstall: Int,
     override val kvartal: Int,
     override val antallPersoner: Int,
-    override val tapteDagsverk: Double,
-    override val muligeDagsverk: Double,
-    override val prosent: Double,
+    override val tapteDagsverk: BigDecimal,
+    override val muligeDagsverk: BigDecimal,
+    override val prosent: BigDecimal,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
@@ -19,9 +20,9 @@ data class UmaskertSykefraværsstatistikkForEttKvartalSektor(
     override val årstall: Int,
     override val kvartal: Int,
     override val antallPersoner: Int,
-    override val tapteDagsverk: Double,
-    override val muligeDagsverk: Double,
-    override val prosent: Double,
+    override val tapteDagsverk: BigDecimal,
+    override val muligeDagsverk: BigDecimal,
+    override val prosent: BigDecimal,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
@@ -30,9 +31,9 @@ data class UmaskertSykefraværsstatistikkForEttKvartalNæring(
     override val årstall: Int,
     override val kvartal: Int,
     override val antallPersoner: Int,
-    override val tapteDagsverk: Double,
-    override val muligeDagsverk: Double,
-    override val prosent: Double,
+    override val tapteDagsverk: BigDecimal,
+    override val muligeDagsverk: BigDecimal,
+    override val prosent: BigDecimal,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
@@ -41,9 +42,9 @@ data class UmaskertSykefraværsstatistikkForEttKvartalBransje(
     override val årstall: Int,
     override val kvartal: Int,
     override val antallPersoner: Int,
-    override val tapteDagsverk: Double,
-    override val muligeDagsverk: Double,
-    override val prosent: Double,
+    override val tapteDagsverk: BigDecimal,
+    override val muligeDagsverk: BigDecimal,
+    override val prosent: BigDecimal,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
@@ -52,10 +53,10 @@ data class UmaskertSykefraværsstatistikkForEttKvartalVirksomhet(
     override val årstall: Int,
     override val kvartal: Int,
     override val antallPersoner: Int,
-    override val tapteDagsverk: Double,
-    override val muligeDagsverk: Double,
-    override val prosent: Double,
-    val tapteDagsverkGradert: Double,
+    override val tapteDagsverk: BigDecimal,
+    override val muligeDagsverk: BigDecimal,
+    override val prosent: BigDecimal,
+    val tapteDagsverkGradert: BigDecimal,
     val rectype: String,
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk

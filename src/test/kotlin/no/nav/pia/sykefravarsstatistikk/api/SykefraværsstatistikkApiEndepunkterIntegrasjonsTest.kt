@@ -91,31 +91,31 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             tapteDagsverk = 440.0.toBigDecimal(),
             muligeDagsverk = 1254.0.toBigDecimal(),
             antallPersoner = 22,
-            tapteDagsverGradert = 387.710000,
+            tapteDagsverGradert = 387.710000.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 21.0,
+                    tapteDagsverk = 21.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "B",
-                    tapteDagsverk = 37.0,
+                    tapteDagsverk = 37.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "C",
-                    tapteDagsverk = 24.0,
+                    tapteDagsverk = 24.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 27.0,
+                    tapteDagsverk = 27.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "E",
-                    tapteDagsverk = 67.0,
+                    tapteDagsverk = 67.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "F",
-                    tapteDagsverk = 2.0,
+                    tapteDagsverk = 2.0.toBigDecimal(),
                 ),
             ),
         )
@@ -126,27 +126,27 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             tapteDagsverk = 85.0.toBigDecimal(),
             muligeDagsverk = 1653.0.toBigDecimal(),
             antallPersoner = 29,
-            tapteDagsverGradert = 79.258500,
+            tapteDagsverGradert = 79.258500.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 3.0,
+                    tapteDagsverk = 3.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "B",
-                    tapteDagsverk = 11.0,
+                    tapteDagsverk = 11.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 12.0,
+                    tapteDagsverk = 12.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "E",
-                    tapteDagsverk = 13.0,
+                    tapteDagsverk = 13.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "F",
-                    tapteDagsverk = 6.0,
+                    tapteDagsverk = 6.0.toBigDecimal(),
                 ),
             ),
         )
@@ -157,27 +157,27 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             tapteDagsverk = 118.0.toBigDecimal(),
             muligeDagsverk = 1197.0.toBigDecimal(),
             antallPersoner = 21,
-            tapteDagsverGradert = 100.936000,
+            tapteDagsverGradert = 100.936000.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 2.0,
+                    tapteDagsverk = 2.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "B",
-                    tapteDagsverk = 11.0,
+                    tapteDagsverk = 11.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 18.0,
+                    tapteDagsverk = 18.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "E",
-                    tapteDagsverk = 14.0,
+                    tapteDagsverk = 14.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "F",
-                    tapteDagsverk = 13.0,
+                    tapteDagsverk = 13.0.toBigDecimal(),
                 ),
             ),
         )
@@ -188,27 +188,27 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             tapteDagsverk = 41.0.toBigDecimal(),
             muligeDagsverk = 1140.0.toBigDecimal(),
             antallPersoner = 20,
-            tapteDagsverGradert = 15.850700,
+            tapteDagsverGradert = 15.850700.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 5.0,
+                    tapteDagsverk = 5.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "B",
-                    tapteDagsverk = 3.0,
+                    tapteDagsverk = 3.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "C",
-                    tapteDagsverk = 5.0,
+                    tapteDagsverk = 5.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 3.0,
+                    tapteDagsverk = 3.0.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "E",
-                    tapteDagsverk = 3.0,
+                    tapteDagsverk = 3.0.toBigDecimal(),
                 ),
             ),
         )
@@ -221,7 +221,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
             tapteDagsverk = 330864.7.toBigDecimal(),
             muligeDagsverk = 3331505.8.toBigDecimal(),
-            prosent = 9.9,
+            prosent = 9.9.toBigDecimal(),
             antallPersoner = 1000,
         )
         sendSykefraværsstatistikk(
@@ -230,7 +230,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
             tapteDagsverk = 312606.4.toBigDecimal(),
             muligeDagsverk = 3245624.8.toBigDecimal(),
-            prosent = 9.6,
+            prosent = 9.6.toBigDecimal(),
             antallPersoner = 1000,
         )
         sendSykefraværsstatistikk(
@@ -239,7 +239,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
             tapteDagsverk = 311214.1.toBigDecimal(),
             muligeDagsverk = 3782127.8.toBigDecimal(),
-            prosent = 8.2,
+            prosent = 8.2.toBigDecimal(),
             antallPersoner = 1000,
         )
         sendSykefraværsstatistikk(
@@ -248,7 +248,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
             tapteDagsverk = 327662.8.toBigDecimal(),
             muligeDagsverk = 3511634.6.toBigDecimal(),
-            prosent = 9.3,
+            prosent = 9.3.toBigDecimal(),
             antallPersoner = 1000,
         )
     }
@@ -329,7 +329,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         kode: String,
         tapteDagsverk: BigDecimal,
         muligeDagsverk: BigDecimal,
-        tapteDagsverGradert: Double = 0.0,
+        tapteDagsverGradert: BigDecimal = 0.0.toBigDecimal(),
         tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         antallPersoner: Int,
     ) {
@@ -341,7 +341,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             muligeDagsverk = muligeDagsverk,
             tapteDagsverGradert = tapteDagsverGradert,
             tapteDagsverkMedVarighet = tapteDagsverkMedVarighet,
-            prosent = sykefraværsprosent(tapteDagsverk = tapteDagsverk, muligeDagsverk = muligeDagsverk),
+            prosent = sykefraværsprosent(tapteDagsverk = tapteDagsverk, muligeDagsverk = muligeDagsverk).toBigDecimal(),
             antallPersoner = antallPersoner,
         )
     }
@@ -352,8 +352,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         kode: String,
         tapteDagsverk: BigDecimal,
         muligeDagsverk: BigDecimal,
-        prosent: Double,
-        tapteDagsverGradert: Double = 0.0,
+        prosent: BigDecimal,
+        tapteDagsverGradert: BigDecimal = 0.0.toBigDecimal(),
         tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         antallPersoner: Int,
     ) {
@@ -361,8 +361,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             kategori = kategori,
             kode = kode,
             årstallOgKvartal = årstallOgKvartal,
-            tapteDagsverk = tapteDagsverk.toDouble(), // TODO: JsonMelding skal være BigDecimal
-            muligeDagsverk = muligeDagsverk.toDouble(),
+            tapteDagsverk = tapteDagsverk, // TODO: JsonMelding skal være BigDecimal
+            muligeDagsverk = muligeDagsverk,
             prosent = prosent,
             tapteDagsverGradert = tapteDagsverGradert,
             tapteDagsverkMedVarighet = tapteDagsverkMedVarighet,

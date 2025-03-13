@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.persistering.BigDecimalSerializer
 import java.math.BigDecimal
 
 class SykefraværsstatistikkImportTestUtils {
@@ -39,7 +40,8 @@ class SykefraværsstatistikkImportTestUtils {
     @Serializable
     data class TapteDagsverkPerVarighet(
         val varighet: String,
-        val tapteDagsverk: Double,
+        @Serializable(with = BigDecimalSerializer::class)
+        val tapteDagsverk: BigDecimal,
     )
 
     data class JsonMelding(
@@ -50,11 +52,11 @@ class SykefraværsstatistikkImportTestUtils {
             kategori: Statistikkategori,
             kode: String,
             årstallOgKvartal: ÅrstallOgKvartal = ÅrstallOgKvartal(2023, 1),
-            prosent: Double,
-            tapteDagsverk: Double,
-            muligeDagsverk: Double,
+            prosent: BigDecimal,
+            tapteDagsverk: BigDecimal,
+            muligeDagsverk: BigDecimal,
             antallPersoner: Int,
-            tapteDagsverGradert: Double = 0.0,
+            tapteDagsverGradert: BigDecimal = BigDecimal(0.0),
             tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         ) : this(
             JsonKey(
@@ -67,10 +69,10 @@ class SykefraværsstatistikkImportTestUtils {
                 kode = kode,
                 årstall = årstallOgKvartal.årstall,
                 kvartal = årstallOgKvartal.kvartal,
-                prosent = prosent.toBigDecimal(),
-                tapteDagsverk = tapteDagsverk.toBigDecimal(),
-                muligeDagsverk = muligeDagsverk.toBigDecimal(),
-                tapteDagsverkGradert = tapteDagsverGradert.toBigDecimal(),
+                prosent = prosent,
+                tapteDagsverk = tapteDagsverk,
+                muligeDagsverk = muligeDagsverk,
+                tapteDagsverkGradert = tapteDagsverGradert,
                 tapteDagsverkPerVarighet = tapteDagsverkMedVarighet,
                 antallPersoner = antallPersoner,
             ),
@@ -291,7 +293,7 @@ class SykefraværsstatistikkImportTestUtils {
                     list.add(
                         TapteDagsverkPerVarighet(
                             varighet = rs.getString("varighet"),
-                            tapteDagsverk = rs.getBigDecimal("tapte_dagsverk").toDouble(),
+                            tapteDagsverk = rs.getBigDecimal("tapte_dagsverk"),
                         ),
                     )
                 }

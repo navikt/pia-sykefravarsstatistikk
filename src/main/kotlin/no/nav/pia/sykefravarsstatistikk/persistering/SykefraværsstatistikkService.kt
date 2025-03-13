@@ -32,6 +32,8 @@ import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class SykefraværsstatistikkService(
     private val sykefraværsstatistikkRepository: SykefraværsstatistikkRepository,
@@ -353,6 +355,16 @@ class SykefraværsstatistikkService(
         return response.toList().right()
     }
 
+    // TODO: Kopier fra Sykefraværsstatistikk-api
+    private fun List<BigDecimal>.average(): BigDecimal {
+        if (this.isEmpty()) {
+            return BigDecimal.ZERO
+        }
+
+        val sum = this.reduce { acc, value -> acc.add(value) }
+        return sum.divide(BigDecimal(this.size), 10, RoundingMode.HALF_UP)
+    }
+
     private fun List<Sykefraværsstatistikk>.muligeDagsverkTotalt() = sumOf { it.muligeDagsverk }
 
     private fun List<Sykefraværsstatistikk>.tapteDagsverkTotalt() = sumOf { it.tapteDagsverk }
@@ -361,13 +373,13 @@ class SykefraværsstatistikkService(
 
     private fun List<Sykefraværsstatistikk>.prosentKortTid() = map { it.prosent }.average()
 
-    private fun List<Sykefraværsstatistikk>.prosentGradert() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
+    private fun List<Sykefraværsstatistikk>.prosentGradert() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * BigDecimal(100)
 
     private fun List<Sykefraværsstatistikk>.personerIBeregning() = map { it.antallPersoner }.average().toInt()
 
     private fun List<Sykefraværsstatistikk>.trendTotalt() = -1.0
 
-    private fun List<Sykefraværsstatistikk>.prosentTotalt() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
+    private fun List<Sykefraværsstatistikk>.prosentTotalt() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * BigDecimal(100)
 
     private fun List<Sykefraværsstatistikk>.kvartalerIBeregning() = map { KvartalIBeregning(it.årstall, it.kvartal) }
 

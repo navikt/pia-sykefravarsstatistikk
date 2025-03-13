@@ -16,6 +16,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.OVERORDNET_ENHET
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enUnderenhetUtenStatistikk
@@ -198,17 +199,17 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.4
-            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 180204407.260000
-            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 11539578.440000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.4
+            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 180204407.260000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 11539578.440000
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe overordnetEnhetMedTilhørighetUtenBransje.sektor.kode
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.3
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 19790049.740000
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 1275292.330000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 19790049.740000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
 
             kvartalsvisStatistikk.firstOrNull { it.type == BRANSJE.name }.shouldBeNull()
 
@@ -216,9 +217,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
             næringsStatistikk.shouldNotBeNull()
             næringsStatistikk.label shouldBe underenhetMedTilhørighetUtenBransje.næringskode.næring.tosifferIdentifikator
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 5.9
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 1239902.548524
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 73154.250363
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 73154.250363
 
             kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }.shouldBeNull()
 
@@ -247,17 +248,17 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.4
-            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 11539578.440000
-            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 180204407.260000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.4
+            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 11539578.440000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 180204407.260000
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe overordnetEnhetMedTilhørighetBransjeBygg.sektor.kode
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.3
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 1275292.330000
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 19790049.740000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 19790049.740000
 
             kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }.shouldBeNull()
 
@@ -266,9 +267,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
             bransjeStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 5.8
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 270744.659570
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 4668011.371895
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.8
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 270744.659570
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 4668011.371895
 
             kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }.shouldBeNull()
             kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }.shouldBeNull()
@@ -297,17 +298,17 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.4
-            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 11539578.440000
-            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 180204407.260000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.4
+            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 11539578.440000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 180204407.260000
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe overordnetEnhetMedTilhørighetUtenBransje2.sektor.kode
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.3
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 1275292.330000
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 19790049.740000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 19790049.740000
 
             kvartalsvisStatistikk.firstOrNull { it.type == BRANSJE.name }.shouldBeNull()
 
@@ -315,16 +316,16 @@ class SykefraværsstatistikkApiEndepunkterTest {
             næringsStatistikk.shouldNotBeNull()
             næringsStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje.næringskode.næring.tosifferIdentifikator
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 5.9
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 1239902.548524
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 73154.250363
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 73154.250363
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
             underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje.navn
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 154.5439
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 28.3
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 761.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             val overordnetEnhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }
             overordnetEnhetStatistikk.shouldBeNull()
@@ -353,17 +354,17 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.4
-            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 11539578.440000
-            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 180204407.260000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.4
+            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 11539578.440000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 180204407.260000
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe "1"
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.3
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 1275292.330000
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 19790049.740000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 19790049.740000
 
             kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }.shouldBeNull()
 
@@ -372,16 +373,16 @@ class SykefraværsstatistikkApiEndepunkterTest {
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
             bransjeStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 5.8
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 270744.659570
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 4668011.371895
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.8
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 270744.659570
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 4668011.371895
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
             underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetBransjeSykehus.navn
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 154.5439
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 28.3
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 761.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }.shouldBeNull()
         }
@@ -409,17 +410,17 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.4
-            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 11539578.440000
-            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 180204407.260000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.4
+            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 11539578.440000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 180204407.260000
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetUtenBransje.sektor.kode
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.3
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 1275292.330000
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 19790049.740000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 19790049.740000
 
             kvartalsvisStatistikk.firstOrNull { it.type == BRANSJE.name }.shouldBeNull()
 
@@ -427,16 +428,16 @@ class SykefraværsstatistikkApiEndepunkterTest {
             næringsStatistikk.shouldNotBeNull()
             næringsStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje2.næringskode.næring.tosifferIdentifikator
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 5.9
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 1239902.548524
-            næringsStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 73154.250363
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
+            næringsStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 73154.250363
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
             underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje2.navn
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 154.5439
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 28.3
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 761.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }.shouldBeNull()
         }
@@ -470,17 +471,17 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.4
-            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 11539578.440000
-            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 180204407.260000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.4
+            landStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 11539578.440000
+            landStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 180204407.260000
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetBransjeBarnehage.sektor.kode
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 6.3
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 1275292.330000
-            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 19790049.740000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
+            sektorStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 19790049.740000
 
             kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }.shouldBeNull()
 
@@ -489,16 +490,16 @@ class SykefraværsstatistikkApiEndepunkterTest {
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
             bransjeStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 5.8
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 270744.659570
-            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 4668011.371895
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.8
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 270744.659570
+            bransjeStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 4668011.371895
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
             underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetBransjeBarnehage.navn
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk shouldBe 154.5439
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent shouldBe 28.3
-            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk shouldBe 761.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
+            underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }.shouldBeNull()
         }

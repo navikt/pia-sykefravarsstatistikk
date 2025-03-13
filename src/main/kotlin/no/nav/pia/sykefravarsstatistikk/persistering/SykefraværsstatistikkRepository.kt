@@ -208,11 +208,11 @@ class SykefraværsstatistikkRepository(
             orgnr = string("orgnr"),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
-            tapteDagsverkGradert = double("tapte_dagsverk_gradert"),
+            tapteDagsverkGradert = bigDecimal("tapte_dagsverk_gradert"),
             antallPersoner = int("antall_personer"),
-            tapteDagsverk = double("tapte_dagsverk"),
-            muligeDagsverk = double("mulige_dagsverk"),
-            prosent = double("prosent"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
             rectype = string("rectype"),
             opprettet = localDateTime("opprettet"),
         )
@@ -223,9 +223,9 @@ class SykefraværsstatistikkRepository(
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
-            tapteDagsverk = double("tapte_dagsverk"),
-            muligeDagsverk = double("mulige_dagsverk"),
-            prosent = double("prosent"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
             opprettet = localDateTime("opprettet"),
         )
 
@@ -235,9 +235,9 @@ class SykefraværsstatistikkRepository(
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
-            tapteDagsverk = double("tapte_dagsverk"),
-            muligeDagsverk = double("mulige_dagsverk"),
-            prosent = double("prosent"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
             opprettet = localDateTime("opprettet"),
         )
 
@@ -247,9 +247,9 @@ class SykefraværsstatistikkRepository(
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
-            tapteDagsverk = double("tapte_dagsverk"),
-            muligeDagsverk = double("mulige_dagsverk"),
-            prosent = double("prosent"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
             opprettet = localDateTime("opprettet"),
         )
 
@@ -259,9 +259,9 @@ class SykefraværsstatistikkRepository(
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
-            tapteDagsverk = double("tapte_dagsverk"),
-            muligeDagsverk = double("mulige_dagsverk"),
-            prosent = double("prosent"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
             opprettet = localDateTime("opprettet"),
         )
 

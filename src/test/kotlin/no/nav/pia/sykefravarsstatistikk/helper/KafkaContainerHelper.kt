@@ -287,19 +287,19 @@ class KafkaContainerHelper(
             kategori = Statistikkategori.VIRKSOMHET,
             kode = virksomhet.orgnr,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
-            prosent = 28.3,
-            tapteDagsverk = 154.5439,
-            muligeDagsverk = 761.3,
+            prosent = 28.3.toBigDecimal(),
+            tapteDagsverk = 154.5439.toBigDecimal(),
+            muligeDagsverk = 761.3.toBigDecimal(),
             antallPersoner = 4,
-            tapteDagsverGradert = 33.2,
+            tapteDagsverGradert = 33.2.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 12.3,
+                    tapteDagsverk = 12.3.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 5.2,
+                    tapteDagsverk = 5.2.toBigDecimal(),
                 ),
             ),
         )
@@ -313,35 +313,35 @@ class KafkaContainerHelper(
             kategori = Statistikkategori.BRANSJE,
             kode = bransje.navn,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
-            prosent = 5.8,
-            tapteDagsverk = 270744.659570,
-            muligeDagsverk = 4668011.371895,
+            prosent = 5.8.toBigDecimal(),
+            tapteDagsverk = 270744.659570.toBigDecimal(),
+            muligeDagsverk = 4668011.371895.toBigDecimal(),
             antallPersoner = 88563,
-            tapteDagsverGradert = 1000.0,
+            tapteDagsverGradert = 1000.0.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 93005.180000,
+                    tapteDagsverk = 93005.180000.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "B",
-                    tapteDagsverk = 4505.170000,
+                    tapteDagsverk = 4505.170000.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "C",
-                    tapteDagsverk = 114144.140000,
+                    tapteDagsverk = 114144.140000.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 17410.030000,
+                    tapteDagsverk = 17410.030000.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "E",
-                    tapteDagsverk = 48317.900000,
+                    tapteDagsverk = 48317.900000.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "F",
-                    tapteDagsverk = 5835.970000,
+                    tapteDagsverk = 5835.970000.toBigDecimal(),
                 ),
             ),
         )
@@ -355,35 +355,35 @@ class KafkaContainerHelper(
             kategori = Statistikkategori.NÆRING,
             kode = næring.tosifferIdentifikator,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
-            prosent = 5.9,
-            tapteDagsverk = 73154.250363,
-            muligeDagsverk = 1239902.548524,
+            prosent = 5.9.toBigDecimal(),
+            tapteDagsverk = 73154.250363.toBigDecimal(),
+            muligeDagsverk = 1239902.548524.toBigDecimal(),
             antallPersoner = 25122,
-            tapteDagsverGradert = 28655.128516,
+            tapteDagsverGradert = 28655.128516.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 7925.03,
+                    tapteDagsverk = 7925.03.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "B",
-                    tapteDagsverk = 30269.75,
+                    tapteDagsverk = 30269.75.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "C",
-                    tapteDagsverk = 474.21,
+                    tapteDagsverk = 474.21.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 11120.86,
+                    tapteDagsverk = 11120.86.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "E",
-                    tapteDagsverk = 9487.93,
+                    tapteDagsverk = 9487.93.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "F",
-                    tapteDagsverk = 13876.47,
+                    tapteDagsverk = 13876.47.toBigDecimal(),
                 ),
             ),
         )
@@ -397,9 +397,9 @@ class KafkaContainerHelper(
             kategori = Statistikkategori.SEKTOR,
             kode = sektor.kode,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
-            tapteDagsverk = 1275292.330000,
-            muligeDagsverk = 19790049.740000,
-            prosent = 6.3,
+            tapteDagsverk = 1275292.330000.toBigDecimal(),
+            muligeDagsverk = 19790049.740000.toBigDecimal(),
+            prosent = 6.3.toBigDecimal(),
             antallPersoner = 367239,
         )
 
@@ -411,9 +411,9 @@ class KafkaContainerHelper(
             kategori = Statistikkategori.LAND,
             kode = "NO",
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
-            tapteDagsverk = 11539578.440000,
-            muligeDagsverk = 180204407.260000,
-            prosent = 6.4,
+            tapteDagsverk = 11539578.440000.toBigDecimal(),
+            muligeDagsverk = 180204407.260000.toBigDecimal(),
+            prosent = 6.4.toBigDecimal(),
             antallPersoner = 3365162,
         )
 }

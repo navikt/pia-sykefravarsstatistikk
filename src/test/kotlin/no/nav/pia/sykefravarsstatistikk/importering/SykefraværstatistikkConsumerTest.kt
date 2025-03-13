@@ -19,19 +19,19 @@ class SykefraværstatistikkConsumerTest {
             kategori = Statistikkategori.VIRKSOMHET,
             kode = "987654321",
             årstallOgKvartal = KVARTAL_2024_3,
-            prosent = 28.3,
-            tapteDagsverk = 154.5439,
-            muligeDagsverk = 761.3,
+            prosent = 28.3.toBigDecimal(),
+            tapteDagsverk = 154.5439.toBigDecimal(),
+            muligeDagsverk = 761.3.toBigDecimal(),
             antallPersoner = 4,
-            tapteDagsverGradert = 33.2,
+            tapteDagsverGradert = 33.2.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
-                    tapteDagsverk = 12.3,
+                    tapteDagsverk = 12.3.toBigDecimal(),
                 ),
                 TapteDagsverkPerVarighet(
                     varighet = "D",
-                    tapteDagsverk = 5.2,
+                    tapteDagsverk = 5.2.toBigDecimal(),
                 ),
             ),
         )
@@ -59,16 +59,8 @@ class SykefraværstatistikkConsumerTest {
             årstallOgKvartal = KVARTAL_2024_3,
         )
 
-        statistikkMedVarighet.tapteDagsverkMedVarighet shouldBe listOf(
-            TapteDagsverkPerVarighet(
-                varighet = "A",
-                tapteDagsverk = 12.3,
-            ),
-            TapteDagsverkPerVarighet(
-                varighet = "D",
-                tapteDagsverk = 5.2,
-            ),
-        )
+        statistikkMedVarighet.tapteDagsverkMedVarighet.first { it.varighet == "A" }.tapteDagsverk bigDecimalShouldBe 12.3
+        statistikkMedVarighet.tapteDagsverkMedVarighet.first { it.varighet == "D" }.tapteDagsverk bigDecimalShouldBe 5.2
     }
 
     @Test
@@ -76,11 +68,11 @@ class SykefraværstatistikkConsumerTest {
         val gammelTapteDagsverkPerVarighet = listOf(
             TapteDagsverkPerVarighet(
                 varighet = "A",
-                tapteDagsverk = 12.3,
+                tapteDagsverk = 12.3.toBigDecimal(),
             ),
             TapteDagsverkPerVarighet(
                 varighet = "D",
-                tapteDagsverk = 5.2,
+                tapteDagsverk = 5.2.toBigDecimal(),
             ),
         )
 
@@ -88,11 +80,11 @@ class SykefraværstatistikkConsumerTest {
             kategori = Statistikkategori.VIRKSOMHET,
             kode = "987654321",
             årstallOgKvartal = KVARTAL_2024_3,
-            prosent = 28.3,
-            tapteDagsverk = 154.5439,
-            muligeDagsverk = 761.3,
+            prosent = 28.3.toBigDecimal(),
+            tapteDagsverk = 154.5439.toBigDecimal(),
+            muligeDagsverk = 761.3.toBigDecimal(),
             antallPersoner = 4,
-            tapteDagsverGradert = 33.2,
+            tapteDagsverGradert = 33.2.toBigDecimal(),
             tapteDagsverkMedVarighet = gammelTapteDagsverkPerVarighet,
         )
         kafkaContainerHelper.sendOgVentTilKonsumert(
@@ -119,25 +111,17 @@ class SykefraværstatistikkConsumerTest {
             årstallOgKvartal = KVARTAL_2024_3,
         )
 
-        statistikkMedGammelVarighet.tapteDagsverkMedVarighet shouldBe listOf(
-            TapteDagsverkPerVarighet(
-                varighet = "A",
-                tapteDagsverk = 12.3,
-            ),
-            TapteDagsverkPerVarighet(
-                varighet = "D",
-                tapteDagsverk = 5.2,
-            ),
-        )
+        statistikkMedGammelVarighet.tapteDagsverkMedVarighet.first { it.varighet == "A" }.tapteDagsverk bigDecimalShouldBe 12.3
+        statistikkMedGammelVarighet.tapteDagsverkMedVarighet.first { it.varighet == "D" }.tapteDagsverk bigDecimalShouldBe 5.2
 
         val nyTapteDagsverkPerVarighet = listOf(
             TapteDagsverkPerVarighet(
                 varighet = "A",
-                tapteDagsverk = 12.3,
+                tapteDagsverk = 12.3.toBigDecimal(),
             ),
             TapteDagsverkPerVarighet(
                 varighet = "C",
-                tapteDagsverk = 4.4,
+                tapteDagsverk = 4.4.toBigDecimal(),
             ),
         )
 
@@ -145,11 +129,11 @@ class SykefraværstatistikkConsumerTest {
             kategori = Statistikkategori.VIRKSOMHET,
             kode = "987654321",
             årstallOgKvartal = KVARTAL_2024_3,
-            prosent = 28.3,
-            tapteDagsverk = 154.5439,
-            muligeDagsverk = 761.3,
+            prosent = 28.3.toBigDecimal(),
+            tapteDagsverk = 154.5439.toBigDecimal(),
+            muligeDagsverk = 761.3.toBigDecimal(),
             antallPersoner = 4,
-            tapteDagsverGradert = 33.2,
+            tapteDagsverGradert = 33.2.toBigDecimal(),
             tapteDagsverkMedVarighet = nyTapteDagsverkPerVarighet,
         )
 
@@ -172,15 +156,7 @@ class SykefraværstatistikkConsumerTest {
             årstallOgKvartal = KVARTAL_2024_3,
         )
 
-        statistikkMedNyVarighet.tapteDagsverkMedVarighet shouldBe listOf(
-            TapteDagsverkPerVarighet(
-                varighet = "A",
-                tapteDagsverk = 12.3,
-            ),
-            TapteDagsverkPerVarighet(
-                varighet = "C",
-                tapteDagsverk = 4.4,
-            ),
-        )
+        statistikkMedNyVarighet.tapteDagsverkMedVarighet.first { it.varighet == "A" }.tapteDagsverk bigDecimalShouldBe 12.3
+        statistikkMedNyVarighet.tapteDagsverkMedVarighet.first { it.varighet == "C" }.tapteDagsverk bigDecimalShouldBe 4.4
     }
 }

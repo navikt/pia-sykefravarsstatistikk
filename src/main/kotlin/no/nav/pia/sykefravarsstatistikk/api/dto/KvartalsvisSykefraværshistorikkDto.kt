@@ -2,6 +2,8 @@ package no.nav.pia.sykefravarsstatistikk.api.dto
 
 import kotlinx.serialization.Serializable
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
+import no.nav.pia.sykefravarsstatistikk.persistering.BigDecimalSerializer
+import java.math.BigDecimal
 
 @Serializable
 data class KvartalsvisSykefraværshistorikkDto(
@@ -32,9 +34,12 @@ data class KvartalsvisSykefraværshistorikkDto(
 
 @Serializable
 data class KvartalsvisSykefraværsprosentDto(
-    val tapteDagsverk: Double,
-    val muligeDagsverk: Double,
-    val prosent: Double,
+    @Serializable(with = BigDecimalSerializer::class)
+    val tapteDagsverk: BigDecimal,
+    @Serializable(with = BigDecimalSerializer::class)
+    val muligeDagsverk: BigDecimal,
+    @Serializable(with = BigDecimalSerializer::class)
+    val prosent: BigDecimal,
     val erMaskert: Boolean,
     val årstall: Int,
     val kvartal: Int,
