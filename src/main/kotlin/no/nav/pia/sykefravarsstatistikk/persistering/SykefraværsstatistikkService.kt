@@ -7,25 +7,21 @@ import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
 import no.nav.pia.sykefravarsstatistikk.api.auth.Tilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.muligeDagsverkTotaltAggregert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentGradertAggregert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentKortTidAggregert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentLangTidAggregert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.prosentTotaltAggregert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.tapteDagsverkTotaltAggregert
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto.Companion.trendTotaltAggregert
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
+import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalIBeregning
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.tilDto
 import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.BRANSJE
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.LAND
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
+import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
@@ -356,4 +352,99 @@ class SykefraværsstatistikkService(
 
         return response.toList().right()
     }
+
+    private fun List<Sykefraværsstatistikk>.muligeDagsverkTotalt() = sumOf { it.muligeDagsverk }
+
+    private fun List<Sykefraværsstatistikk>.tapteDagsverkTotalt() = sumOf { it.tapteDagsverk }
+
+    private fun List<Sykefraværsstatistikk>.prosentLangTid() = map { it.prosent }.average()
+
+    private fun List<Sykefraværsstatistikk>.prosentKortTid() = map { it.prosent }.average()
+
+    private fun List<Sykefraværsstatistikk>.prosentGradert() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
+
+    private fun List<Sykefraværsstatistikk>.personerIBeregning() = map { it.antallPersoner }.average().toInt()
+
+    private fun List<Sykefraværsstatistikk>.trendTotalt() = -1.0
+
+    private fun List<Sykefraværsstatistikk>.prosentTotalt() = tapteDagsverkTotalt() / muligeDagsverkTotalt() * 100
+
+    private fun List<Sykefraværsstatistikk>.kvartalerIBeregning() = map { KvartalIBeregning(it.årstall, it.kvartal) }
+
+    private fun List<Sykefraværsstatistikk>.prosentTotaltAggregert(
+        statistikkategori: Statistikkategori,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = "%.1f".format(prosentTotalt()),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
+
+    private fun List<Sykefraværsstatistikk>.prosentGradertAggregert(
+        statistikkategori: Statistikkategori,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = "%.1f".format(prosentGradert()),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
+
+    private fun List<Sykefraværsstatistikk>.prosentKortTidAggregert(
+        statistikkategori: Statistikkategori,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = "%.1f".format(prosentKortTid()),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
+
+    private fun List<Sykefraværsstatistikk>.prosentLangTidAggregert(
+        statistikkategori: Statistikkategori,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = "%.1f".format(prosentLangTid()),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
+
+    private fun List<Sykefraværsstatistikk>.trendTotaltAggregert(
+        statistikkategori: Statistikkategori = BRANSJE,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = trendTotalt().toString(),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
+
+    private fun List<Sykefraværsstatistikk>.tapteDagsverkTotaltAggregert(
+        statistikkategori: Statistikkategori = VIRKSOMHET,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = tapteDagsverkTotalt().toString(),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
+
+    private fun List<Sykefraværsstatistikk>.muligeDagsverkTotaltAggregert(
+        statistikkategori: Statistikkategori = VIRKSOMHET,
+        label: String,
+    ) = AggregertStatistikkDto(
+        statistikkategori = statistikkategori.name,
+        label = label,
+        verdi = muligeDagsverkTotalt().toString(),
+        antallPersonerIBeregningen = personerIBeregning(),
+        kvartalerIBeregningen = kvartalerIBeregning(),
+    )
 }
