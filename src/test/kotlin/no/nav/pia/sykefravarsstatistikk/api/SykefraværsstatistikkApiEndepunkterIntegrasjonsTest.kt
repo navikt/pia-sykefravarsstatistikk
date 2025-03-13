@@ -7,10 +7,10 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværsprosentDto
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -61,11 +61,9 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 orgnr = underenhet.orgnr,
                 config = withToken(),
             )
-            println("Result:  ${Json.encodeToString(kvartalsvisStatistikk)} ")
 
             kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkLand, Statistikkategori.LAND, "Norge")
-            // TODO: Sektor label er feil, skal være "Privat og offentlig næringsvirksomhet"
-            kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkSektor, Statistikkategori.SEKTOR, "3")
+            kvartalsvisStatistikk.shoudBeEqualForKategori(expectedStatistikkSektor, Statistikkategori.SEKTOR, Sektor.PRIVAT.beskrivelse)
             kvartalsvisStatistikk.shoudBeEqualForKategori(
                 expectedStatistikkBransje,
                 Statistikkategori.BRANSJE,

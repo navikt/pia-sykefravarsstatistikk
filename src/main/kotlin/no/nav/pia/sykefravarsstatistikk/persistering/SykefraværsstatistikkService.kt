@@ -289,7 +289,7 @@ class SykefraværsstatistikkService(
                 httpStatusCode = HttpStatusCode.BadRequest,
             ).left()
         }
-        response.add(umaskertSektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.kode))
+        response.add(umaskertSektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.beskrivelse))
 
         val bransje = underenhet.bransje()
         if (bransje != null) {
