@@ -1,8 +1,11 @@
 package no.nav.pia.sykefravarsstatistikk.domene
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ÅrstallOgKvartal(
     val årstall: Int,
-    val kvartal: Int
+    val kvartal: Int,
 ) : Comparable<ÅrstallOgKvartal> {
     init {
         require(!(kvartal > 4 || kvartal < 1)) { "Kvartal må være 1, 2, 3 eller 4" }
@@ -30,29 +33,24 @@ data class ÅrstallOgKvartal(
         return årstallOgKvartal
     }
 
-    private fun forrigeKvartal(): ÅrstallOgKvartal {
-        return if (kvartal == 1) {
+    private fun forrigeKvartal(): ÅrstallOgKvartal =
+        if (kvartal == 1) {
             ÅrstallOgKvartal(årstall - 1, 4)
         } else {
             ÅrstallOgKvartal(årstall, kvartal - 1)
         }
-    }
 
-    private fun nesteKvartal(): ÅrstallOgKvartal {
-        return if (kvartal == 4) {
+    private fun nesteKvartal(): ÅrstallOgKvartal =
+        if (kvartal == 4) {
             ÅrstallOgKvartal(årstall + 1, 1)
         } else {
             ÅrstallOgKvartal(årstall, kvartal + 1)
         }
-    }
 
-    override fun compareTo(other: ÅrstallOgKvartal): Int {
-        return Comparator.comparing<ÅrstallOgKvartal, Int> { it.årstall }
+    override fun compareTo(other: ÅrstallOgKvartal): Int =
+        Comparator.comparing<ÅrstallOgKvartal, Int> { it.årstall }
             .thenComparing<Int> { it.kvartal }
             .compare(this, other)
-    }
 
-    override fun toString(): String {
-        return "$kvartal. kvartal $årstall"
-    }
+    override fun toString(): String = "$kvartal. kvartal $årstall"
 }

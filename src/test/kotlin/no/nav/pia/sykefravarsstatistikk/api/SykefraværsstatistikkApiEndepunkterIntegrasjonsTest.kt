@@ -9,10 +9,10 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
-import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværsprosentDto
+import no.nav.pia.sykefravarsstatistikk.api.dto.StatistikkJson
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
@@ -160,7 +160,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             muligeDagsverkTotalt,
         )
 
-    private fun List<AggregertStatistikkDto>.shouldHaveStatistikkForKategori(
+    private fun List<StatistikkJson>.shouldHaveStatistikkForKategori(
         statistikkategori: Statistikkategori,
         label: String,
     ) {

@@ -27,7 +27,8 @@ import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.helse
-import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
+import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
+import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkSerivce
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -47,7 +48,8 @@ fun Route.medAltinnTilgang(
 
 fun Application.configureRouting(
     altinnTilgangerService: AltinnTilgangerService,
-    sykefraværsstatistikkService: SykefraværsstatistikkService,
+    aggregertStatistikkService: AggregertStatistikkService,
+    kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkSerivce,
     enhetsregisteretService: EnhetsregisteretService,
 ) {
     routing {
@@ -107,7 +109,8 @@ fun Application.configureRouting(
                 enhetsregisteretService = enhetsregisteretService,
             ) {
                 sykefraværsstatistikk(
-                    sykefraværsstatistikkService = sykefraværsstatistikkService,
+                    aggregertStatistikkService = aggregertStatistikkService,
+                    kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
                 )
             }
         }

@@ -14,6 +14,8 @@ import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureMonitoring
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureRouting
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureSerialization
+import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
+import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkSerivce
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkRepository
@@ -30,15 +32,21 @@ fun main() {
     val sykefraværsstatistikkService =
         SykefraværsstatistikkService(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
 
+    val kvartalsvisSykefraværshistorikkService =
+        KvartalsvisSykefraværshistorikkSerivce(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
+
+    val aggregertStatistikkService =
+        AggregertStatistikkService(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
+
     SykefraværsstatistikkConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
-        sykefraværsstatistikkService = SykefraværsstatistikkService(SykefraværsstatistikkRepository(dataSource = dataSource)),
+        sykefraværsstatistikkService = sykefraværsstatistikkService,
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
     SykefraværsstatistikkConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
-        sykefraværsstatistikkService = SykefraværsstatistikkService(SykefraværsstatistikkRepository(dataSource = dataSource)),
+        sykefraværsstatistikkService = sykefraværsstatistikkService,
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
@@ -59,7 +67,8 @@ fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         configure(
             altinnTilgangerService = altinnTilgangerService,
-            sykefraværsstatistikkService = sykefraværsstatistikkService,
+            aggregertStatistikkService = aggregertStatistikkService,
+            kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
             enhetsregisteretService = enhetsregisteretService,
         )
     }.also {
@@ -72,14 +81,16 @@ fun main() {
 
 fun Application.configure(
     altinnTilgangerService: AltinnTilgangerService,
-    sykefraværsstatistikkService: SykefraværsstatistikkService,
+    aggregertStatistikkService: AggregertStatistikkService,
+    kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkSerivce,
     enhetsregisteretService: EnhetsregisteretService,
 ) {
     configureMonitoring()
     configureSerialization()
     configureRouting(
         altinnTilgangerService = altinnTilgangerService,
-        sykefraværsstatistikkService = sykefraværsstatistikkService,
+        aggregertStatistikkService = aggregertStatistikkService,
+        kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
         enhetsregisteretService = enhetsregisteretService,
     )
 }
