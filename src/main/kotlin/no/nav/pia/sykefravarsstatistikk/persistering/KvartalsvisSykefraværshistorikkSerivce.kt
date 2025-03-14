@@ -27,6 +27,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class KvartalsvisSykefraværshistorikkSerivce(
+    private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkRepository: SykefraværsstatistikkRepository,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -101,11 +102,8 @@ class KvartalsvisSykefraværshistorikkSerivce(
         underenhet: Underenhet,
         tilganger: Tilganger,
     ): Either<Feil, List<KvartalsvisSykefraværshistorikkDto>> {
-        val årstall = 2024
-        val kvartal = 4
-        val sisteKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal)
-
-        val førsteKvartal = sisteKvartal.minusKvartaler(20)
+        val gjeldendeKvartal = importtidspunktRepository.hentNyesteImporterteKvartal()
+        val førsteKvartal = gjeldendeKvartal.minusKvartaler(20)
 
         val response: MutableList<KvartalsvisSykefraværshistorikkDto> = mutableListOf()
 

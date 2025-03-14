@@ -30,6 +30,7 @@ import java.math.RoundingMode
 
 class AggregertStatistikkService(
     private val sykefraværsstatistikkRepository: SykefraværsstatistikkRepository,
+    private val importtidspunktRepository: ImporttidspunktRepository,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -89,11 +90,8 @@ class AggregertStatistikkService(
         underenhet: Underenhet,
         tilganger: Tilganger,
     ): Either<Feil, AggregertStatistikkResponseDto> {
-        val årstall = 2024
-        val kvartal = 4
-        val inneværendeKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal)
-
-        val førsteKvartal = inneværendeKvartal.minusKvartaler(4) // 4 siste kvartaler
+        val gjeldendeKvartal = importtidspunktRepository.hentNyesteImporterteKvartal()
+        val førsteKvartal = gjeldendeKvartal.minusKvartaler(4)
         val prosentSiste4KvartalerTotalt = mutableListOf<StatistikkJson>()
         val prosentSiste4KvartalerGradert = mutableListOf<StatistikkJson>()
         val prosentSiste4KvartalerKorttid = mutableListOf<StatistikkJson>()

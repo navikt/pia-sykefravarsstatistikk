@@ -15,6 +15,7 @@ import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureMonitorin
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureRouting
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureSerialization
 import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
+import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkSerivce
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
@@ -29,14 +30,21 @@ fun main() {
     val dataSource = createDataSource(database = naisEnvironment.database)
     runMigration(dataSource = dataSource)
 
-    val sykefraværsstatistikkService =
-        SykefraværsstatistikkService(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
+    val sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource)
+    val importtidspunktRepository = ImporttidspunktRepository(dataSource = dataSource)
+    val sykefraværsstatistikkService = SykefraværsstatistikkService(
+        sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
+    )
 
-    val kvartalsvisSykefraværshistorikkService =
-        KvartalsvisSykefraværshistorikkSerivce(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
+    val kvartalsvisSykefraværshistorikkService = KvartalsvisSykefraværshistorikkSerivce(
+        importtidspunktRepository = importtidspunktRepository,
+        sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
+    )
 
-    val aggregertStatistikkService =
-        AggregertStatistikkService(sykefraværsstatistikkRepository = SykefraværsstatistikkRepository(dataSource = dataSource))
+    val aggregertStatistikkService = AggregertStatistikkService(
+        importtidspunktRepository = importtidspunktRepository,
+        sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
+    )
 
     SykefraværsstatistikkConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
