@@ -102,6 +102,13 @@ class KvartalsvisSykefraværshistorikkSerivce(
         underenhet: Underenhet,
         tilganger: Tilganger,
     ): Either<Feil, List<KvartalsvisSykefraværshistorikkDto>> {
+        if (!tilganger.harEnkeltTilgang) {
+            return Feil(
+                feilmelding = "Ingen tilgang til underenhet med orgnr: '${underenhet.orgnr}'",
+                httpStatusCode = HttpStatusCode.Forbidden,
+            ).left()
+        }
+
         val gjeldendeKvartal = importtidspunktRepository.hentNyesteImporterteKvartal()
         val førsteKvartal = gjeldendeKvartal.minusKvartaler(20)
 
@@ -160,19 +167,15 @@ class KvartalsvisSykefraværshistorikkSerivce(
             )
         }
 
-        if (tilganger.harEnkeltTilgang) {
-            val umaskertVirksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
+        val umaskertVirksomhetsstatistikkForVirksomhet =
+            hentSykefraværsstatistikkVirksomhet(
                 virksomhet = underenhet,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
-                return Feil(
-                    feilmelding = "Ingen virksomhetsstatistikk funnet for underenhet '${underenhet.orgnr}'",
-                    httpStatusCode = HttpStatusCode.BadRequest,
-                ).left()
+                return emptyList<KvartalsvisSykefraværshistorikkDto>().right()
             }
 
-            response.add(umaskertVirksomhetsstatistikk.tilDto(type = VIRKSOMHET.name, label = underenhet.navn))
-        }
+        response.add(umaskertVirksomhetsstatistikkForVirksomhet.tilDto(type = VIRKSOMHET.name, label = underenhet.navn))
 
         val umaskertVirksomhetsstatistikk = if (tilganger.harEnkeltTilgangOverordnetEnhet) {
             hentSykefraværsstatistikkVirksomhet(

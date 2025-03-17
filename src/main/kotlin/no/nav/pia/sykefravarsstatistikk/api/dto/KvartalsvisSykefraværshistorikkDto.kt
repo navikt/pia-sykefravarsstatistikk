@@ -23,7 +23,7 @@ data class KvartalsvisSykefraværshistorikkDto(
                     tapteDagsverk = sykefraværsstatistikk.tapteDagsverk,
                     muligeDagsverk = sykefraværsstatistikk.muligeDagsverk,
                     prosent = sykefraværsstatistikk.prosent,
-                    erMaskert = false,
+                    erMaskert = sykefraværsstatistikk.antallPersoner < 5, // TODO: Implement maskering (+ test)
                     årstall = sykefraværsstatistikk.årstall,
                     kvartal = sykefraværsstatistikk.kvartal,
                 )
