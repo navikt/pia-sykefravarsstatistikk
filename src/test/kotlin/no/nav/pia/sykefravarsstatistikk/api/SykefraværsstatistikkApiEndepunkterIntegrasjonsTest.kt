@@ -22,6 +22,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetSykehjemUtenTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetSykehjemMedTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
@@ -145,7 +146,11 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 underenhetSykehjemMedTilgang.navn,
             )
 
-            kvartalsvisStatistikk.shouldForNone { statistikk -> statistikk.type shouldBe Statistikkategori.OVERORDNET_ENHET.name }
+            kvartalsvisStatistikk.shoudBeEqualForKategori(
+                expectedStatistikkForKategori = emptyList(),
+                statistikkategori = Statistikkategori.OVERORDNET_ENHET,
+                label = overordnetSykehjemUtenTilgang.navn,
+            )
         }
     }
 

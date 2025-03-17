@@ -174,20 +174,20 @@ class KvartalsvisSykefraværshistorikkSerivce(
             response.add(umaskertVirksomhetsstatistikk.tilDto(type = VIRKSOMHET.name, label = underenhet.navn))
         }
 
-        if (tilganger.harEnkeltTilgangOverordnetEnhet) {
-            val umaskertVirksomhetsstatistikk = hentSykefraværsstatistikkVirksomhet(
+        val umaskertVirksomhetsstatistikk = if (tilganger.harEnkeltTilgangOverordnetEnhet) {
+            hentSykefraværsstatistikkVirksomhet(
                 virksomhet = overordnetEnhet,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
-                return Feil(
-                    feilmelding = "Ingen virksomhetsstatistikk funnet for overordnet enhet '${overordnetEnhet.orgnr}'",
-                    httpStatusCode = HttpStatusCode.BadRequest,
-                ).left()
+                logger.info("Ingen virksomhetsstatistikk funnet for overordnet enhet")
+                emptyList()
             }
-            response.add(
-                umaskertVirksomhetsstatistikk.tilDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn),
-            )
+        } else {
+            emptyList()
         }
+        response.add(
+            umaskertVirksomhetsstatistikk.tilDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn),
+        )
 
         return response.toList().right()
     }
