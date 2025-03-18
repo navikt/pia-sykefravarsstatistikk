@@ -104,7 +104,7 @@ class KvartalsvisSykefraværshistorikkSerivce(
     ): Either<Feil, List<KvartalsvisSykefraværshistorikkDto>> {
         if (!tilganger.harEnkeltTilgang) {
             return Feil(
-                feilmelding = "Ingen tilgang til underenhet med orgnr: '${underenhet.orgnr}'",
+                feilmelding = "{\"message\":\"You don't have access to this resource\"}",
                 httpStatusCode = HttpStatusCode.Forbidden,
             ).left()
         }
