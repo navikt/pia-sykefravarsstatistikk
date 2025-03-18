@@ -79,3 +79,9 @@ internal fun withToken(block: HttpRequestBuilder.() -> Unit = {}): HttpRequestBu
         apply(block)
         header(HttpHeaders.Authorization, "Bearer ${TestContainerHelper.accessToken().serialize()}")
     }
+
+internal fun withoutToken(block: HttpRequestBuilder.() -> Unit = {}): HttpRequestBuilder.() -> Unit =
+    {
+        apply(block)
+        header(HttpHeaders.Authorization, "Bearer 12345678901")
+    }

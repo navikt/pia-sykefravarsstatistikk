@@ -4,8 +4,10 @@ import arrow.core.getOrElse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.auth.AuthenticationChecked
+import io.ktor.server.auth.authentication
 import io.ktor.server.response.respond
 import io.ktor.util.AttributeKey
+import kotlinx.serialization.Serializable
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedIkkeTilgangTilOrg
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedOkKall
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
@@ -21,6 +23,8 @@ import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.hentToken
 import no.nav.pia.sykefravarsstatistikk.http.orgnr
 import no.nav.pia.sykefravarsstatistikk.http.tokenSubject
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @Suppress("ktlint:standard:function-naming")
 fun AltinnAuthorizationPlugin(
@@ -29,8 +33,24 @@ fun AltinnAuthorizationPlugin(
 ) = createRouteScopedPlugin(
     name = "AuthorizationPlugin",
 ) {
+    val logger: Logger = LoggerFactory.getLogger(this::class.java)
     pluginConfig.apply {
         on(AuthenticationChecked) { call ->
+            if (call.authentication.allErrors.isNotEmpty()) {
+                logger.warn("Authentication errors: ${call.authentication.allErrors}")
+                call.respond(
+                    status = HttpStatusCode.Unauthorized,
+                    ResponseIError(message = "Unauthorized"),
+                )
+                return@on
+            }
+            if (call.authentication.allFailures.isNotEmpty()) {
+                call.respond(
+                    status = HttpStatusCode.Unauthorized,
+                    ResponseIError(message = "Unauthorized"),
+                )
+                return@on
+            }
             val fnr = call.request.tokenSubject()
             val token = call.request.hentToken()
 
@@ -69,7 +89,10 @@ fun AltinnAuthorizationPlugin(
             )
 
             if (!harTilgangTilOrgnr) {
-                call.respond(status = HttpStatusCode.Forbidden, "Bruker har ikke tilgang til virksomheten")
+                call.respond(
+                    status = HttpStatusCode.Forbidden,
+                    ResponseIError(message = "You don't have access to this resource"),
+                )
                     .also {
                         call.auditLogVedIkkeTilgangTilOrg(
                             fnr = fnr,
@@ -100,4 +123,9 @@ val OverordnetEnhetKey = AttributeKey<OverordnetEnhet>("OverordnetEnhet")
 data class Tilganger(
     val harEnkeltTilgang: Boolean,
     val harEnkeltTilgangOverordnetEnhet: Boolean,
+)
+
+@Serializable
+data class ResponseIError(
+    val message: String,
 )

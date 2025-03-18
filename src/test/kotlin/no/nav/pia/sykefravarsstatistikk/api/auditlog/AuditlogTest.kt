@@ -52,7 +52,7 @@ class AuditlogTest {
     fun `auditlogger feil ved manglende rettigheter`() {
         runBlocking {
             shouldFailWithMessage(
-                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, message: Bruker har ikke tilgang til virksomheten",
+                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
             ) {
                 TestContainerHelper.hentKvartalsvisStatistikk(
                     orgnr = underenhetUtenTilgang.orgnr,

@@ -6,6 +6,7 @@ import io.kotest.inspectors.forAll
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
@@ -36,6 +37,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.und
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedEnkelrettighetUtenBransje2
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedTilhørighetUtenBransje
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import no.nav.pia.sykefravarsstatistikk.helper.withoutToken
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -63,11 +65,12 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response`() {
         runBlocking {
-            shouldFailWithMessage("Feil ved henting av kvartalsvis statistikk, status: 401 Unauthorized, message: ") {
-                TestContainerHelper.hentKvartalsvisStatistikk(
-                    orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
-                )
-            }
+            val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
+                config = withoutToken(),
+            )
+
+            response.status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
@@ -75,7 +78,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response`() {
         runBlocking {
             shouldFailWithMessage(
-                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, message: Bruker har ikke tilgang til virksomheten",
+                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
             ) {
                 TestContainerHelper.hentKvartalsvisStatistikk(
                     orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
@@ -97,14 +100,14 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
             )
 
-            shouldFailWithMessage(
-                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, message: Bruker har ikke tilgang til virksomheten",
-            ) {
-                TestContainerHelper.hentKvartalsvisStatistikk(
-                    orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
-                    config = withToken(),
-                )
-            }
+            val expectedMessage = "{\"message\":\"You don't have access to this resource\"}"
+            val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
+                config = withToken(),
+            )
+
+            response.status shouldBe HttpStatusCode.Forbidden
+            response.bodyAsText() shouldBe expectedMessage
         }
     }
 

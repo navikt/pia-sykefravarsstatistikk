@@ -8,6 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.request
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -127,10 +128,19 @@ class TestContainerHelper {
                 config = config,
             )?.let { response ->
                 if (response.status != HttpStatusCode.OK) {
-                    fail("Feil ved henting av kvartalsvis statistikk, status: ${response.status}, message: ${response.bodyAsText()}")
+                    fail("Feil ved henting av kvartalsvis statistikk, status: ${response.status}, body: ${response.bodyAsText()}")
                 }
                 response.body()
             } ?: fail("Feil ved henting av kvartalsvis statistikk, mottok ikke respons")
+
+        suspend fun hentKvartalsvisStatistikkResponse(
+            orgnr: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ): HttpResponse =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/$orgnr/historikk/kvartalsvis",
+                config = config,
+            ) ?: fail("Feil ved henting av kvartalsvis statistikk, mottok ikke respons")
 
         private val httpClient = HttpClient(CIO) {
             install(ContentNegotiation) {
