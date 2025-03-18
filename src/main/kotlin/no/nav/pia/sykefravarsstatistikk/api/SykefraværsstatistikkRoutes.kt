@@ -9,13 +9,13 @@ import no.nav.pia.sykefravarsstatistikk.api.auth.OverordnetEnhetKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.TilgangerKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.UnderenhetKey
 import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
-import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkSerivce
+import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun Route.sykefraværsstatistikk(
     aggregertStatistikkService: AggregertStatistikkService,
-    kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkSerivce,
+    kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService,
 ) {
     val logger: Logger = LoggerFactory.getLogger(this::class.java)
     route("/sykefravarsstatistikk/{orgnr}") {

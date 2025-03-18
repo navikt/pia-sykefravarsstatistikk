@@ -16,7 +16,7 @@ import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureRouting
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.plugins.configureSerialization
 import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository
-import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkSerivce
+import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkService
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkRepository
@@ -36,7 +36,7 @@ fun main() {
         sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
     )
 
-    val kvartalsvisSykefraværshistorikkService = KvartalsvisSykefraværshistorikkSerivce(
+    val kvartalsvisSykefraværshistorikkService = KvartalsvisSykefraværshistorikkService(
         importtidspunktRepository = importtidspunktRepository,
         sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
     )
@@ -90,7 +90,7 @@ fun main() {
 fun Application.configure(
     altinnTilgangerService: AltinnTilgangerService,
     aggregertStatistikkService: AggregertStatistikkService,
-    kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkSerivce,
+    kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService,
     enhetsregisteretService: EnhetsregisteretService,
 ) {
     configureMonitoring()

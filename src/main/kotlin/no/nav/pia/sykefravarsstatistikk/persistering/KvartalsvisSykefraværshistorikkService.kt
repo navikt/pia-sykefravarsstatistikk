@@ -26,7 +26,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class KvartalsvisSykefraværshistorikkSerivce(
+class KvartalsvisSykefraværshistorikkService(
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkRepository: SykefraværsstatistikkRepository,
 ) {
