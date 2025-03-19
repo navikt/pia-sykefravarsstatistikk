@@ -32,6 +32,10 @@ class KvartalsvisSykefraværshistorikkService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
+    companion object {
+        const val ANTALL_KVARTALER_5_ÅR_TILBAKE_I_TID = 20
+    }
+
     private fun hentSykefraværsstatistikkVirksomhet(
         virksomhet: Virksomhet,
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
@@ -110,7 +114,7 @@ class KvartalsvisSykefraværshistorikkService(
         }
 
         val gjeldendeKvartal = importtidspunktRepository.hentNyesteImporterteKvartal()
-        val førsteKvartal = gjeldendeKvartal.minusKvartaler(20)
+        val førsteKvartal = gjeldendeKvartal.minusKvartaler(ANTALL_KVARTALER_5_ÅR_TILBAKE_I_TID)
 
         val response: MutableList<KvartalsvisSykefraværshistorikkDto> = mutableListOf()
 

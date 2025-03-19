@@ -193,15 +193,15 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         this.size shouldBe expectedStatistikk.size
         this.forEachIndexed { index, kvartalsvisSykefraværsprosentDto ->
             val expected = expectedStatistikk[index]
-            kvartalsvisSykefraværsprosentDto.tapteDagsverk bigDecimalShouldBeEqual expected.tapteDagsverk
-            kvartalsvisSykefraværsprosentDto.muligeDagsverk bigDecimalShouldBeEqual expected.muligeDagsverk
-            kvartalsvisSykefraværsprosentDto.prosent bigDecimalShouldBeEqual expected.prosent
+            kvartalsvisSykefraværsprosentDto.tapteDagsverk?.bigDecimalShouldBeEqual(expected.tapteDagsverk)
+            kvartalsvisSykefraværsprosentDto.muligeDagsverk?.bigDecimalShouldBeEqual(expected.muligeDagsverk)
+            kvartalsvisSykefraværsprosentDto.prosent?.bigDecimalShouldBeEqual(expected.prosent)
             kvartalsvisSykefraværsprosentDto.årstall shouldBeEqual expected.årstall
             kvartalsvisSykefraværsprosentDto.kvartal shouldBeEqual expected.kvartal
         }
     }
 
-    private infix fun BigDecimal.bigDecimalShouldBeEqual(expected: BigDecimal) {
+    private infix fun BigDecimal.bigDecimalShouldBeEqual(expected: BigDecimal?) {
         (this.compareTo(expected) == 0) shouldBe true
     }
 

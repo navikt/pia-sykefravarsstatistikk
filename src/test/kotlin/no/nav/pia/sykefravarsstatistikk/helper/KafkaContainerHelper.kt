@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
 import kotlinx.coroutines.time.withTimeoutOrNull
+import no.nav.pia.sykefravarsstatistikk.domene.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
@@ -190,6 +191,25 @@ class KafkaContainerHelper(
         sendVirksomhetsstatistikk(virksomhet = overordnetEnhet)
     }
 
+    fun sendEnkelVirksomhetsstatistikk(
+        virksomhet: Virksomhet,
+        årstall: Int = 2010,
+        harForFåAnsatte: Boolean = false,
+    ) {
+        for (kvartal in 1..4) {
+            val virksomhetMelding = if (harForFåAnsatte) {
+                enVirksomhetsMeldingMedFåAnsatte(årstall = årstall, kvartal = kvartal, virksomhet = virksomhet)
+            } else {
+                enStandardVirksomhetsMelding(årstall = årstall, kvartal = kvartal, virksomhet = virksomhet)
+            }
+            sendOgVentTilKonsumert(
+                nøkkel = virksomhetMelding.toJsonKey(),
+                melding = virksomhetMelding.toJsonValue(),
+                topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
+            )
+        }
+    }
+
     fun sendVirksomhetsstatistikk(
         virksomhet: Virksomhet,
         startÅr: Int = 2010,
@@ -197,7 +217,8 @@ class KafkaContainerHelper(
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {
-                val virksomhetMelding = enStandardVirksomhetsMelding(årstall = år, kvartal = kvartal, virksomhet = virksomhet)
+                val virksomhetMelding =
+                    enStandardVirksomhetsMelding(årstall = år, kvartal = kvartal, virksomhet = virksomhet)
                 sendOgVentTilKonsumert(
                     nøkkel = virksomhetMelding.toJsonKey(),
                     melding = virksomhetMelding.toJsonValue(),
@@ -278,6 +299,28 @@ class KafkaContainerHelper(
         }
     }
 
+    private fun enVirksomhetsMeldingMedFåAnsatte(
+        årstall: Int,
+        kvartal: Int,
+        virksomhet: Virksomhet,
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.VIRKSOMHET,
+            kode = virksomhet.orgnr,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            prosent = 0.2.toBigDecimal(),
+            tapteDagsverk = 2.0.toBigDecimal(),
+            muligeDagsverk = 1000.0.toBigDecimal(),
+            antallPersoner = (MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER - 1),
+            tapteDagsverGradert = 0.0.toBigDecimal(),
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 2.0.toBigDecimal(),
+                ),
+            ),
+        )
+
     private fun enStandardVirksomhetsMelding(
         årstall: Int,
         kvartal: Int,
@@ -290,7 +333,7 @@ class KafkaContainerHelper(
             prosent = 28.3.toBigDecimal(),
             tapteDagsverk = 154.5439.toBigDecimal(),
             muligeDagsverk = 761.3.toBigDecimal(),
-            antallPersoner = 4,
+            antallPersoner = 14,
             tapteDagsverGradert = 33.2.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(

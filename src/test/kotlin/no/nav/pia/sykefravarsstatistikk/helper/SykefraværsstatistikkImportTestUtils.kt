@@ -106,7 +106,7 @@ class SykefraværsstatistikkImportTestUtils {
     companion object {
         val KVARTAL_2024_3 = ÅrstallOgKvartal(2024, 3)
 
-        infix fun BigDecimal.bigDecimalShouldBe(expected: Double) = this.toDouble().shouldBe(expected)
+        infix fun BigDecimal?.bigDecimalShouldBe(expected: Double) = this!!.toDouble().shouldBe(expected)
 
         private fun Statistikkategori.tilKodenavn() =
             when (this) {

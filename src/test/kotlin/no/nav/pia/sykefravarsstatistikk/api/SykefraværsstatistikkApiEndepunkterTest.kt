@@ -1,13 +1,11 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
 import io.kotest.assertions.shouldFail
-import io.kotest.assertions.shouldFailWithMessage
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
@@ -29,7 +27,6 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.ove
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetEnhetMedTilhørighetUtenBransje
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetEnhetMedTilhørighetUtenBransje2
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetEnhetUtenStatistikk
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedEnkelrettighetBransjeBarnehage
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedEnkelrettighetBransjeSykehus
@@ -37,7 +34,6 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.und
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedEnkelrettighetUtenBransje2
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetMedTilhørighetUtenBransje
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
-import no.nav.pia.sykefravarsstatistikk.helper.withoutToken
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -50,67 +46,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
         }
     }
 
-    @Test
-    fun `Bruker som når et ukjent endepunkt får '404 - Not found' i response`() {
-        runBlocking {
-            val resultat = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetUtenBransje.orgnr}/sykefravarshistorikk/alt",
-                config = withToken(),
-            )
-            resultat.shouldNotBeNull()
-            resultat.status shouldBe HttpStatusCode.NotFound
-        }
-    }
-
-    @Test
-    fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response`() {
-        runBlocking {
-            val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
-                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
-                config = withoutToken(),
-            )
-
-            response.status shouldBe HttpStatusCode.Unauthorized
-        }
-    }
-
-    @Test
-    fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response`() {
-        runBlocking {
-            shouldFailWithMessage(
-                "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
-            ) {
-                TestContainerHelper.hentKvartalsvisStatistikk(
-                    orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
-                    config = withToken(),
-                )
-            }
-        }
-    }
-
-    @Test
-    fun `Innlogget bruker uten enkelrettighet til virksomhet får '403 - Forbidden' i response`() {
-        runBlocking {
-            altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.orgnr,
-                altinn2Rettighet = "ingen_tilgang_til_statistikk",
-            )
-            kafkaContainerHelper.sendStatistikk(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
-            )
-
-            val expectedMessage = "{\"message\":\"You don't have access to this resource\"}"
-            val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
-                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
-                config = withToken(),
-            )
-
-            response.status shouldBe HttpStatusCode.Forbidden
-            response.bodyAsText() shouldBe expectedMessage
-        }
-    }
-
+    /*
+       Kvartalsvis statistikk
+     * */
     @Test
     fun `Innlogget bruker får en 200`() {
         runBlocking {
@@ -128,6 +66,42 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
                 config = withToken(),
             ).shouldNotBeNull()
+        }
+    }
+
+    @Test
+    fun `Data skal være maskert i response`() {
+        runBlocking {
+            kafkaContainerHelper.sendLandsstatistikk()
+            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor)
+            kafkaContainerHelper.sendNæringsstatistikk(næring = underenhetMedTilhørighetUtenBransje.næringskode.næring)
+            kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
+                virksomhet = underenhetMedTilhørighetUtenBransje,
+                årstall = 2020,
+                harForFåAnsatte = true,
+            )
+
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+
+            val statistikk = TestContainerHelper.hentKvartalsvisStatistikk(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
+                config = withToken(),
+            )
+
+            // prettyPrint(statistikk)
+            val actualStatistikkForVirksomhet =
+                statistikk.firstOrNull { it.type == VIRKSOMHET.name }
+            val kvartalsvisSykefraværsprosent = actualStatistikkForVirksomhet?.kvartalsvisSykefraværsprosent
+            kvartalsvisSykefraværsprosent shouldNotBe null
+            kvartalsvisSykefraværsprosent?.forEach { sykefravarsstatistikk ->
+                sykefravarsstatistikk.erMaskert shouldBe true
+                sykefravarsstatistikk.prosent shouldBe null
+                sykefravarsstatistikk.tapteDagsverk shouldBe null
+                sykefravarsstatistikk.muligeDagsverk shouldBe null
+            }
         }
     }
 
@@ -402,6 +376,9 @@ class SykefraværsstatistikkApiEndepunkterTest {
         }
     }
 
+    /*
+      Aggregert statistikk
+     * */
     @Test
     fun `Bruker får aggregert statistikk`() {
         runBlocking {

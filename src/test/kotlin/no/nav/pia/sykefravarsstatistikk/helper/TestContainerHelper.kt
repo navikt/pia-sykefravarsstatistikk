@@ -17,6 +17,8 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.time.withTimeoutOrNull
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto.Companion.tilDomene
@@ -118,6 +120,15 @@ class TestContainerHelper {
                 }
                 response.body()
             } ?: fail("Feil ved henting av aggregert statistikk, mottok ikke respons")
+
+        suspend fun hentAggregertStatistikkResponse(
+            orgnr: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ): HttpResponse =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/$orgnr/siste4kvartaler/aggregert",
+                config = config,
+            ) ?: fail("Feil ved henting av aggregert statistikk, mottok ikke respons")
 
         suspend fun hentKvartalsvisStatistikk(
             orgnr: String,
@@ -414,5 +425,14 @@ class TestContainerHelper {
             ).tilDomene(),
             overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
         )
+
+        @OptIn(ExperimentalSerializationApi::class)
+        fun prettyPrint(statistikk: List<KvartalsvisSykefraværshistorikkDto>) {
+            val prettyJson = Json {
+                prettyPrint = true
+                prettyPrintIndent = " "
+            }
+            println("[DEBUG][Test] Statistikk: \n ${prettyJson.encodeToString(statistikk)}")
+        }
     }
 }
