@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import io.ktor.http.HttpStatusCode
-import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService.HentAggregertStatistikkFeil.`bransjestatistikk mangler i db`
+import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService.HentAggregertStatistikkFeil.`virksomhet er ikke næringsdrivende`
 import no.nav.pia.sykefravarsstatistikk.api.auth.Tilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
@@ -30,6 +30,11 @@ class AggregertStatistikkService(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     object HentAggregertStatistikkFeil {
+        val `virksomhet er ikke næringsdrivende` = Feil(
+            feilmelding = "Virksomhet er ikke næringsdrivende",
+            httpStatusCode = HttpStatusCode.BadRequest,
+        )
+
         val `næringsstatistikk mangler i db` = Feil(
             feilmelding = "Ingen statistikk funnet for næring",
             httpStatusCode = HttpStatusCode.BadRequest,
@@ -61,7 +66,7 @@ class AggregertStatistikkService(
 
         if (underenhet is Underenhet.IkkeNæringsdrivende) {
             log.info("Underenhet ${underenhet.orgnr} er ikke næringsdrivende")
-            return `bransjestatistikk mangler i db`.left()
+            return `virksomhet er ikke næringsdrivende`.left()
         }
         val virksomhet = underenhet as Underenhet.Næringsdrivende
 
