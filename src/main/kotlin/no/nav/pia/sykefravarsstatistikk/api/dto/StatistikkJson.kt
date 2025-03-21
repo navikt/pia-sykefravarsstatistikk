@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.api.dto
 
 import kotlinx.serialization.Serializable
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 
 @Serializable
@@ -16,7 +17,7 @@ data class AggregertStatistikkResponseDto(
 
 @Serializable
 data class StatistikkJson(
-    val statistikkategori: String,
+    val statistikkategori: Statistikkategori,
     val label: String,
     val verdi: String,
     val antallPersonerIBeregningen: Int,

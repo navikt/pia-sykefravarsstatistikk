@@ -14,11 +14,17 @@ data class BrregUnderenhetDto(
     val antallAnsatte: Int = 0,
 ) {
     fun tilDomene(): Underenhet =
-        Underenhet(
-            orgnr = this.organisasjonsnummer,
-            navn = this.navn,
-            næringskode = this.naeringskode1.tilDomene(),
-            overordnetEnhetOrgnr = this.overordnetEnhet,
-            antallAnsatte = this.antallAnsatte,
-        )
+        if (naeringskode1 != null) {
+            Underenhet.Næringsdrivende(
+                orgnr = organisasjonsnummer,
+                overordnetEnhetOrgnr = overordnetEnhet,
+                navn = navn,
+                næringskode = naeringskode1.tilDomene(),
+                antallAnsatte = antallAnsatte,
+            )
+        } else {
+            Underenhet.IkkeNæringsdrivende(
+                orgnr = organisasjonsnummer,
+            )
+        }
 }

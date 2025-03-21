@@ -1,6 +1,5 @@
 package no.nav.pia.sykefravarsstatistikk.domene
 
-// TODO: Flytt til ia-felles
 class Næring(
     val tosifferIdentifikator: String,
 ) {
