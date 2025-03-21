@@ -21,9 +21,9 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.overordnetSykehjemUtenTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.underenhetSykehjemMedTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetSykehjemUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetSykehjemMedTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import java.math.BigDecimal
