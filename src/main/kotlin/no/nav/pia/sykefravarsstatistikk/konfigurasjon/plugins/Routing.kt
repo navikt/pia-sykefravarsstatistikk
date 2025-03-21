@@ -23,12 +23,14 @@ import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
+import no.nav.pia.sykefravarsstatistikk.api.publiseringsdato
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.helse
 import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkService
+import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoService
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -50,6 +52,7 @@ fun Application.configureRouting(
     altinnTilgangerService: AltinnTilgangerService,
     aggregertStatistikkService: AggregertStatistikkService,
     kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService,
+    publiseringsdatoService: PubliseringsdatoService,
     enhetsregisteretService: EnhetsregisteretService,
 ) {
     routing {
@@ -104,6 +107,9 @@ fun Application.configureRouting(
         }
         install(IgnoreTrailingSlash)
         authenticate("tokenx") {
+            publiseringsdato(
+                publiseringsdatoService = publiseringsdatoService,
+            )
             medAltinnTilgang(
                 altinnTilgangerService = altinnTilgangerService,
                 enhetsregisteretService = enhetsregisteretService,

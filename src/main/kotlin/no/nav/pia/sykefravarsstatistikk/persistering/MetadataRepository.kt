@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.persistering
 
 import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -94,6 +95,26 @@ class MetadataRepository(
                     )
                 }
             }
+        }
+    }
+
+    fun hentPubliseringsdatoer(): List<PubliseringsdatoDto> {
+        logger.debug("Henter publiseringsdatoer")
+        return using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(
+                    """
+                    SELECT *
+                    FROM publiseringsdatoer
+                    """.trimIndent(),
+                ).map {
+                    PubliseringsdatoDto(
+                        rapportPeriode = it.string("rapport_periode"),
+                        offentligDato = it.localDateTime("offentlig_dato").toKotlinLocalDateTime(),
+                        oppdatertIDvh = it.localDateTime("oppdatert_i_dvh").toKotlinLocalDateTime(),
+                    )
+                }.asList,
+            )
         }
     }
 }
