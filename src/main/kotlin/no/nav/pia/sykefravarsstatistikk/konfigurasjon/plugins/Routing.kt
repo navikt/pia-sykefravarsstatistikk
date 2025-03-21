@@ -23,11 +23,11 @@ import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
+import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.helse
-import no.nav.pia.sykefravarsstatistikk.persistering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkService
 import java.net.URI
 import java.util.concurrent.TimeUnit

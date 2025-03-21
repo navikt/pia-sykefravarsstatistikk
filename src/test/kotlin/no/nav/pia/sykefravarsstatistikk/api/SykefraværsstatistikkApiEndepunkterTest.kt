@@ -6,8 +6,11 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
+import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.BRANSJE
@@ -70,7 +73,47 @@ class SykefraværsstatistikkApiEndepunkterTest {
     }
 
     @Test
-    fun `Data skal være maskert i response`() {
+    fun `Aggregert statistikk skal være maskert i response`() {
+        // OBS: mangler   "prosentSiste4KvartalerKorttid", "prosentSiste4KvartalerLangtid",
+        // "tapteDagsverkTotalt": og "muligeDagsverkTotalt"
+        runBlocking {
+            kafkaContainerHelper.sendLandsstatistikk()
+            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor)
+            kafkaContainerHelper.sendNæringsstatistikk(næring = underenhetMedTilhørighetUtenBransje.næringskode.næring)
+            kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
+                virksomhet = underenhetMedTilhørighetUtenBransje,
+                årstall = 2024,
+                harForFåAnsatte = true,
+            )
+
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+            )
+
+            val statistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
+                config = withToken(),
+            )
+
+            val statistikk = Json.decodeFromString<AggregertStatistikkResponseDto>(statistikkResponse.bodyAsText())
+            val maskertStatistikkForVirksomhet =
+                statistikk.prosentSiste4KvartalerTotalt.find { it.statistikkategori == VIRKSOMHET }
+            maskertStatistikkForVirksomhet shouldBe null
+            val statistikkForNæring =
+                statistikk.prosentSiste4KvartalerTotalt.find { it.statistikkategori == NÆRING }
+            statistikkForNæring shouldNotBe null
+            val statistikkForLand =
+                statistikk.prosentSiste4KvartalerTotalt.find { it.statistikkategori == LAND }
+            statistikkForLand shouldNotBe null
+
+            statistikk.tapteDagsverkTotalt shouldBe emptyList()
+            statistikk.muligeDagsverkTotalt shouldBe emptyList()
+        }
+    }
+
+    @Test
+    fun `Kvartalsvis statistikk skal være maskert i response`() {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor)
@@ -400,7 +443,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val bransje = underenhetMedEnkelrettighetBransjeBarnehage.bransje()!!
 
             val landStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
-                .firstOrNull { it.statistikkategori == LAND.name }
+                .firstOrNull { it.statistikkategori == LAND }
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalerIBeregningen.size shouldBe 4 // skal være ett år
@@ -409,11 +452,11 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.verdi shouldBe "6.4"
             landStatistikk.antallPersonerIBeregningen shouldBe 3365162
 
-            aggregertStatistikkDto.prosentSiste4KvartalerTotalt.firstOrNull { it.statistikkategori == NÆRING.name }
+            aggregertStatistikkDto.prosentSiste4KvartalerTotalt.firstOrNull { it.statistikkategori == NÆRING }
                 .shouldBeNull()
 
             val bransjeStatistikk =
-                aggregertStatistikkDto.prosentSiste4KvartalerTotalt.firstOrNull { it.statistikkategori == BRANSJE.name }
+                aggregertStatistikkDto.prosentSiste4KvartalerTotalt.firstOrNull { it.statistikkategori == BRANSJE }
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
             bransjeStatistikk.kvartalerIBeregningen.size shouldBe 4 // skal være ett år
@@ -422,7 +465,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             bransjeStatistikk.antallPersonerIBeregningen shouldBe 88563
 
             val virksomhetStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
-                .firstOrNull { it.statistikkategori == VIRKSOMHET.name }
+                .firstOrNull { it.statistikkategori == VIRKSOMHET }
             virksomhetStatistikk.shouldNotBeNull()
             virksomhetStatistikk.label shouldBe underenhetMedEnkelrettighetBransjeBarnehage.navn
         }

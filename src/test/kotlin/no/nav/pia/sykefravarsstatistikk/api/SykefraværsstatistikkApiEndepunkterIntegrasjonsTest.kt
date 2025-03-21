@@ -7,7 +7,6 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
@@ -82,7 +81,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
             listOf(
                 aggregertStatistikk.prosentSiste4KvartalerTotalt,
-                aggregertStatistikk.prosentSiste4KvartalerGradert,
+                // TODO: vi har ikke gradert for bransje enda
+                // aggregertStatistikk.prosentSiste4KvartalerGradert,
                 aggregertStatistikk.prosentSiste4KvartalerKorttid,
                 aggregertStatistikk.prosentSiste4KvartalerLangtid,
                 aggregertStatistikk.trendTotalt,
@@ -106,7 +106,6 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                     label = underenhetSykehjemMedTilgang.navn,
                 )
             }
-            println("[DEBUG][Test] kvartalsvisStatistikk: '${Json.encodeToString(aggregertStatistikk)}'")
         }
     }
 
@@ -169,9 +168,9 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         statistikkategori: Statistikkategori,
         label: String,
     ) {
-        this.shouldForOne { statistikk -> statistikk.statistikkategori shouldBe statistikkategori.name }
+        this.shouldForOne { statistikk -> statistikk.statistikkategori shouldBe statistikkategori }
         val actualStatistikkForKategori =
-            this.firstOrNull { it.statistikkategori == statistikkategori.name }
+            this.firstOrNull { it.statistikkategori == statistikkategori }
         actualStatistikkForKategori.shouldNotBeNull()
         actualStatistikkForKategori.label shouldBe label
     }
@@ -357,10 +356,51 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
                 kode = Bransje.SYKEHJEM.navn,
+                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2023, kvartal = 4),
+                tapteDagsverk = 312364.7.toBigDecimal(),
+                muligeDagsverk = 3123505.8.toBigDecimal(),
+                prosent = 9.8.toBigDecimal(),
+                tapteDagsverGradert = 21234.790000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 4123.340000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 812.330000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 171.230000.toBigDecimal(),
+                    ),
+                ),
+                antallPersoner = 96123,
+            ),
+        )
+        statistikk.add(
+            sendSykefraværsstatistikk(
+                kategori = Statistikkategori.BRANSJE,
+                kode = Bransje.SYKEHJEM.navn,
                 årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
                 tapteDagsverk = 330864.7.toBigDecimal(),
                 muligeDagsverk = 3331505.8.toBigDecimal(),
                 prosent = 9.9.toBigDecimal(),
+                tapteDagsverGradert = 28664.790000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 4314.340000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 892.130000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 171.020000.toBigDecimal(),
+                    ),
+                ),
                 antallPersoner = 96403,
             ),
         )
@@ -372,6 +412,21 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 312606.4.toBigDecimal(),
                 muligeDagsverk = 3245624.8.toBigDecimal(),
                 prosent = 9.6.toBigDecimal(),
+                tapteDagsverGradert = 18965.760000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "B",
+                        tapteDagsverk = 223.980000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "C",
+                        tapteDagsverk = 1674.030000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "E",
+                        tapteDagsverk = 812.030000.toBigDecimal(),
+                    ),
+                ),
                 antallPersoner = 96711,
             ),
         )
@@ -383,6 +438,21 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 311214.1.toBigDecimal(),
                 muligeDagsverk = 3782127.8.toBigDecimal(),
                 prosent = 8.2.toBigDecimal(),
+                tapteDagsverGradert = 23123.990000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "C",
+                        tapteDagsverk = 23.080000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "D",
+                        tapteDagsverk = 2764.990000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "F",
+                        tapteDagsverk = 312.430000.toBigDecimal(),
+                    ),
+                ),
                 antallPersoner = 104737,
             ),
         )
@@ -394,6 +464,17 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
                 tapteDagsverk = 327662.8.toBigDecimal(),
                 muligeDagsverk = 3511634.6.toBigDecimal(),
                 prosent = 9.3.toBigDecimal(),
+                tapteDagsverGradert = 46675.600000.toBigDecimal(),
+                tapteDagsverkMedVarighet = listOf(
+                    TapteDagsverkPerVarighet(
+                        varighet = "A",
+                        tapteDagsverk = 443.080000.toBigDecimal(),
+                    ),
+                    TapteDagsverkPerVarighet(
+                        varighet = "F",
+                        tapteDagsverk = 344.430000.toBigDecimal(),
+                    ),
+                ),
                 antallPersoner = 96778,
             ),
         )
@@ -535,7 +616,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             kategori = kategori,
             kode = kode,
             årstallOgKvartal = årstallOgKvartal,
-            tapteDagsverk = tapteDagsverk, // TODO: JsonMelding skal være BigDecimal
+            tapteDagsverk = tapteDagsverk,
             muligeDagsverk = muligeDagsverk,
             prosent = prosent,
             tapteDagsverGradert = tapteDagsverGradert,

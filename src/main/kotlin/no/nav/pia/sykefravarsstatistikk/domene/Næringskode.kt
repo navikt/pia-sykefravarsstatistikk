@@ -1,6 +1,5 @@
 package no.nav.pia.sykefravarsstatistikk.domene
 
-// TODO: Flytt til ia-felles
 class Næringskode private constructor(
     val femsifferIdentifikator: String,
 ) {
@@ -16,5 +15,5 @@ class Næringskode private constructor(
         }
     }
 
-    val næring = Næring(femsifferIdentifikator.take(2))
+    val næring = Næring(tosifferIdentifikator = femsifferIdentifikator.take(2))
 }

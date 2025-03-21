@@ -206,7 +206,7 @@ class TestContainerHelper {
             )
 
         val underenhetMedEnkelrettighetBransjeBarnehage =
-            Underenhet(
+            Underenhet.Næringsdrivende(
                 orgnr = "100000002",
                 navn = "Underenhet Med Enkelrettighet Bransje Barnehage",
                 antallAnsatte = 50,
@@ -233,7 +233,7 @@ class TestContainerHelper {
             )
 
         val underenhetMedEnkelrettighetBransjeSykehus =
-            Underenhet(
+            Underenhet.Næringsdrivende(
                 orgnr = "100000006",
                 navn = "Underenhet Med Enkelrettighet Bransje Sykehus",
                 antallAnsatte = 100,
@@ -260,7 +260,7 @@ class TestContainerHelper {
             )
 
         val underenhetMedTilhørighetBransjeBygg =
-            Underenhet(
+            Underenhet.Næringsdrivende(
                 orgnr = "100000004",
                 navn = "Underenhet Med Tilhørighet Bransje Bygg",
                 antallAnsatte = 150,
@@ -286,7 +286,7 @@ class TestContainerHelper {
                 ).tilDomene(),
             )
 
-        val underenhetMedEnkelrettighetUtenBransje2 = Underenhet(
+        val underenhetMedEnkelrettighetUtenBransje2 = Underenhet.Næringsdrivende(
             orgnr = "100000012",
             navn = "Underenhet Med Enkelrettighet Uten Bransje 2",
             antallAnsatte = 200,
@@ -312,7 +312,7 @@ class TestContainerHelper {
                 ).tilDomene(),
             )
 
-        val underenhetMedEnkelrettighetUtenBransje = Underenhet(
+        val underenhetMedEnkelrettighetUtenBransje = Underenhet.Næringsdrivende(
             orgnr = "100000010",
             navn = "Underenhet Med Enkelrettighet Uten Bransje",
             antallAnsatte = 250,
@@ -338,7 +338,7 @@ class TestContainerHelper {
                 antallAnsatte = 300,
             )
 
-        val underenhetMedTilhørighetUtenBransje = Underenhet(
+        val underenhetMedTilhørighetUtenBransje = Underenhet.Næringsdrivende(
             orgnr = "100000008",
             navn = "Underenhet Med Tilhørighet Uten Bransje",
             antallAnsatte = 300,
@@ -364,7 +364,7 @@ class TestContainerHelper {
                 ).tilDomene(),
             )
 
-        val enUnderenhetUtenStatistikk = Underenhet(
+        val enUnderenhetUtenStatistikk = Underenhet.Næringsdrivende(
             orgnr = "100000014",
             navn = "Underenhet Uten Statistikk",
             antallAnsatte = 350,
@@ -390,7 +390,7 @@ class TestContainerHelper {
                 ).tilDomene(),
             )
 
-        val underenhetUtenTilgang = Underenhet(
+        val underenhetUtenTilgang = Underenhet.Næringsdrivende(
             orgnr = "100000016",
             navn = "Underenhet Uten Tilgang",
             antallAnsatte = 400,
@@ -415,7 +415,7 @@ class TestContainerHelper {
                 ).tilDomene(),
             )
 
-        val underenhetSykehjemMedTilgang = Underenhet(
+        val underenhetSykehjemMedTilgang = Underenhet.Næringsdrivende(
             orgnr = "100000018",
             navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
             antallAnsatte = 400,
@@ -427,12 +427,12 @@ class TestContainerHelper {
         )
 
         @OptIn(ExperimentalSerializationApi::class)
-        fun prettyPrint(statistikk: List<KvartalsvisSykefraværshistorikkDto>) {
+        inline fun <reified T> prettyPrint(statistikk: T) {
             val prettyJson = Json {
                 prettyPrint = true
                 prettyPrintIndent = " "
             }
-            println("[DEBUG][Test] Statistikk: \n ${prettyJson.encodeToString(statistikk)}")
+            println("[DEBUG][Test] Statistikk: \n ${prettyJson.encodeToString(value = statistikk)}")
         }
     }
 }
