@@ -19,6 +19,7 @@ import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkService
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
+import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoService
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkGraderingRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkMedVarighetRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkRepository
@@ -36,6 +37,7 @@ fun main() {
     val sykefraværsstatistikkMedVarighetRepository = SykefraværsstatistikkMedVarighetRepository(dataSource = dataSource)
     val sykefraværsstatistikkGraderingRepository = SykefraværsstatistikkGraderingRepository(dataSource = dataSource)
     val importtidspunktRepository = ImporttidspunktRepository(dataSource = dataSource)
+    val publiseringsdatoRepository = MetadataRepository(dataSource = dataSource)
     val sykefraværsstatistikkService = SykefraværsstatistikkService(
         sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
     )
@@ -51,6 +53,8 @@ fun main() {
         sykefraværsstatistikkMedVarighetRepository = sykefraværsstatistikkMedVarighetRepository,
         sykefraværsstatistikkGraderingRepository = sykefraværsstatistikkGraderingRepository,
     )
+
+    val publiseringsdatoService = PubliseringsdatoService(publiseringsdatoRepository = publiseringsdatoRepository)
 
     SykefraværsstatistikkConsumer(
         topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
@@ -84,6 +88,7 @@ fun main() {
             aggregertStatistikkService = aggregertStatistikkService,
             kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
             enhetsregisteretService = enhetsregisteretService,
+            publiseringsdatoService = publiseringsdatoService,
         )
     }.also {
         // https://doc.nais.io/nais-application/good-practices/#handles-termination-gracefully
@@ -98,6 +103,7 @@ fun Application.configure(
     aggregertStatistikkService: AggregertStatistikkService,
     kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService,
     enhetsregisteretService: EnhetsregisteretService,
+    publiseringsdatoService: PubliseringsdatoService,
 ) {
     configureMonitoring()
     configureSerialization()
@@ -106,5 +112,6 @@ fun Application.configure(
         aggregertStatistikkService = aggregertStatistikkService,
         kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
         enhetsregisteretService = enhetsregisteretService,
+        publiseringsdatoService = publiseringsdatoService,
     )
 }
