@@ -3,13 +3,13 @@ package no.nav.pia.sykefravarsstatistikk.api.aggregering
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
 import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService.HentAggregertStatistikkFeil.`virksomhet er ikke næringsdrivende`
 import no.nav.pia.sykefravarsstatistikk.api.auth.Tilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
-import no.nav.pia.sykefravarsstatistikk.domene.Bransjeprogram.finnBransje
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
@@ -181,7 +181,7 @@ class AggregertStatistikkService(
     }
 
     fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring =
-        finnBransje(virksomhet.næringskode)?.let {
+        Bransje.fra(virksomhet.næringskode.femsifferIdentifikator)?.let {
             BransjeEllerNæring(it)
         } ?: BransjeEllerNæring(Næring(tosifferIdentifikator = virksomhet.næringskode.næring.tosifferIdentifikator))
 
