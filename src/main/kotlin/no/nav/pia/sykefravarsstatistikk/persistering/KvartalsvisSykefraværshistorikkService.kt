@@ -139,47 +139,61 @@ class KvartalsvisSykefraværshistorikkService(
         }
         response.add(umaskertSektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.beskrivelse))
 
-        val bransje = underenhet.bransje()
-        if (bransje != null) {
-            val umaskertBransjestatistikk = hentSykefraværsstatistikkBransje(
-                bransje = bransje,
-                førsteÅrstalOgKvartal = førsteKvartal,
-            ).ifEmpty {
-                return Feil(
-                    feilmelding = "Ingen bransjestatistikk funnet for bransje '${bransje.navn}'",
-                    httpStatusCode = HttpStatusCode.BadRequest,
-                ).left()
+        if (underenhet is Underenhet.Næringsdrivende) {
+            val bransje = underenhet.bransje()
+            if (bransje != null) {
+                val umaskertBransjestatistikk = hentSykefraværsstatistikkBransje(
+                    bransje = bransje,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                ).ifEmpty {
+                    return Feil(
+                        feilmelding = "Ingen bransjestatistikk funnet for bransje '${bransje.navn}'",
+                        httpStatusCode = HttpStatusCode.BadRequest,
+                    ).left()
+                }
+                response.add(umaskertBransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
+            } else {
+                val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
+                    næring = underenhet.næringskode.næring,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                ).ifEmpty {
+                    return Feil(
+                        feilmelding = "Ingen næringsstatistikk funnet for næring " +
+                            "med navn: '${underenhet.næringskode.næring.navn}' " +
+                            "og kode: '${underenhet.næringskode.næring.tosifferIdentifikator}'",
+                        httpStatusCode = HttpStatusCode.BadRequest,
+                    ).left()
+                }
+                response.add(
+                    umaskertNæringsstatistikk.tilDto(
+                        type = "NÆRING",
+                        label = underenhet.næringskode.næring.tosifferIdentifikator,
+                    ),
+                )
             }
-            response.add(umaskertBransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
-        } else {
-            val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
-                næring = underenhet.næringskode.næring,
-                førsteÅrstalOgKvartal = førsteKvartal,
-            ).ifEmpty {
-                return Feil(
-                    feilmelding = "Ingen næringsstatistikk funnet for næring " +
-                        "med navn: '${underenhet.næringskode.næring.navn}' " +
-                        "og kode: '${underenhet.næringskode.næring.tosifferIdentifikator}'",
-                    httpStatusCode = HttpStatusCode.BadRequest,
-                ).left()
-            }
+            val umaskertVirksomhetsstatistikkForVirksomhet =
+                hentSykefraværsstatistikkVirksomhet(
+                    virksomhet = underenhet,
+                    førsteÅrstalOgKvartal = førsteKvartal,
+                ).ifEmpty {
+                    return emptyList<KvartalsvisSykefraværshistorikkDto>().right()
+                }
+
             response.add(
-                umaskertNæringsstatistikk.tilDto(
+                umaskertVirksomhetsstatistikkForVirksomhet.tilDto(
+                    type = VIRKSOMHET.name,
+                    label = underenhet.navn,
+                ),
+            )
+        } else {
+            response.add(
+                KvartalsvisSykefraværshistorikkDto(
                     type = "NÆRING",
-                    label = underenhet.næringskode.næring.tosifferIdentifikator,
+                    label = "Ikke næringsdrivende",
+                    kvartalsvisSykefraværsprosent = emptyList(),
                 ),
             )
         }
-
-        val umaskertVirksomhetsstatistikkForVirksomhet =
-            hentSykefraværsstatistikkVirksomhet(
-                virksomhet = underenhet,
-                førsteÅrstalOgKvartal = førsteKvartal,
-            ).ifEmpty {
-                return emptyList<KvartalsvisSykefraværshistorikkDto>().right()
-            }
-
-        response.add(umaskertVirksomhetsstatistikkForVirksomhet.tilDto(type = VIRKSOMHET.name, label = underenhet.navn))
 
         val umaskertVirksomhetsstatistikk = if (tilganger.harEnkeltTilgangOverordnetEnhet) {
             hentSykefraværsstatistikkVirksomhet(

@@ -177,7 +177,7 @@ class KafkaContainerHelper(
     }
 
     fun sendStatistikk(
-        underenhet: Underenhet,
+        underenhet: Underenhet.Næringsdrivende,
         overordnetEnhet: OverordnetEnhet,
     ) {
         sendLandsstatistikk()

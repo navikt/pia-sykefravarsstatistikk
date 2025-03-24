@@ -71,8 +71,9 @@ fun AltinnAuthorizationPlugin(
             val underenhet: Underenhet = enhetsregisteretService.hentUnderEnhet(orgnr)
                 .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
 
-            val overordnetEnhet: OverordnetEnhet = enhetsregisteretService.hentEnhet(underenhet.overordnetEnhetOrgnr)
-                .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
+            val overordnetEnhet: OverordnetEnhet =
+                enhetsregisteretService.hentEnhet((underenhet as Underenhet.Næringsdrivende).overordnetEnhetOrgnr)
+                    .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
 
             val harTilgangTilOrgnr = altinnTilganger.harTilgangTilOrgnr(
                 orgnr = underenhet.orgnr,
@@ -106,7 +107,14 @@ fun AltinnAuthorizationPlugin(
                     orgnr = orgnr,
                     virksomheter = altinnTilganger.virksomheterVedkommendeHarTilgangTil(),
                 )
-                call.attributes.put(TilgangerKey, Tilganger(harEnkeltTilgang, harEnkeltTilgangOverordnetEnhet))
+                call.attributes.put(
+                    TilgangerKey,
+                    Tilganger(
+                        harTilgangTilOrgnr = harTilgangTilOrgnr,
+                        harEnkeltTilgang = harEnkeltTilgang,
+                        harEnkeltTilgangOverordnetEnhet = harEnkeltTilgangOverordnetEnhet,
+                    ),
+                )
                 call.attributes.put(UnderenhetKey, underenhet)
                 call.attributes.put(OverordnetEnhetKey, overordnetEnhet)
             }
@@ -121,6 +129,7 @@ val UnderenhetKey = AttributeKey<Underenhet>("Underenhet")
 val OverordnetEnhetKey = AttributeKey<OverordnetEnhet>("OverordnetEnhet")
 
 data class Tilganger(
+    val harTilgangTilOrgnr: Boolean,
     val harEnkeltTilgang: Boolean,
     val harEnkeltTilgangOverordnetEnhet: Boolean,
 )
