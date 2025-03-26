@@ -15,10 +15,12 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.helper.PubliseringsdatoImportTestUtils.Companion.toJson
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoDto
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.admin.AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG
@@ -174,6 +176,24 @@ class KafkaContainerHelper(
         val offsetMetadata = adminClient.listConsumerGroupOffsets(consumerGroup)
             .partitionsToOffsetAndMetadata().get()
         return offsetMetadata[offsetMetadata.keys.firstOrNull { it.topic().contains(topic) }]?.offset() ?: -1
+    }
+
+    fun sendPubliseringsdatoer(publiseringsdatoer: List<PubliseringsdatoDto>) {
+        publiseringsdatoer.forEach {
+            val key = PubliseringsdatoImportTestUtils.PubliseringsdatoJsonKey(
+                rapportPeriode = it.rapportPeriode,
+            )
+            val value = PubliseringsdatoImportTestUtils.PubliseringsdatoJsonValue(
+                rapportPeriode = it.rapportPeriode,
+                offentligDato = it.offentligDato,
+                oppdatertIDvh = it.oppdatertIDvh,
+            )
+            sendOgVentTilKonsumert(
+                nøkkel = key.toJson(),
+                melding = value.toJson(),
+                topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_PUBLISERINGSDATO,
+            )
+        }
     }
 
     fun sendStatistikk(

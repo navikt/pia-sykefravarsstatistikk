@@ -1,15 +1,32 @@
 package no.nav.pia.sykefravarsstatistikk
 
 import no.nav.pia.sykefravarsstatistikk.NaisEnvironment.Companion.getEnvVar
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 
 class NaisEnvironment(
     val database: Database = Database(),
 ) {
     companion object {
+        val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
         fun getEnvVar(
             varName: String,
             defaultValue: String? = null,
         ) = System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable $varName")
+
+        fun dagensDato(): LocalDateTime {
+            val lokalDatoEnvVar: String = getEnvVar("LOKAL_DATO")
+            if (System.getenv("NAIS_CLUSTER_NAME") == Clusters.LOKAL.clusterId && lokalDatoEnvVar.isNotEmpty()) {
+                val lokalDato = LocalDateTime.parse(lokalDatoEnvVar)
+                logger.warn("OBS: applikasjon bruker env var 'LOKAL_DATO' med verdi '$lokalDato' som dagens dato")
+                return lokalDato
+            }
+            val iDag = LocalDateTime.now()
+            logger.info("Bruker systemdato '$iDag' som dagens dato")
+            return iDag
+        }
     }
 }
 

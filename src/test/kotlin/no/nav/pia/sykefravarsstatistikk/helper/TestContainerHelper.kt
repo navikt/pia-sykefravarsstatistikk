@@ -17,6 +17,7 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.time.withTimeoutOrNull
+import kotlinx.datetime.LocalDateTime
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
@@ -41,6 +42,9 @@ class TestContainerHelper {
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
         private val wiremockContainerHelper = WiremockContainerHelper()
 
+        // Setter lokal dato for å kunne teste /publiseringsdato uten å være avhengig av tidspunktet testen kjører
+        private val lokalDato = LocalDateTime.parse("2025-03-01T15:59:59")
+
         val applikasjon: GenericContainer<*> = GenericContainer(
             ImageFromDockerfile().withDockerfile(Path("./Dockerfile")),
         ).dependsOn(
@@ -56,6 +60,7 @@ class TestContainerHelper {
                     mapOf(
                         "CONSUMER_LOOP_DELAY" to "1",
                         "NAIS_CLUSTER_NAME" to "lokal",
+                        "LOKAL_DATO" to lokalDato.toString(),
                     ),
                 ).plus(
                     mapOf(
@@ -144,6 +149,12 @@ class TestContainerHelper {
                 url = "/sykefravarsstatistikk/$orgnr/historikk/kvartalsvis",
                 config = config,
             ) ?: fail("Feil ved henting av kvartalsvis statistikk, mottok ikke respons")
+
+        suspend fun hentPubliseringsdatoResponse(config: HttpRequestBuilder.() -> Unit = {}): HttpResponse =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/publiseringsdato",
+                config = config,
+            ) ?: fail("Feil ved henting av publiseringsdato, mottok ikke respons")
 
         private val httpClient = HttpClient(CIO) {
             install(ContentNegotiation) {
