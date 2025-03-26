@@ -17,11 +17,13 @@ class NaisEnvironment(
         ) = System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable $varName")
 
         fun dagensDato(): LocalDateTime {
-            val lokalDatoEnvVar: String = getEnvVar("LOKAL_DATO")
-            if (System.getenv("NAIS_CLUSTER_NAME") == Clusters.LOKAL.clusterId && lokalDatoEnvVar.isNotEmpty()) {
-                val lokalDato = LocalDateTime.parse(lokalDatoEnvVar)
-                logger.warn("OBS: applikasjon bruker env var 'LOKAL_DATO' med verdi '$lokalDato' som dagens dato")
-                return lokalDato
+            if (System.getenv("NAIS_CLUSTER_NAME") == Clusters.LOKAL.clusterId) {
+                val lokalDatoEnvVar: String = getEnvVar("LOKAL_DATO")
+                if (lokalDatoEnvVar.isNotEmpty()) {
+                    val lokalDato = LocalDateTime.parse(lokalDatoEnvVar)
+                    logger.warn("OBS: applikasjon bruker env var 'LOKAL_DATO' med verdi '$lokalDato' som dagens dato")
+                    return lokalDato
+                }
             }
             val iDag = LocalDateTime.now()
             logger.info("Bruker systemdato '$iDag' som dagens dato")
