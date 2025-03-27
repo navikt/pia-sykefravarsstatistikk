@@ -160,7 +160,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
-        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartalMedGradering(
             kategori = Statistikkategori.NÆRINGSKODE,
             verdi = "88911",
             kvartal = KVARTAL_2024_3,
@@ -172,6 +172,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         statistikkQ32024.kode shouldBe "88911"
         statistikkQ32024.tapteDagsverk bigDecimalShouldBe 17.5
         statistikkQ32024.muligeDagsverk bigDecimalShouldBe 761.3
+        statistikkQ32024.tapteDagsverkGradert bigDecimalShouldBe 19.2
         statistikkQ32024.prosent bigDecimalShouldBe 2.3
         statistikkQ32024.antallPersoner shouldBe 4
 
