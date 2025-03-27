@@ -80,7 +80,7 @@ class SykefraværsstatistikkRepository(
             }
 
             is NæringSykefraværsstatistikkDto -> {
-                insertNæringSykefraværsstatistikk(
+                insertSykefraværsstatistikkMedGradering(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
                 insertTapteDagsverkPerVarighetForKategori(
@@ -108,7 +108,7 @@ class SykefraværsstatistikkRepository(
             }
 
             is BransjeSykefraværsstatistikkDto -> {
-                insertSykefraværsstatistikk(
+                insertSykefraværsstatistikkMedGradering(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
                 insertTapteDagsverkPerVarighetForKategori(
@@ -398,12 +398,19 @@ class SykefraværsstatistikkRepository(
         )
     }
 
-    private fun TransactionalSession.insertNæringSykefraværsstatistikk(sykefraværsstatistikkDto: NæringSykefraværsstatistikkDto) {
+    private fun TransactionalSession.insertSykefraværsstatistikkMedGradering(sykefraværsstatistikkDto: SykefraværsstatistikkDto) {
+        val tabellNavn = sykefraværsstatistikkDto.tilTabellNavn()
+        val kolonneNavn = sykefraværsstatistikkDto.tilKolonneNavn()
+
+        if (sykefraværsstatistikkDto !is KvartalsvisSykefraværsstatistikkMedGradering) {
+            logger.warn("Kan ikke lagre statstitikk med gradering for '${sykefraværsstatistikkDto::class}'")
+            return
+        }
         run(
             queryOf(
                 """
-                INSERT INTO sykefravarsstatistikk_naring(
-                    naring,
+                INSERT INTO $tabellNavn(
+                    $kolonneNavn,
                     arstall,
                     kvartal,
                     antall_personer,
@@ -413,7 +420,7 @@ class SykefraværsstatistikkRepository(
                     prosent
                 )
                 VALUES(
-                    :naring,
+                    :statistikkSpesifikkVerdi,
                     :arstall,
                     :kvartal,
                     :antall_personer,
@@ -422,7 +429,7 @@ class SykefraværsstatistikkRepository(
                     :tapte_dagsverk_gradert,
                     :prosent
                 )
-                ON CONFLICT (naring, arstall, kvartal) DO UPDATE SET
+                ON CONFLICT ($kolonneNavn, arstall, kvartal) DO UPDATE SET
                     antall_personer = :antall_personer,
                     tapte_dagsverk = :tapte_dagsverk,
                     mulige_dagsverk = :mulige_dagsverk,
@@ -431,7 +438,7 @@ class SykefraværsstatistikkRepository(
                     sist_endret = now()
                 """.trimIndent(),
                 mapOf(
-                    "naring" to sykefraværsstatistikkDto.næring,
+                    "statistikkSpesifikkVerdi" to sykefraværsstatistikkDto.tilStatistikkSpesifikkVerdi(),
                     "arstall" to sykefraværsstatistikkDto.årstall,
                     "kvartal" to sykefraværsstatistikkDto.kvartal,
                     "antall_personer" to sykefraværsstatistikkDto.antallPersoner,

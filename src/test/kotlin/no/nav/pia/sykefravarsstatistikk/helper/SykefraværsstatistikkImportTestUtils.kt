@@ -20,6 +20,18 @@ class SykefraværsstatistikkImportTestUtils {
         val antallPersoner: Int,
     )
 
+    data class StatistikkGjeldendeKvartalMedGradering(
+        val kategori: Statistikkategori,
+        val kode: String,
+        val årstall: Int,
+        val kvartal: Int,
+        val tapteDagsverk: BigDecimal,
+        val muligeDagsverk: BigDecimal,
+        val prosent: BigDecimal,
+        val tapteDagsverkGradert: BigDecimal,
+        val antallPersoner: Int,
+    )
+
     data class VirksomhetStatistikk(
         val orgnr: String,
         val årstall: Int,
@@ -206,6 +218,38 @@ class SykefraværsstatistikkImportTestUtils {
                     prosent = rs.getBigDecimal("prosent"),
                     tapteDagsverk = rs.getBigDecimal("tapte_dagsverk"),
                     muligeDagsverk = rs.getBigDecimal("mulige_dagsverk"),
+                    antallPersoner = rs.getInt("antall_personer"),
+                )
+            }
+        }
+
+        fun hentStatistikkGjeldendeKvartalMedGradering(
+            kategori: Statistikkategori,
+            verdi: String,
+            kvartal: ÅrstallOgKvartal,
+            tabellnavn: String,
+            kodenavn: String,
+        ): StatistikkGjeldendeKvartalMedGradering {
+            val query = """
+            select * from $tabellnavn 
+             where $kodenavn = '$verdi'
+             and arstall = ${kvartal.årstall} and kvartal = ${kvartal.kvartal}
+            """.trimMargin()
+            TestContainerHelper.postgresContainerHelper.dataSource.connection.use { connection ->
+                val statement = connection.createStatement()
+                statement.execute(query)
+                val rs = statement.resultSet
+                rs.next()
+                rs.row shouldBe 1
+                return StatistikkGjeldendeKvartalMedGradering(
+                    kategori = kategori,
+                    kode = rs.getString(kodenavn),
+                    årstall = rs.getInt("arstall"),
+                    kvartal = rs.getInt("kvartal"),
+                    prosent = rs.getBigDecimal("prosent"),
+                    tapteDagsverk = rs.getBigDecimal("tapte_dagsverk"),
+                    muligeDagsverk = rs.getBigDecimal("mulige_dagsverk"),
+                    tapteDagsverkGradert = rs.getBigDecimal("tapte_dagsverk_gradert"),
                     antallPersoner = rs.getInt("antall_personer"),
                 )
             }

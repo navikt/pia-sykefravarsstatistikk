@@ -5,6 +5,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkGjeldendeKvartal
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkGjeldendeKvartalMedGradering
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.hentStatistikkMedVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
@@ -86,8 +87,8 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             prosent = 2.7.toBigDecimal(),
             tapteDagsverk = 5039.8.toBigDecimal(),
             muligeDagsverk = 186.3.toBigDecimal(),
-            antallPersoner = 3,
-            tapteDagsverGradert = 0.0.toBigDecimal(),
+            antallPersoner = 5,
+            tapteDagsverGradert = 87.87601.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
@@ -105,7 +106,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
-        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartalMedGradering(
             kategori = Statistikkategori.NÆRING,
             verdi = "22",
             kvartal = KVARTAL_2024_3,
@@ -114,7 +115,11 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         )
         statistikkQ32024.kategori shouldBe Statistikkategori.NÆRING
         statistikkQ32024.kode shouldBe "22"
+        statistikkQ32024.muligeDagsverk bigDecimalShouldBe 186.3
+        statistikkQ32024.prosent bigDecimalShouldBe 2.7
+        statistikkQ32024.antallPersoner shouldBe 5
         statistikkQ32024.tapteDagsverk bigDecimalShouldBe 5039.8
+        statistikkQ32024.tapteDagsverkGradert bigDecimalShouldBe 87.87601
 
         val statistikkMedVarighet = hentStatistikkMedVarighet(
             tabellnavn = "sykefravarsstatistikk_naring_med_varighet",
@@ -191,7 +196,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             tapteDagsverk = 5039.8.toBigDecimal(),
             muligeDagsverk = 186.3.toBigDecimal(),
             antallPersoner = 3,
-            tapteDagsverGradert = 0.0.toBigDecimal(),
+            tapteDagsverGradert = 21.2345.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
@@ -209,7 +214,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
             KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
-        val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
+        val statistikkQ32024 = hentStatistikkGjeldendeKvartalMedGradering(
             kategori = Statistikkategori.BRANSJE,
             verdi = "22",
             kvartal = KVARTAL_2024_3,
@@ -221,6 +226,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         statistikkQ32024.kode shouldBe "22"
         statistikkQ32024.tapteDagsverk bigDecimalShouldBe 5039.8
         statistikkQ32024.muligeDagsverk bigDecimalShouldBe 186.3
+        statistikkQ32024.tapteDagsverkGradert bigDecimalShouldBe 21.2345
         statistikkQ32024.prosent bigDecimalShouldBe 2.7
         statistikkQ32024.antallPersoner shouldBe 3
 
