@@ -94,7 +94,7 @@ class SykefraværsstatistikkRepository(
             }
 
             is NæringskodeSykefraværsstatistikkDto -> {
-                insertSykefraværsstatistikk(
+                insertSykefraværsstatistikkMedGradering(
                     sykefraværsstatistikkDto = sykefraværsstatistikkDto,
                 )
                 insertTapteDagsverkPerVarighetForKategori(

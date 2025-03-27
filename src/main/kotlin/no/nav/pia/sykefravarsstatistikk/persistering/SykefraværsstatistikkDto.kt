@@ -102,11 +102,12 @@ data class NæringskodeSykefraværsstatistikkDto(
     @Serializable(with = BigDecimalSerializer::class)
     override val muligeDagsverk: BigDecimal,
     @Serializable(with = BigDecimalSerializer::class)
-    val tapteDagsverkGradert: BigDecimal,
+    override val tapteDagsverkGradert: BigDecimal,
     @Serializable(with = TapteDagsverkPerVarighetListSerializer::class)
     val tapteDagsverkPerVarighet: List<TapteDagsverkPerVarighetDto>,
     override val antallPersoner: Int,
-) : SykefraværsstatistikkDto()
+) : SykefraværsstatistikkDto(),
+    KvartalsvisSykefraværsstatistikkMedGradering
 
 @Serializable
 data class BransjeSykefraværsstatistikkDto(
