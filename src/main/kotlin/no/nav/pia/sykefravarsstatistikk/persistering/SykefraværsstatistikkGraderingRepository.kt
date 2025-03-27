@@ -25,12 +25,12 @@ class SykefraværsstatistikkGraderingRepository(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun hentForNæring(næring: Næring): List<UmaskertSykefraværUtenProsentForEttKvartal> = hentGradertSykefravær(næring)
+    fun hentForNæring(næring: Næring): List<UmaskertSykefraværUtenProsentForEttKvartal> = hentGradertSykefravær(næring = næring)
 
-    @Deprecated("Bransje har ikke fått enda tapte_dagsverk_gradert")
-    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværUtenProsentForEttKvartal> = emptyList()
+    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværUtenProsentForEttKvartal> = hentGradertSykefravær(bransje = bransje)
 
-    fun hentForVirksomhet(virksomhet: Virksomhet): List<UmaskertSykefraværUtenProsentForEttKvartal> = hentGradertSykefravær(virksomhet)
+    fun hentForVirksomhet(virksomhet: Virksomhet): List<UmaskertSykefraværUtenProsentForEttKvartal> =
+        hentGradertSykefravær(virksomhet = virksomhet)
 
     private fun hentGradertSykefravær(næring: Næring): List<UmaskertSykefraværUtenProsentForEttKvartal> =
         try {
@@ -47,7 +47,6 @@ class SykefraværsstatistikkGraderingRepository(
             throw e
         }
 
-    @Deprecated("Bransje har ikke fått enda tapte_dagsverk_gradert")
     private fun hentGradertSykefravær(bransje: Bransje): List<UmaskertSykefraværUtenProsentForEttKvartal> =
         try {
             using(sessionOf(dataSource)) { session ->

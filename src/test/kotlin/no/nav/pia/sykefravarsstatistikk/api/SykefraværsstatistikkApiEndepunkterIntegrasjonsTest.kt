@@ -81,8 +81,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
             listOf(
                 aggregertStatistikk.prosentSiste4KvartalerTotalt,
-                // TODO: vi har ikke gradert for bransje enda
-                // aggregertStatistikk.prosentSiste4KvartalerGradert,
+                aggregertStatistikk.prosentSiste4KvartalerGradert,
                 aggregertStatistikk.prosentSiste4KvartalerKorttid,
                 aggregertStatistikk.prosentSiste4KvartalerLangtid,
                 aggregertStatistikk.trendTotalt,
