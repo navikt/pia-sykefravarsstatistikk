@@ -14,9 +14,12 @@ import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilganger
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltTilgang
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarTilgangTil
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighet
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.virksomheterVedkommendeHarTilgangTil
+import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
@@ -79,12 +82,12 @@ fun AltinnAuthorizationPlugin(
                 orgnr = underenhet.orgnr,
             )
 
-            val harEnkeltTilgang = altinnTilganger.harEnkeltTilgang(
+            val harEnkeltTilgang = altinnTilganger.harEnkeltrettighet(
                 orgnr = underenhet.orgnr,
                 altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
-            val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltTilgang(
+            val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltrettighet(
                 orgnr = overordnetEnhet.orgnr,
                 altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
@@ -113,6 +116,12 @@ fun AltinnAuthorizationPlugin(
                         harTilgangTilOrgnr = harTilgangTilOrgnr,
                         harEnkeltTilgang = harEnkeltTilgang,
                         harEnkeltTilgangOverordnetEnhet = harEnkeltTilgangOverordnetEnhet,
+                        altinnOrganisasjonerVedkommendeHarTilgangTil =
+                            altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil(),
+                        altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil =
+                            altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
+                                ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                            ),
                     ),
                 )
                 call.attributes.put(UnderenhetKey, underenhet)
@@ -132,6 +141,8 @@ data class Tilganger(
     val harTilgangTilOrgnr: Boolean,
     val harEnkeltTilgang: Boolean,
     val harEnkeltTilgangOverordnetEnhet: Boolean,
+    val altinnOrganisasjonerVedkommendeHarTilgangTil: List<AltinnOrganisasjon>,
+    val altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil: List<AltinnOrganisasjon>,
 )
 
 @Serializable

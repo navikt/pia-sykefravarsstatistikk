@@ -33,7 +33,7 @@ class AuditlogTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                underenhet = underenhetMedTilhørighetUtenBransje,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 

@@ -20,11 +20,12 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.routing
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
+import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
+import no.nav.pia.sykefravarsstatistikk.api.organisasjoner
 import no.nav.pia.sykefravarsstatistikk.api.publiseringsdato
-import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.exceptions.IkkeFunnetException
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
@@ -114,6 +115,7 @@ fun Application.configureRouting(
                 altinnTilgangerService = altinnTilgangerService,
                 enhetsregisteretService = enhetsregisteretService,
             ) {
+                organisasjoner()
                 sykefraværsstatistikk(
                     aggregertStatistikkService = aggregertStatistikkService,
                     kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,

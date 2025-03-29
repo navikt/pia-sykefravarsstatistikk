@@ -61,7 +61,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                underenhet = underenhetMedTilhørighetUtenBransje,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -87,7 +87,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                underenhet = underenhetMedTilhørighetUtenBransje,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -125,7 +125,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.orgnr,
+                underenhet = underenhetMedTilhørighetUtenBransje,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -152,7 +152,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Får IKKE feil ved manglende statistikk`() {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = enUnderenhetUtenStatistikk.orgnr,
+                underenhet = enUnderenhetUtenStatistikk,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -188,7 +188,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetUtenBransje.orgnr,
+                underenhet = underenhetMedEnkelrettighetUtenBransje,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -241,7 +241,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker med tilhørighet til virksomhet (i bransje) og enkelttilgang får kvartalsvis statistikk`() {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeSykehus.orgnr,
+                underenhet = underenhetMedEnkelrettighetBransjeSykehus,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -300,7 +300,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker med tilhørighet til virksomhet, enkelttilgang og overordnet enhet får kvartalsvis statistikk`() {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetUtenBransje2.orgnr,
+                underenhet = underenhetMedEnkelrettighetUtenBransje2,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -363,13 +363,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.orgnr,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
-            )
-
-            // TODO: gi enkelrettighet på overordnet enhet
-            altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage.orgnr,
+                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
+                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 
@@ -431,7 +426,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             )
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.orgnr,
+                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
 

@@ -156,6 +156,24 @@ class TestContainerHelper {
                 config = config,
             ) ?: fail("Feil ved henting av publiseringsdato, mottok ikke respons")
 
+        suspend fun hentOrganisasjonerTilgangResponse(
+            orgnr: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ): HttpResponse =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/$orgnr/organisasjoner/tilgang",
+                config = config,
+            ) ?: fail("Feil ved henting av organisasjoner vedkommenede har tilgang til, mottok ikke respons")
+
+        suspend fun hentOrganisasjonerMedEnkeltrettighetResponse(
+            orgnr: String,
+            config: HttpRequestBuilder.() -> Unit = {},
+        ): HttpResponse =
+            applikasjon.performGet(
+                url = "/sykefravarsstatistikk/$orgnr/organisasjoner/enkeltrettighet",
+                config = config,
+            ) ?: fail("Feil ved henting av organisasjoner på enkelrettighet, mottok ikke respons")
+
         private val httpClient = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json()

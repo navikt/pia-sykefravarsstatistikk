@@ -1,0 +1,84 @@
+package no.nav.pia.sykefravarsstatistikk.api
+
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
+import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
+import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
+class OrganisasjonerEndepunktTest {
+    @BeforeTest
+    fun setup() {
+        runBlocking {
+            altinnTilgangerContainerHelper.slettAlleRettigheter()
+        }
+    }
+
+    @Test
+    fun `Innlogget bruker får hente organisasjoner hen har tilgang til`() {
+        val underenhet: Underenhet = underenhetUtenTilgang
+        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
+        altinnTilgangerContainerHelper.leggTilRettigheter(
+            overordnetEnhet = overordnetEnhet,
+            underenhet = underenhet,
+            altinn2Rettighet = "En annen enkeltrettighet",
+        )
+
+        runBlocking {
+            val response = TestContainerHelper.hentOrganisasjonerTilgangResponse(
+                orgnr = underenhet.orgnr,
+                config = withToken(),
+            )
+
+            response.status.value shouldBe 200
+            val altinnOrganisasjoner = Json.decodeFromString<List<AltinnOrganisasjon>>(response.bodyAsText())
+            altinnOrganisasjoner shouldNotBe null
+            altinnOrganisasjoner.size shouldBe 2
+            val altinnOrganisasjonForOverordnetEnhet: AltinnOrganisasjon =
+                altinnOrganisasjoner.find { it.organizationNumber == overordnetEnhet.orgnr }!!
+            val altinnOrganisasjonForUnderenhet: AltinnOrganisasjon =
+                altinnOrganisasjoner.find { it.organizationNumber == underenhet.orgnr }!!
+            altinnOrganisasjonForOverordnetEnhet.name shouldBe overordnetEnhet.navn
+            altinnOrganisasjonForOverordnetEnhet.organizationNumber shouldBe overordnetEnhet.orgnr
+            altinnOrganisasjonForOverordnetEnhet.parentOrganizationNumber shouldBe ""
+            altinnOrganisasjonForOverordnetEnhet.organizationForm shouldBe "ORGL"
+            altinnOrganisasjonForUnderenhet.name shouldBe (underenhet as Underenhet.Næringsdrivende).navn
+            altinnOrganisasjonForUnderenhet.organizationNumber shouldBe underenhet.orgnr
+            altinnOrganisasjonForUnderenhet.parentOrganizationNumber shouldBe overordnetEnhet.orgnr
+            altinnOrganisasjonForUnderenhet.organizationForm shouldBe "BEDR"
+        }
+    }
+
+    @Test
+    fun `Innlogget bruker får hente organisasjoner hen har enkeltrettigheter til`() {
+        val underenhet: Underenhet = underenhetUtenTilgang
+        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
+        altinnTilgangerContainerHelper.leggTilRettigheter(
+            overordnetEnhet = overordnetEnhet,
+            underenhet = underenhet,
+            altinn2Rettighet = "En annen enkeltrettighet",
+        )
+
+        runBlocking {
+            val response = TestContainerHelper.hentOrganisasjonerMedEnkeltrettighetResponse(
+                orgnr = underenhet.orgnr,
+                config = withToken(),
+            )
+
+            response.status.value shouldBe 200
+            val altinnOrganisasjoner = Json.decodeFromString<List<AltinnOrganisasjon>>(response.bodyAsText())
+            altinnOrganisasjoner shouldNotBe null
+            altinnOrganisasjoner.size shouldBe 0
+        }
+    }
+}

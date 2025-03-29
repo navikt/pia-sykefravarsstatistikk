@@ -21,6 +21,7 @@ import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.altinnTilgangerProxyUrl
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.cluster
 import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
+import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
 import no.nav.pia.sykefravarsstatistikk.http.HttpClient.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -30,7 +31,10 @@ class AltinnTilgangerService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {
+        //    ref: https://www.nav.no/arbeidsgiver/tilganger
         const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK = "3403:1"
+        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3 =
+            "nav_forebygge-og-redusere-sykefravær_sykefraværsstatistikk"
 
         fun AltinnTilganger?.harTilgangTilOrgnr(orgnr: String?): Boolean =
             this?.virksomheterVedkommendeHarTilgangTil()?.contains(orgnr) ?: false
@@ -40,10 +44,57 @@ class AltinnTilgangerService {
                 flatten(it) { o -> o.orgnr }
             }?.toList() ?: emptyList()
 
-        fun AltinnTilganger?.harEnkeltTilgang(
+        fun AltinnTilganger?.harEnkeltrettighet(
             orgnr: String?,
             altinn2Tilgang: String,
         ) = this?.orgNrTilTilganger?.get(orgnr)?.contains(altinn2Tilgang) ?: false
+
+        fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarTilgangTil(): List<AltinnOrganisasjon> =
+            this?.hierarki?.flatMap {
+                flatten(it) { altinnTilgang ->
+                    AltinnOrganisasjon(
+                        name = altinnTilgang.navn,
+                        organizationNumber = altinnTilgang.orgnr,
+                        organizationForm = altinnTilgang.organisasjonsform,
+                        parentOrganizationNumber = this.finnOverordnetEnhet(altinnTilgang.orgnr) ?: "",
+                    )
+                }
+            }?.toList() ?: emptyList()
+
+        fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(enkeltrettighet: String): List<AltinnOrganisasjon> =
+            this?.hierarki?.flatMap { altinnTilgang ->
+                flatten(altinnTilgang) { it }.filter {
+                    it.altinn2Tilganger.contains(enkeltrettighet) ||
+                        it.altinn3Tilganger.contains(
+                            enkeltrettighet,
+                        )
+                }
+                    .map {
+                        AltinnOrganisasjon(
+                            name = it.navn,
+                            organizationNumber = it.orgnr,
+                            organizationForm = it.organisasjonsform,
+                            parentOrganizationNumber = this.finnOverordnetEnhet(it.orgnr) ?: "",
+                        )
+                    }
+            }?.toList() ?: emptyList()
+
+        fun AltinnTilganger?.finnOverordnetEnhet(orgnr: String): String? {
+            val listeAvAltinnTilgangPerOrgnr = this?.listeAvAltinnTilgangPerOrgnr()
+            val filtrertMapPåOrgnr: Map<String, List<AltinnTilgang>>? =
+                listeAvAltinnTilgangPerOrgnr
+                    ?.filter { it.value.any { altinnTilgang -> altinnTilgang.orgnr == orgnr } }
+            return if (filtrertMapPåOrgnr?.isEmpty() == true) {
+                null
+            } else {
+                filtrertMapPåOrgnr?.keys?.first()
+            }
+        }
+
+        private fun AltinnTilganger?.listeAvAltinnTilgangPerOrgnr(): Map<String, List<AltinnTilgang>> =
+            this?.hierarki?.flatMap {
+                flatten(it) { o: AltinnTilgang -> o.orgnr to o.underenheter }
+            }?.toMap() ?: emptyMap()
 
         private fun <T> flatten(
             altinnTilgang: AltinnTilgang,
