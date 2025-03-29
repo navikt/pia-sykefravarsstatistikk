@@ -1,7 +1,10 @@
 package no.nav.pia.sykefravarsstatistikk.helper
 
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
+import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.log
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
@@ -17,10 +20,6 @@ class AltinnTilgangerContainerHelper(
     network: Network = Network.newNetwork(),
     logger: Logger = LoggerFactory.getLogger(AltinnTilgangerContainerHelper::class.java),
 ) {
-    companion object {
-        const val OVERORDNET_ENHET = "999888321"
-    }
-
     private val networkAlias = "mockAltinnTilgangerContainer"
     private val port = 7070
 
@@ -58,8 +57,8 @@ class AltinnTilgangerContainerHelper(
     }
 
     internal fun leggTilRettigheter(
-        overordnetEnhet: String = OVERORDNET_ENHET,
-        underenhet: String,
+        overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang,
+        underenhet: Underenhet,
         altinn2Rettighet: String = "",
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
     ) {
@@ -68,7 +67,7 @@ class AltinnTilgangerContainerHelper(
                 altinnTilgangerContainer.getMappedPort(
                     7070,
                 )
-            }'. Og legger til rettighet '$altinn2Rettighet' for underenhet '$underenhet'",
+            }'. Og legger til rettighet '$altinn2Rettighet' for underenhet '${underenhet.orgnr}'",
         )
         val client = MockServerClient(
             altinnTilgangerContainer.host,
@@ -85,12 +84,12 @@ class AltinnTilgangerContainerHelper(
                     {
                       "hierarki": [
                         {
-                          "orgnr": "$overordnetEnhet",
+                          "orgnr": "${overordnetEnhet.orgnr}",
                           "altinn3Tilganger": [],
                           "altinn2Tilganger": [],
                           "underenheter": [
                             {
-                              "orgnr": "$underenhet",
+                              "orgnr": "${underenhet.orgnr}",
                               "altinn3Tilganger": [
                                 "$altinn3Rettighet"
                               ],
@@ -98,26 +97,26 @@ class AltinnTilgangerContainerHelper(
                                 "$altinn2Rettighet"
                               ],
                               "underenheter": [],
-                              "navn": "NAVN TIL UNDERENHET",
+                              "navn": "${(underenhet as Underenhet.Næringsdrivende).navn}",
                               "organisasjonsform": "BEDR"
                             }
                           ],
-                          "navn": "NAVN TIL OVERORDNET ENHET",
+                          "navn": "${overordnetEnhet.navn}",
                           "organisasjonsform": "ORGL"
                         }
                       ],
                       "orgNrTilTilganger": {
-                        "$underenhet": [
+                        "${underenhet.orgnr}": [
                           "$altinn3Rettighet",
                           "$altinn2Rettighet"
                         ]
                       },
                       "tilgangTilOrgNr": {
                         "$altinn3Rettighet": [
-                          "$underenhet"
+                          "${underenhet.orgnr}"
                         ],
                         "$altinn2Rettighet": [
-                          "$underenhet"
+                          "${underenhet.orgnr}"
                         ]
                       },
                       "isError": false

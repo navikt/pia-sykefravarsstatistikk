@@ -6,7 +6,7 @@ import arrow.core.right
 import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
 import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService.HentAggregertStatistikkFeil.`virksomhet er ikke næringsdrivende`
-import no.nav.pia.sykefravarsstatistikk.api.auth.Tilganger
+import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
@@ -55,7 +55,7 @@ class AggregertStatistikkService(
 
     fun hentAggregertStatistikk(
         underenhet: Underenhet,
-        tilganger: Tilganger,
+        tilganger: VerifiserteTilganger,
     ): Either<Feil, AggregertStatistikkResponseDto> {
         if (!tilganger.harTilgangTilOrgnr) {
             return Feil(

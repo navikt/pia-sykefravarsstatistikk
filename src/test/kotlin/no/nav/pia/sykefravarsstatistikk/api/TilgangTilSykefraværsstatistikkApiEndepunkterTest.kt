@@ -94,7 +94,7 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Innlogget bruker uten enkelrettighet til virksomhet får '403 - Forbidden' i response (kvartalsvis endepunkt)`() {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.orgnr,
+                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
                 altinn2Rettighet = "ingen_tilgang_til_statistikk",
             )
             kafkaContainerHelper.sendStatistikk(

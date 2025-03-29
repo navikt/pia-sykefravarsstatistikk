@@ -54,7 +54,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhet.orgnr,
+                underenhet = underenhet,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
             lagLandStatistikkTestCase()
@@ -114,7 +114,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhet.orgnr,
+                underenhet = underenhet,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
             )
             val expectedStatistikkLand = lagLandStatistikkTestCase()
