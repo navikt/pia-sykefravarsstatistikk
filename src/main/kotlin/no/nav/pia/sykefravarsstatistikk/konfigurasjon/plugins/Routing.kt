@@ -21,9 +21,11 @@ import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.routing
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnAuthorizationPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnOrganisajonerBrukerenHarTilgangTilPlugin
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
+import no.nav.pia.sykefravarsstatistikk.api.auth.VerifisertInnloggingPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.VerifisertEnkelrettighetForOrgnrPlugin
 import no.nav.pia.sykefravarsstatistikk.api.organisasjoner
 import no.nav.pia.sykefravarsstatistikk.api.publiseringsdato
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
@@ -35,19 +37,37 @@ import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoService
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-fun Route.medAltinnTilgang(
-    altinnTilgangerService: AltinnTilgangerService,
+fun Route.medVerifisertEnkeltrettighetForOrgnr(
     enhetsregisteretService: EnhetsregisteretService,
     authorizedRoutes: Route.() -> Unit,
 ) = (this as RoutingNode).createChild(selector).apply {
     install(
-        AltinnAuthorizationPlugin(
-            altinnTilgangerService = altinnTilgangerService,
+        VerifisertEnkelrettighetForOrgnrPlugin(
             enhetsregisteretService = enhetsregisteretService,
         ),
     )
     authorizedRoutes()
 }
+
+fun Route.medAltinnOrganisasjonerBrukerenHarTilgangTil(
+    altinnTilgangerService: AltinnTilgangerService,
+    authorizedRoutes: Route.() -> Unit,
+) = (this as RoutingNode).createChild(selector).apply {
+    install(
+        AltinnOrganisajonerBrukerenHarTilgangTilPlugin(
+            altinnTilgangerService = altinnTilgangerService,
+        ),
+    )
+    authorizedRoutes()
+}
+
+fun Route.medVerifisertInnlogging(authorizedRoutes: Route.() -> Unit) =
+    (this as RoutingNode).createChild(selector).apply {
+        install(
+            VerifisertInnloggingPlugin(),
+        )
+        authorizedRoutes()
+    }
 
 fun Application.configureRouting(
     altinnTilgangerService: AltinnTilgangerService,
@@ -108,18 +128,23 @@ fun Application.configureRouting(
         }
         install(IgnoreTrailingSlash)
         authenticate("tokenx") {
-            publiseringsdato(
-                publiseringsdatoService = publiseringsdatoService,
-            )
-            medAltinnTilgang(
-                altinnTilgangerService = altinnTilgangerService,
-                enhetsregisteretService = enhetsregisteretService,
-            ) {
-                organisasjoner()
-                sykefraværsstatistikk(
-                    aggregertStatistikkService = aggregertStatistikkService,
-                    kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
+            medVerifisertInnlogging {
+                publiseringsdato(
+                    publiseringsdatoService = publiseringsdatoService,
                 )
+                medAltinnOrganisasjonerBrukerenHarTilgangTil(
+                    altinnTilgangerService = altinnTilgangerService,
+                ) {
+                    organisasjoner()
+                    medVerifisertEnkeltrettighetForOrgnr(
+                        enhetsregisteretService = enhetsregisteretService,
+                    ) {
+                        sykefraværsstatistikk(
+                            aggregertStatistikkService = aggregertStatistikkService,
+                            kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService,
+                        )
+                    }
+                }
             }
         }
     }
