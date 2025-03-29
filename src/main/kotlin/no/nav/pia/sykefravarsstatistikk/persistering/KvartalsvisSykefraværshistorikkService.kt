@@ -5,7 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
-import no.nav.pia.sykefravarsstatistikk.api.auth.Tilganger
+import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.tilDto
 import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
@@ -104,7 +104,7 @@ class KvartalsvisSykefraværshistorikkService(
     fun hentSykefraværshistorikk(
         overordnetEnhet: OverordnetEnhet,
         underenhet: Underenhet,
-        tilganger: Tilganger,
+        tilganger: VerifiserteTilganger,
     ): Either<Feil, List<KvartalsvisSykefraværshistorikkDto>> {
         if (!tilganger.harEnkeltTilgang) {
             return Feil(

@@ -36,7 +36,6 @@ class OrganisasjonerEndepunktTest {
 
         runBlocking {
             val response = TestContainerHelper.hentOrganisasjonerTilgangResponse(
-                orgnr = underenhet.orgnr,
                 config = withToken(),
             )
 
@@ -71,7 +70,6 @@ class OrganisasjonerEndepunktTest {
 
         runBlocking {
             val response = TestContainerHelper.hentOrganisasjonerMedEnkeltrettighetResponse(
-                orgnr = underenhet.orgnr,
                 config = withToken(),
             )
 
