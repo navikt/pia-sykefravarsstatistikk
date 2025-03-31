@@ -65,7 +65,7 @@ jobs:
       id-token: write
     name: Deploy app to dev
     needs: build
-    if: github.ref == 'refs/heads/tapte-dv-for-bransje'
+    if: github.ref == 'refs/heads/organisasjoner-endepunkt'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
