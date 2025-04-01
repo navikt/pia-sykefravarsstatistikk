@@ -4,20 +4,18 @@ import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.auth.AuthenticationChecked
 import io.ktor.util.AttributeKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilganger
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarTilgangTil
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
 import no.nav.pia.sykefravarsstatistikk.http.hentToken
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 @Suppress("ktlint:standard:function-naming")
 fun AltinnOrganisajonerBrukerenHarTilgangTilPlugin(altinnTilgangerService: AltinnTilgangerService) =
     createRouteScopedPlugin(
         name = "AltinnOrganisajonerBrukerenHarTilgangTilPlugin",
     ) {
-        val logger: Logger = LoggerFactory.getLogger(this::class.java)
         pluginConfig.apply {
             on(AuthenticationChecked) { call ->
                 val token = call.request.hentToken()
@@ -28,7 +26,8 @@ fun AltinnOrganisajonerBrukerenHarTilgangTilPlugin(altinnTilgangerService: Altin
                     altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil()
                 val altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil =
                     altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-                        ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                        enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                        enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
                     )
                 call.attributes.put(
                     AltinnTilgangerKey,

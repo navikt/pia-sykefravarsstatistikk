@@ -9,7 +9,8 @@ import io.kotest.matchers.shouldNotBe
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
@@ -62,7 +63,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedTilhørighetUtenBransje,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             TestContainerHelper.hentKvartalsvisStatistikk(
@@ -88,7 +90,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedTilhørighetUtenBransje,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val statistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
@@ -126,7 +129,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedTilhørighetUtenBransje,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val statistikk = TestContainerHelper.hentKvartalsvisStatistikk(
@@ -153,7 +157,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = enUnderenhetUtenStatistikk,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             shouldFail {
@@ -189,7 +194,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedEnkelrettighetUtenBransje,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
@@ -242,7 +248,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedEnkelrettighetBransjeSykehus,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             kafkaContainerHelper.sendStatistikk(
@@ -301,7 +308,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedEnkelrettighetUtenBransje2,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             kafkaContainerHelper.sendStatistikk(
@@ -365,7 +373,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
                 underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
@@ -427,7 +436,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val aggregertStatistikkDto = TestContainerHelper.hentAggregertStatistikk(
