@@ -10,7 +10,6 @@ import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedIkkeTilgangTilOr
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedOkKall
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighet
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.virksomheterVedkommendeHarTilgangTil
@@ -19,15 +18,12 @@ import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
 import no.nav.pia.sykefravarsstatistikk.http.orgnr
 import no.nav.pia.sykefravarsstatistikk.http.tokenSubject
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 @Suppress("ktlint:standard:function-naming")
 fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: EnhetsregisteretService) =
     createRouteScopedPlugin(
         name = "VerifisertEnkelrettighetForOrgnrPlugin",
     ) {
-        val logger: Logger = LoggerFactory.getLogger(this::class.java)
         pluginConfig.apply {
             on(AuthenticationChecked) { call ->
                 val fnr = call.request.tokenSubject()
@@ -57,12 +53,10 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
 
                 val harEnkeltTilgang = altinnTilganger.harEnkeltrettighet(
                     orgnr = underenhet.orgnr,
-                    altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
                 )
 
                 val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltrettighet(
                     orgnr = overordnetEnhet.orgnr,
-                    altinn2Tilgang = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
                 )
 
                 if (!harTilgangTilOrgnr) {

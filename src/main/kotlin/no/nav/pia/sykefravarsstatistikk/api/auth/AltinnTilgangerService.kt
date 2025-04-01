@@ -32,7 +32,7 @@ class AltinnTilgangerService {
 
     companion object {
         //    ref: https://www.nav.no/arbeidsgiver/tilganger
-        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK = "3403:1"
+        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2 = "3403:1"
         const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3 =
             "nav_forebygge-og-redusere-sykefravær_sykefraværsstatistikk"
 
@@ -46,8 +46,13 @@ class AltinnTilgangerService {
 
         fun AltinnTilganger?.harEnkeltrettighet(
             orgnr: String?,
-            altinn2Tilgang: String,
-        ) = this?.orgNrTilTilganger?.get(orgnr)?.contains(altinn2Tilgang) ?: false
+            enkeltrettighetIAltinn2: String = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3: String = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+        ): Boolean {
+            val harAltinn2Enkeltrettighet = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn2) ?: false
+            val harAltinn3Enkeltrettighet = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
+            return harAltinn2Enkeltrettighet || harAltinn3Enkeltrettighet
+        }
 
         fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarTilgangTil(): List<AltinnOrganisasjon> =
             this?.hierarki?.flatMap {
@@ -61,12 +66,15 @@ class AltinnTilgangerService {
                 }
             }?.toList() ?: emptyList()
 
-        fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(enkeltrettighet: String): List<AltinnOrganisasjon> =
+        fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
+            enkeltrettighetIAltinn2: String,
+            enkeltrettighetIAltinn3: String,
+        ): List<AltinnOrganisasjon> =
             this?.hierarki?.flatMap { altinnTilgang ->
                 flatten(altinnTilgang) { it }.filter {
-                    it.altinn2Tilganger.contains(enkeltrettighet) ||
+                    it.altinn2Tilganger.contains(enkeltrettighetIAltinn2) ||
                         it.altinn3Tilganger.contains(
-                            enkeltrettighet,
+                            enkeltrettighetIAltinn3,
                         )
                 }
                     .map {

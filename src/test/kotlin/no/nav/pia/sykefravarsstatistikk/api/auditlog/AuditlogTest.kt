@@ -2,7 +2,7 @@ package no.nav.pia.sykefravarsstatistikk.api.auditlog
 
 import io.kotest.assertions.shouldFailWithMessage
 import kotlinx.coroutines.runBlocking
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
@@ -34,7 +34,7 @@ class AuditlogTest {
 
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetMedTilhørighetUtenBransje,
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             )
 
             TestContainerHelper.hentKvartalsvisStatistikk(
