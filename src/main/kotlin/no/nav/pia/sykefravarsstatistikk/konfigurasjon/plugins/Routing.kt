@@ -49,7 +49,7 @@ fun Route.medVerifisertEnkeltrettighetForOrgnr(
     authorizedRoutes()
 }
 
-fun Route.medAltinnOrganisasjonerBrukerenHarTilgangTil(
+fun Route.medOrganisasjonerBrukerenHarTilgangTilIAltinn(
     altinnTilgangerService: AltinnTilgangerService,
     authorizedRoutes: Route.() -> Unit,
 ) = (this as RoutingNode).createChild(selector).apply {
@@ -132,7 +132,7 @@ fun Application.configureRouting(
                 publiseringsdato(
                     publiseringsdatoService = publiseringsdatoService,
                 )
-                medAltinnOrganisasjonerBrukerenHarTilgangTil(
+                medOrganisasjonerBrukerenHarTilgangTilIAltinn(
                     altinnTilgangerService = altinnTilgangerService,
                 ) {
                     organisasjoner()
