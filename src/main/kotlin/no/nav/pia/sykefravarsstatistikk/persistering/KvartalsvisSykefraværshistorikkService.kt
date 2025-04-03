@@ -33,7 +33,7 @@ class KvartalsvisSykefraværshistorikkService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {
-        const val ANTALL_KVARTALER_5_ÅR_TILBAKE_I_TID = 20
+        const val ANTALL_ÅR_I_HISTORIKK = 5
     }
 
     private fun hentSykefraværsstatistikkVirksomhet(
@@ -41,13 +41,13 @@ class KvartalsvisSykefraværshistorikkService(
         førsteÅrstalOgKvartal: ÅrstallOgKvartal,
     ): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
         logger.info(
-            "Henter statistikk for virksomhet med orgnr: '${virksomhet.orgnr}' fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}",
+            "Henter statistikk for virksomhet fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}",
         )
         val sykefraværsstatistikkTilVirksomhet = sykefraværsstatistikkRepository.hentSykefraværsstatistikkVirksomhet(
             virksomhet = virksomhet,
         )
         return sykefraværsstatistikkTilVirksomhet.filter {
-            ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
+            ÅrstallOgKvartal(it.årstall, it.kvartal) >= førsteÅrstalOgKvartal
         }
     }
 
@@ -60,7 +60,7 @@ class KvartalsvisSykefraværshistorikkService(
             bransje = bransje,
         )
         return sykefraværsstatistikkTilBransje.filter {
-            ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
+            ÅrstallOgKvartal(it.årstall, it.kvartal) >= førsteÅrstalOgKvartal
         }
     }
 
@@ -74,7 +74,7 @@ class KvartalsvisSykefraværshistorikkService(
         val sykefraværsstatistikkTilNæring =
             sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
         return sykefraværsstatistikkTilNæring.filter {
-            ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
+            ÅrstallOgKvartal(it.årstall, it.kvartal) >= førsteÅrstalOgKvartal
         }
     }
 
@@ -87,7 +87,7 @@ class KvartalsvisSykefraværshistorikkService(
             sektor = sektor,
         )
         return sykefraværsstatistikkTilSektor.filter {
-            ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
+            ÅrstallOgKvartal(it.årstall, it.kvartal) >= førsteÅrstalOgKvartal
         }
     }
 
@@ -97,7 +97,7 @@ class KvartalsvisSykefraværshistorikkService(
         logger.info("Henter statistikk for land  fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}")
         val sykefraværsstatistikkLand = sykefraværsstatistikkRepository.hentSykefraværsstatistikkLand()
         return sykefraværsstatistikkLand.filter {
-            ÅrstallOgKvartal(it.årstall, it.kvartal) > førsteÅrstalOgKvartal
+            ÅrstallOgKvartal(it.årstall, it.kvartal) >= førsteÅrstalOgKvartal
         }
     }
 
@@ -114,7 +114,7 @@ class KvartalsvisSykefraværshistorikkService(
         }
 
         val gjeldendeKvartal = importtidspunktRepository.hentNyesteImporterteKvartal()
-        val førsteKvartal = gjeldendeKvartal.minusKvartaler(ANTALL_KVARTALER_5_ÅR_TILBAKE_I_TID)
+        val førsteKvartal = gjeldendeKvartal.førsteÅrstallOgKvartalSiden(ANTALL_ÅR_I_HISTORIKK)
 
         val response: MutableList<KvartalsvisSykefraværshistorikkDto> = mutableListOf()
 
@@ -176,7 +176,8 @@ class KvartalsvisSykefraværshistorikkService(
                     virksomhet = underenhet,
                     førsteÅrstalOgKvartal = førsteKvartal,
                 ).ifEmpty {
-                    return emptyList<KvartalsvisSykefraværshistorikkDto>().right()
+                    logger.info("Ingen virksomhetsstatistikk funnet for underenhet")
+                    emptyList()
                 }
 
             response.add(

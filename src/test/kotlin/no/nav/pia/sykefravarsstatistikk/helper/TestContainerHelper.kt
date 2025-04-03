@@ -113,7 +113,7 @@ class TestContainerHelper {
                 config = config,
             )?.let { response ->
                 if (response.status != HttpStatusCode.OK) {
-                    fail("Feil ved henting av aggregert statistikk, status: ${response.status}, message: ${response.bodyAsText()}")
+                    fail("Feil ved henting av aggregert statistikk, status: ${response.status}, body: ${response.bodyAsText()}")
                 }
                 response.body()
             } ?: fail("Feil ved henting av aggregert statistikk, mottok ikke respons")

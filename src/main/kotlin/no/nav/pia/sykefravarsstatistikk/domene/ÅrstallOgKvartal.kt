@@ -11,14 +11,20 @@ data class ÅrstallOgKvartal(
         require(!(kvartal > 4 || kvartal < 1)) { "Kvartal må være 1, 2, 3 eller 4" }
     }
 
+    fun førsteÅrstallOgKvartalSiden(antallÅr: Int): ÅrstallOgKvartal =
+        this.inkludertTidligere((4 * antallÅr) - 1).sortedWith(
+            compareBy(
+                { it.årstall },
+                { it.kvartal },
+            ),
+        ).first()
+
     fun sisteFireKvartaler(): List<ÅrstallOgKvartal> = this.inkludertTidligere(3)
 
     fun sisteFemKvartaler(): List<ÅrstallOgKvartal> =
         this.inkludertTidligere(4) // Her går vi ett år tilbake i tid + ett kvartel (For å kalkulere Trend)
 
-    fun minusEttÅr(): ÅrstallOgKvartal {
-        return ÅrstallOgKvartal(årstall - 1, kvartal)
-    }
+    fun minusEttÅr(): ÅrstallOgKvartal = ÅrstallOgKvartal(årstall - 1, kvartal)
 
     fun minusKvartaler(antallKvartaler: Int): ÅrstallOgKvartal {
         if (antallKvartaler < 0) {
@@ -42,7 +48,7 @@ data class ÅrstallOgKvartal(
         return årstallOgKvartal
     }
 
-    private fun inkludertTidligere(n: Int): List<ÅrstallOgKvartal> = (0..n).map { this.minusKvartaler(it) }
+    internal fun inkludertTidligere(n: Int): List<ÅrstallOgKvartal> = (0..n).map { this.minusKvartaler(it) }
 
     private fun forrigeKvartal(): ÅrstallOgKvartal =
         if (kvartal == 1) {

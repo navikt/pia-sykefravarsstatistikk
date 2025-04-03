@@ -177,10 +177,22 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 kafkaContainerHelper.sendNæringsstatistikk(næring = enUnderenhetUtenStatistikk.næringskode.næring)
             }
 
-            TestContainerHelper.hentKvartalsvisStatistikk(
+            val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
                 orgnr = enUnderenhetUtenStatistikk.orgnr,
                 config = withToken(),
             )
+
+            kvartalsvisStatistikk.firstOrNull { it.type == LAND.name }!!.kvartalsvisSykefraværsprosent.size shouldBe 20
+            kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }!!.kvartalsvisSykefraværsprosent.size shouldBe 20
+            kvartalsvisStatistikk.firstOrNull {
+                it.type == (
+                    if (bransje !== null) {
+                        BRANSJE.name
+                    } else {
+                        NÆRING.name
+                    }
+                )
+            }!!.kvartalsvisSykefraværsprosent.size shouldBe 20
         }
     }
 
