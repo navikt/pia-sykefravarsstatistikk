@@ -38,6 +38,7 @@ enum class Tillat(
 
 private val auditLog = LoggerFactory.getLogger("auditLogger")
 private val applikasjonsLog = LoggerFactory.getLogger("applikasjonsLogger")
+const val APP_IDENTIFIKATOR = "pia-sykefravarsstatistikk"
 
 fun ApplicationCall.auditLogVedUkjentOrgnummer(
     fnr: String,
@@ -104,10 +105,9 @@ private fun ApplicationCall.auditLog(
     val method = this.request.httpMethod.value
     val uri = this.request.uri
     val severity = if (orgnummer.isNullOrEmpty()) "WARN" else "INFO"
-    val appIdentifikator = "pia-sykefravarsstatistikk"
     val virksomheterSomBrukerRepresenterer = virksomheter.joinToString()
     val logstring =
-        "CEF:0|$appIdentifikator|auditLog|1.0|audit:${auditType.name}|Sporingslogg|$severity|end=${System.currentTimeMillis()} " +
+        "CEF:0|$APP_IDENTIFIKATOR|auditLog|1.0|audit:${auditType.name}|Sporingslogg|$severity|end=${System.currentTimeMillis()} " +
             "suid=$fnr " +
             (orgnummer?.let { "duid=$it " } ?: "") +
             "sproc=${UUID.randomUUID()} " +
