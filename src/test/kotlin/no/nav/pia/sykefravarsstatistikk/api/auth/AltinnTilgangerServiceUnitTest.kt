@@ -4,8 +4,8 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilgang
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilganger
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarTilgangTil
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.finnOverordnetEnhet
@@ -44,11 +44,13 @@ class AltinnTilgangerServiceUnitTest {
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
         altinnTilganger.harEnkeltrettighet(
             orgnr = underenhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
         altinnTilganger.harEnkeltrettighet(
             orgnr = overordnetEnhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
 
@@ -73,11 +75,13 @@ class AltinnTilgangerServiceUnitTest {
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
         altinnTilganger.harEnkeltrettighet(
             orgnr = underenhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
         altinnTilganger.harEnkeltrettighet(
             orgnr = overordnetEnhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
 
@@ -103,11 +107,13 @@ class AltinnTilgangerServiceUnitTest {
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
         altinnTilganger.harEnkeltrettighet(
             orgnr = underenhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
         altinnTilganger.harEnkeltrettighet(
             orgnr = overordnetEnhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
 
@@ -131,8 +137,16 @@ class AltinnTilgangerServiceUnitTest {
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(orgnr = underenhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(orgnr = overordnetEnhet) shouldBe false
+        altinnTilganger.harEnkeltrettighet(
+            orgnr = underenhet,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+        ) shouldBe true
+        altinnTilganger.harEnkeltrettighet(
+            orgnr = overordnetEnhet,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+        ) shouldBe false
     }
 
     @Test
@@ -156,11 +170,13 @@ class AltinnTilgangerServiceUnitTest {
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
         altinnTilganger.harEnkeltrettighet(
             orgnr = underenhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
         altinnTilganger.harEnkeltrettighet(
             orgnr = overordnetEnhet,
-            ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
     }
 
@@ -313,7 +329,6 @@ class AltinnTilgangerServiceUnitTest {
             ),
         )
     }
-
 
     @Test
     fun `listen av virksomheter en bruker har tilgang til hentes rekursivt`() {

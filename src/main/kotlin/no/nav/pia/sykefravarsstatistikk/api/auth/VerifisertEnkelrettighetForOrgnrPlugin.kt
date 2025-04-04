@@ -6,6 +6,7 @@ import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.auth.AuthenticationChecked
 import io.ktor.server.response.respond
 import io.ktor.util.AttributeKey
+import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedIkkeTilgangTilOrg
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedOkKall
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
@@ -53,10 +54,14 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
 
                 val harEnkeltTilgang = altinnTilganger.harEnkeltrettighet(
                     orgnr = underenhet.orgnr,
+                    enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
+                    enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                 )
 
                 val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltrettighet(
                     orgnr = overordnetEnhet.orgnr,
+                    enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
+                    enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                 )
 
                 if (!harTilgangTilOrgnr) {

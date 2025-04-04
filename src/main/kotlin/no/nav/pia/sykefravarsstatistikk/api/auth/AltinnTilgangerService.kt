@@ -32,10 +32,6 @@ class AltinnTilgangerService {
 
     companion object {
         //    ref: https://www.nav.no/arbeidsgiver/tilganger
-        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2 = "3403:1"
-        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3 =
-            "nav_forebygge-og-redusere-sykefravær_sykefraværsstatistikk"
-
         fun AltinnTilganger?.harTilgangTilOrgnr(orgnr: String?): Boolean =
             this?.virksomheterVedkommendeHarTilgangTil()?.contains(orgnr) ?: false
 
@@ -46,11 +42,13 @@ class AltinnTilgangerService {
 
         fun AltinnTilganger?.harEnkeltrettighet(
             orgnr: String?,
-            enkeltrettighetIAltinn2: String = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
-            enkeltrettighetIAltinn3: String = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+            enkeltrettighetIAltinn2: String,
+            enkeltrettighetIAltinn3: String,
         ): Boolean {
-            val harAltinn2Enkeltrettighet = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn2) ?: false
-            val harAltinn3Enkeltrettighet = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
+            val harAltinn2Enkeltrettighet =
+                this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn2) ?: false
+            val harAltinn3Enkeltrettighet =
+                this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
             return harAltinn2Enkeltrettighet || harAltinn3Enkeltrettighet
         }
 

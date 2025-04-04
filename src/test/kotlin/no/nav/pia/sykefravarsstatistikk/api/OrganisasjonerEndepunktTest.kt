@@ -5,14 +5,15 @@ import io.kotest.matchers.shouldNotBe
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetSykehjemMedTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetUtenTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import kotlin.test.BeforeTest
@@ -84,7 +85,7 @@ class OrganisasjonerEndepunktTest {
 
     @Test
     fun `Innlogget bruker får hente organisasjoner hen har enkeltrettigheter til (Altinn2)`() {
-        val underenhet: Underenhet = underenhetUtenTilgang
+        val underenhet: Underenhet = underenhetSykehjemMedTilgang
         val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,

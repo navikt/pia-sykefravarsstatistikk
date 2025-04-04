@@ -3,9 +3,8 @@ package no.nav.pia.sykefravarsstatistikk.api.auth
 import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.auth.AuthenticationChecked
 import io.ktor.util.AttributeKey
+import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilganger
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarTilgangTil
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
@@ -26,9 +25,10 @@ fun AltinnOrganisajonerBrukerenHarTilgangTilPlugin(altinnTilgangerService: Altin
                     altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil()
                 val altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil =
                     altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-                        enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
-                        enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+                        enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
+                        enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                     )
+
                 call.attributes.put(
                     AltinnTilgangerKey,
                     AltinnTilgangerOnCall(
