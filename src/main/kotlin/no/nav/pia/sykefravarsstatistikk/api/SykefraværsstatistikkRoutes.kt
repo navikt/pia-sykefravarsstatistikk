@@ -7,8 +7,8 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService
 import no.nav.pia.sykefravarsstatistikk.api.auth.OverordnetEnhetKey
-import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilgangerKey
 import no.nav.pia.sykefravarsstatistikk.api.auth.UnderenhetKey
+import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilgangerKey
 import no.nav.pia.sykefravarsstatistikk.persistering.KvartalsvisSykefraværshistorikkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

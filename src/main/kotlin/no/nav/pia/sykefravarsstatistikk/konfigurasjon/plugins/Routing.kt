@@ -24,8 +24,8 @@ import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkServi
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnOrganisajonerBrukerenHarTilgangTilPlugin
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
-import no.nav.pia.sykefravarsstatistikk.api.auth.VerifisertInnloggingPlugin
 import no.nav.pia.sykefravarsstatistikk.api.auth.VerifisertEnkelrettighetForOrgnrPlugin
+import no.nav.pia.sykefravarsstatistikk.api.auth.VerifisertInnloggingPlugin
 import no.nav.pia.sykefravarsstatistikk.api.organisasjoner
 import no.nav.pia.sykefravarsstatistikk.api.publiseringsdato
 import no.nav.pia.sykefravarsstatistikk.api.sykefraværsstatistikk
