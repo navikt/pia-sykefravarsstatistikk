@@ -49,7 +49,11 @@ class AltinnTilgangerService {
         private fun AltinnTilganger?.harAltinn3Enkeltrettighet(
             orgnr: String?,
             enkeltrettighetIAltinn3: String,
-        ): Boolean = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
+        ): Boolean {
+            val harTilgang = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
+            if (harTilgang) log.info("Fant tilgang til altinn 3") else log.info("Fant ikke tilgang til altinn 3")
+            return harTilgang
+        }
 
         private fun AltinnTilganger?.harAltinn2Enkeltrettighet(
             orgnr: String?,
