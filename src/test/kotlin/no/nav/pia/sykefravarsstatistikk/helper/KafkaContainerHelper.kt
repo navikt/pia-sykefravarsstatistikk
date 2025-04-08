@@ -306,39 +306,62 @@ class KafkaContainerHelper(
         næring: Næring,
         startÅr: Int = 2010,
         sluttÅr: Int = 2024,
+        harForFåAnsatte: Boolean = false,
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {
-                val bransjemelding = enStandardNæringMelding(årstall = år, kvartal = kvartal, næring = næring)
+                val næringMelding = if (harForFåAnsatte) {
+                    enMeldingMedFåAnsatte(
+                        årstall = år,
+                        kvartal = kvartal,
+                        statistikkategori = Statistikkategori.NÆRING,
+                        kode = næring.tosifferIdentifikator,
+                    )
+                } else {
+                    enStandardNæringMelding(årstall = år, kvartal = kvartal, næring = næring)
+                }
                 sendOgVentTilKonsumert(
-                    nøkkel = bransjemelding.toJsonKey(),
-                    melding = bransjemelding.toJsonValue(),
+                    nøkkel = næringMelding.toJsonKey(),
+                    melding = næringMelding.toJsonValue(),
                     topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
                 )
             }
         }
     }
 
-    private fun enVirksomhetsMeldingMedFåAnsatte(
+    private fun enMeldingMedFåAnsatte(
         årstall: Int,
         kvartal: Int,
-        virksomhet: Virksomhet,
+        statistikkategori: Statistikkategori,
+        kode: String,
     ): JsonMelding =
         JsonMelding(
-            kategori = Statistikkategori.VIRKSOMHET,
-            kode = virksomhet.orgnr,
+            kategori = statistikkategori,
+            kode = kode,
             årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
             prosent = 0.2.toBigDecimal(),
             tapteDagsverk = 2.0.toBigDecimal(),
             muligeDagsverk = 1000.0.toBigDecimal(),
             antallPersoner = (MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER - 1),
-            tapteDagsverGradert = 0.0.toBigDecimal(),
+            tapteDagsverGradert = 0.5.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
                     tapteDagsverk = 2.0.toBigDecimal(),
                 ),
             ),
+        )
+
+    private fun enVirksomhetsMeldingMedFåAnsatte(
+        årstall: Int,
+        kvartal: Int,
+        virksomhet: Virksomhet,
+    ): JsonMelding =
+        enMeldingMedFåAnsatte(
+            årstall = årstall,
+            kvartal = kvartal,
+            statistikkategori = Statistikkategori.VIRKSOMHET,
+            kode = virksomhet.orgnr,
         )
 
     private fun enStandardVirksomhetsMelding(

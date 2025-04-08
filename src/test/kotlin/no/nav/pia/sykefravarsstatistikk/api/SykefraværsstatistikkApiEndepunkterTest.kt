@@ -2,6 +2,7 @@ package no.nav.pia.sykefravarsstatistikk.api
 
 import io.kotest.assertions.shouldFail
 import io.kotest.inspectors.forAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -17,6 +18,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.OVERORDNET_ENHET
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
+import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.KvartalsvisSykefraværshistorikkTestDto
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
@@ -112,6 +114,46 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             statistikk.tapteDagsverkTotalt shouldBe emptyList()
             statistikk.muligeDagsverkTotalt shouldBe emptyList()
+        }
+    }
+
+    @Test
+    fun `Aggregert statistikk skal også være maskert for Næring (eller Bransje) i response`() {
+        runBlocking {
+            kafkaContainerHelper.sendLandsstatistikk(startÅr = 2023, sluttÅr = 2024)
+            kafkaContainerHelper.sendSektorstatistikk(
+                startÅr = 2023,
+                sluttÅr = 2024,
+                sektor = overordnetEnhetMedTilhørighetUtenBransje.sektor,
+            )
+            kafkaContainerHelper.sendNæringsstatistikk(
+                startÅr = 2023,
+                sluttÅr = 2024,
+                næring = underenhetMedTilhørighetUtenBransje.næringskode.næring,
+                harForFåAnsatte = true,
+            )
+
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetMedTilhørighetUtenBransje,
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+            )
+
+            val statistikk = TestContainerHelper.hentAggregertStatistikk(
+                orgnr = underenhetMedTilhørighetUtenBransje.orgnr,
+                config = withToken(),
+            )
+
+            val statistikkForNæring =
+                statistikk.prosentSiste4KvartalerTotalt.find { it.statistikkategori == NÆRING }
+            statistikkForNæring shouldBe null
+            val trendINæring = statistikk.trendTotalt.find { it.statistikkategori == NÆRING }
+            trendINæring shouldNotBe null
+            trendINæring?.verdi shouldBe "0.0"
+            trendINæring?.kvartalerIBeregningen shouldContainExactlyInAnyOrder listOf(
+                ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                ÅrstallOgKvartal(årstall = 2023, kvartal = 4),
+            )
         }
     }
 
