@@ -20,18 +20,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.altinnTilgangerProxyUrl
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.cluster
-import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
+import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.http.HttpClient.client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class AltinnTilgangerService {
-    private val altinnTilgangerUrl: String = "$altinnTilgangerProxyUrl/altinn-tilganger"
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
-
     companion object {
-        //    ref: https://www.nav.no/arbeidsgiver/tilganger
+        private val altinnTilgangerUrl: String = "$altinnTilgangerProxyUrl/altinn-tilganger"
+        private val log: Logger = LoggerFactory.getLogger(this::class.java)
+
         fun AltinnTilganger?.harTilgangTilOrgnr(orgnr: String?): Boolean =
             this?.virksomheterVedkommendeHarTilgangTil()?.contains(orgnr) ?: false
 
@@ -44,13 +43,21 @@ class AltinnTilgangerService {
             orgnr: String?,
             enkeltrettighetIAltinn2: String,
             enkeltrettighetIAltinn3: String,
+        ): Boolean = harAltinn3Enkeltrettighet(orgnr, enkeltrettighetIAltinn3) || harAltinn2Enkeltrettighet(orgnr, enkeltrettighetIAltinn2)
+
+        private fun AltinnTilganger?.harAltinn3Enkeltrettighet(
+            orgnr: String?,
+            enkeltrettighetIAltinn3: String,
         ): Boolean {
-            val harAltinn2Enkeltrettighet =
-                this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn2) ?: false
-            val harAltinn3Enkeltrettighet =
-                this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
-            return harAltinn2Enkeltrettighet || harAltinn3Enkeltrettighet
+            val harTilgang = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
+            if (harTilgang) log.info("Fant altinn 3 enkelrettighet") else log.info("Fant ikke altinn 3 enkelrettighet")
+            return harTilgang
         }
+
+        private fun AltinnTilganger?.harAltinn2Enkeltrettighet(
+            orgnr: String?,
+            enkeltrettighetIAltinn2: String,
+        ) = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn2) ?: false
 
         fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarTilgangTil(): List<AltinnOrganisasjon> =
             this?.hierarki?.flatMap {
@@ -133,7 +140,7 @@ class AltinnTilgangerService {
 
     suspend fun hentAltinnTilganger(token: String): Either<Feil, AltinnTilganger> =
         try {
-            logger.info("henter Altinn tilganger på URL $altinnTilgangerUrl")
+            log.info("henter Altinn tilganger på URL $altinnTilgangerUrl")
             val client = getHttpClient(token)
             val response: HttpResponse = client.post {
                 url(altinnTilgangerUrl)
@@ -143,7 +150,7 @@ class AltinnTilgangerService {
             }
             response.bodyAsText().tilAltinnTilganger().right()
         } catch (e: Exception) {
-            logger.error("Feil ved kall til Altinn tilganger", e)
+            log.error("Feil ved kall til Altinn tilganger", e)
             Feil(
                 feilmelding = "Feil ved kall til Altinn tilganger",
                 httpStatusCode = HttpStatusCode.InternalServerError,
