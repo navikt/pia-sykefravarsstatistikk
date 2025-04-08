@@ -40,13 +40,6 @@ class AggregertStatistikkService(
         underenhet: Underenhet,
         tilganger: VerifiserteTilganger,
     ): Either<Feil, AggregertStatistikkResponseDto> {
-        if (!tilganger.harTilgangTilOrgnr) {
-            return Feil(
-                feilmelding = "{\"message\":\"You don't have access to this resource\"}",
-                httpStatusCode = HttpStatusCode.Forbidden,
-            ).left()
-        }
-
         if (underenhet is Underenhet.IkkeNæringsdrivende) {
             log.info("Underenhet ${underenhet.orgnr} er ikke næringsdrivende")
             return `virksomhet er ikke næringsdrivende`.left()
