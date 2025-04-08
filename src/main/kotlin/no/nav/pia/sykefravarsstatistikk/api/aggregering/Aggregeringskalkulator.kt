@@ -1,12 +1,12 @@
 package no.nav.pia.sykefravarsstatistikk.api.aggregering
 
 import arrow.core.Either
-import no.nav.pia.sykefravarsstatistikk.api.Statistikkfeil
 import no.nav.pia.sykefravarsstatistikk.api.aggregering.SumAvSykefraværOverFlereKvartaler.Companion.NULLPUNKT
 import no.nav.pia.sykefravarsstatistikk.api.dto.StatistikkJson
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.exceptions.Statistikkfeil
 
 class Aggregeringskalkulator(
     private var sykefraværsdata: Sykefraværsdata,

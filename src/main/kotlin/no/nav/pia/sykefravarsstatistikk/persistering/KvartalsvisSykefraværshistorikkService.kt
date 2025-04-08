@@ -5,10 +5,10 @@ import arrow.core.left
 import arrow.core.right
 import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
+import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilganger
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto.Companion.tilDto
-import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
+import no.nav.pia.sykefravarsstatistikk.api.maskering.MaskertKvartalsvisSykefraværshistorikkDto
+import no.nav.pia.sykefravarsstatistikk.api.maskering.MaskertKvartalsvisSykefraværshistorikkDto.Companion.tilMaskertDto
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
@@ -105,7 +105,7 @@ class KvartalsvisSykefraværshistorikkService(
         overordnetEnhet: OverordnetEnhet,
         underenhet: Underenhet,
         tilganger: VerifiserteTilganger,
-    ): Either<Feil, List<KvartalsvisSykefraværshistorikkDto>> {
+    ): Either<Feil, List<MaskertKvartalsvisSykefraværshistorikkDto>> {
         if (!tilganger.harEnkeltTilgang) {
             return Feil(
                 feilmelding = "{\"message\":\"You don't have access to this resource\"}",
@@ -116,7 +116,7 @@ class KvartalsvisSykefraværshistorikkService(
         val gjeldendeKvartal = importtidspunktRepository.hentNyesteImporterteKvartal()
         val førsteKvartal = gjeldendeKvartal.førsteÅrstallOgKvartalSiden(ANTALL_ÅR_I_HISTORIKK)
 
-        val response: MutableList<KvartalsvisSykefraværshistorikkDto> = mutableListOf()
+        val response: MutableList<MaskertKvartalsvisSykefraværshistorikkDto> = mutableListOf()
 
         val umaskertLandstatistikk = hentSykefraværsstatistikkLand(
             førsteKvartal,
@@ -126,7 +126,7 @@ class KvartalsvisSykefraværshistorikkService(
                 httpStatusCode = HttpStatusCode.BadRequest,
             ).left()
         }
-        response.add(umaskertLandstatistikk.tilDto(type = LAND.name, label = "Norge"))
+        response.add(umaskertLandstatistikk.tilMaskertDto(type = LAND.name, label = "Norge"))
 
         val umaskertSektorstatistikk = hentSykefraværsstatistikkSektor(
             sektor = overordnetEnhet.sektor,
@@ -137,7 +137,7 @@ class KvartalsvisSykefraværshistorikkService(
                 httpStatusCode = HttpStatusCode.BadRequest,
             ).left()
         }
-        response.add(umaskertSektorstatistikk.tilDto(type = SEKTOR.name, label = overordnetEnhet.sektor.beskrivelse))
+        response.add(umaskertSektorstatistikk.tilMaskertDto(type = SEKTOR.name, label = overordnetEnhet.sektor.beskrivelse))
 
         if (underenhet is Underenhet.Næringsdrivende) {
             val bransje = underenhet.bransje()
@@ -151,7 +151,7 @@ class KvartalsvisSykefraværshistorikkService(
                         httpStatusCode = HttpStatusCode.BadRequest,
                     ).left()
                 }
-                response.add(umaskertBransjestatistikk.tilDto(type = "BRANSJE", label = bransje.navn))
+                response.add(umaskertBransjestatistikk.tilMaskertDto(type = "BRANSJE", label = bransje.navn))
             } else {
                 val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
                     næring = underenhet.næringskode.næring,
@@ -165,7 +165,7 @@ class KvartalsvisSykefraværshistorikkService(
                     ).left()
                 }
                 response.add(
-                    umaskertNæringsstatistikk.tilDto(
+                    umaskertNæringsstatistikk.tilMaskertDto(
                         type = "NÆRING",
                         label = underenhet.næringskode.næring.tosifferIdentifikator,
                     ),
@@ -181,14 +181,14 @@ class KvartalsvisSykefraværshistorikkService(
                 }
 
             response.add(
-                umaskertVirksomhetsstatistikkForVirksomhet.tilDto(
+                umaskertVirksomhetsstatistikkForVirksomhet.tilMaskertDto(
                     type = VIRKSOMHET.name,
                     label = underenhet.navn,
                 ),
             )
         } else {
             response.add(
-                KvartalsvisSykefraværshistorikkDto(
+                MaskertKvartalsvisSykefraværshistorikkDto(
                     type = "NÆRING",
                     label = "Ikke næringsdrivende",
                     kvartalsvisSykefraværsprosent = emptyList(),
@@ -208,7 +208,7 @@ class KvartalsvisSykefraværshistorikkService(
             emptyList()
         }
         response.add(
-            umaskertVirksomhetsstatistikk.tilDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn),
+            umaskertVirksomhetsstatistikk.tilMaskertDto(type = "OVERORDNET_ENHET", label = overordnetEnhet.navn),
         )
 
         return response.toList().right()

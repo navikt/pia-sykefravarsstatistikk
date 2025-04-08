@@ -10,7 +10,7 @@ import io.ktor.http.HttpStatusCode
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregEnhetDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregUnderenhetDto
-import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
+import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.http.HttpClient

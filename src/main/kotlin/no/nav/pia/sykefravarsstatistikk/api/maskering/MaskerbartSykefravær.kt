@@ -8,15 +8,15 @@ open class MaskerbartSykefravær(
     tapteDagsverk: BigDecimal?,
     muligeDagsverk: BigDecimal?,
     antallPersoner: Int,
-    harSykefraværData: Boolean
+    harSykefraværData: Boolean,
 ) {
     var prosent: BigDecimal? = null
     var tapteDagsverk: BigDecimal? = null
     var muligeDagsverk: BigDecimal? = null
     val erMaskert: Boolean = (
-            harSykefraværData &&
-                    antallPersoner < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER
-            )
+        harSykefraværData &&
+            antallPersoner < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER
+    )
 
     init {
         if (!erMaskert && harSykefraværData) {

@@ -9,12 +9,12 @@ import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkServi
 import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
-import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkGraderingRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkMedVarighetRepository
@@ -32,23 +32,6 @@ class AggregertStatistikkService(
     object HentAggregertStatistikkFeil {
         val `virksomhet er ikke næringsdrivende` = Feil(
             feilmelding = "Virksomhet er ikke næringsdrivende",
-            httpStatusCode = HttpStatusCode.BadRequest,
-        )
-
-        val `næringsstatistikk mangler i db` = Feil(
-            feilmelding = "Ingen statistikk funnet for næring",
-            httpStatusCode = HttpStatusCode.BadRequest,
-        )
-        val `bransjestatistikk mangler i db` = Feil(
-            feilmelding = "Ingen statistikk funnet for bransje",
-            httpStatusCode = HttpStatusCode.BadRequest,
-        )
-        val `virksomhetsstatistikk mangler i db` = Feil(
-            feilmelding = "Ingen statistikk funnet for virksomheten",
-            httpStatusCode = HttpStatusCode.BadRequest,
-        )
-        val `landsstatistikk mangler i db` = Feil(
-            feilmelding = "Ingen statistikk funnet for land",
             httpStatusCode = HttpStatusCode.BadRequest,
         )
     }
