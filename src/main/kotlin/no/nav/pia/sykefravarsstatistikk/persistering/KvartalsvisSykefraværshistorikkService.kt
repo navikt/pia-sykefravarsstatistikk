@@ -167,7 +167,7 @@ class KvartalsvisSykefraværshistorikkService(
                 response.add(
                     umaskertNæringsstatistikk.tilMaskertDto(
                         type = "NÆRING",
-                        label = underenhet.næringskode.næring.tosifferIdentifikator,
+                        label = underenhet.næringskode.næring.navn,
                     ),
                 )
             }

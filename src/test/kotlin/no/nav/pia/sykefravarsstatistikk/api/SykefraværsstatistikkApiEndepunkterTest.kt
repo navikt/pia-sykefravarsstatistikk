@@ -277,7 +277,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val næringsStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }
             næringsStatistikk.shouldNotBeNull()
-            næringsStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje.næringskode.næring.tosifferIdentifikator
+            næringsStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje.næringskode.næring.navn
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
@@ -396,7 +396,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val næringsStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }
             næringsStatistikk.shouldNotBeNull()
-            næringsStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje2.næringskode.næring.tosifferIdentifikator
+            næringsStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje2.næringskode.næring.navn
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
