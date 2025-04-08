@@ -5,7 +5,6 @@ import arrow.core.left
 import arrow.core.right
 import ia.felles.definisjoner.bransjer.Bransje
 import io.ktor.http.HttpStatusCode
-import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilganger
 import no.nav.pia.sykefravarsstatistikk.api.maskering.MaskertKvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.api.maskering.MaskertKvartalsvisSykefraværshistorikkDto.Companion.tilMaskertDto
@@ -23,6 +22,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkFor
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

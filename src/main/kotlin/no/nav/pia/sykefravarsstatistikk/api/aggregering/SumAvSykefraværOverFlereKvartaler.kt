@@ -3,13 +3,13 @@ package no.nav.pia.sykefravarsstatistikk.api.aggregering
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.pia.sykefravarsstatistikk.exceptions.Statistikkfeil
 import no.nav.pia.sykefravarsstatistikk.api.dto.StatistikkJson
 import no.nav.pia.sykefravarsstatistikk.api.maskering.StatistikkUtils
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.domene.Konstanter
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.exceptions.Statistikkfeil
 import java.math.BigDecimal
 import java.util.function.Supplier
 import kotlin.math.max
