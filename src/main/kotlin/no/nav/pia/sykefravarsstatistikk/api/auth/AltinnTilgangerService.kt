@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.altinnTilgangerProxyUrl
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.cluster
-import no.nav.pia.sykefravarsstatistikk.api.tilgangskontroll.Feil
+import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
 import no.nav.pia.sykefravarsstatistikk.http.HttpClient.client
 import org.slf4j.Logger

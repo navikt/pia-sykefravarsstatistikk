@@ -1,10 +1,10 @@
 package no.nav.pia.sykefravarsstatistikk.api.maskering
 
 import arrow.core.Either
-import no.nav.pia.sykefravarsstatistikk.api.Statistikkfeil
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.exceptions.Statistikkfeil
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -25,6 +25,9 @@ open class UmaskertSykefraværUtenProsentForEttKvartal(
         statistikk.antallPersoner,
     )
 
+    /*
+     * Denne metoden skal tas i bruk ved eksportering til Kafka
+     */
     fun tilSykefraværMedKategori(
         kategori: Statistikkategori,
         kode: String,

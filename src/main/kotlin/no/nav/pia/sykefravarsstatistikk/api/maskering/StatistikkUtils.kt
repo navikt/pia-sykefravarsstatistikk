@@ -3,9 +3,9 @@ package no.nav.pia.sykefravarsstatistikk.api.maskering
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import no.nav.pia.sykefravarsstatistikk.exceptions.Statistikkfeil
 import java.math.BigDecimal
 import java.math.RoundingMode
-import no.nav.pia.sykefravarsstatistikk.api.Statistikkfeil
 
 object StatistikkUtils {
     const val ANTALL_SIFRE_I_UTREGNING = 3

@@ -19,7 +19,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.time.withTimeoutOrNull
 import kotlinx.datetime.LocalDateTime
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
 import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -106,7 +105,7 @@ class TestContainerHelper {
         suspend fun hentKvartalsvisStatistikk(
             orgnr: String,
             config: HttpRequestBuilder.() -> Unit = {},
-        ): List<KvartalsvisSykefraværshistorikkDto> =
+        ): List<KvartalsvisSykefraværshistorikkTestDto> =
             applikasjon.performGet(
                 url = "/sykefravarsstatistikk/$orgnr/historikk/kvartalsvis",
                 config = config,

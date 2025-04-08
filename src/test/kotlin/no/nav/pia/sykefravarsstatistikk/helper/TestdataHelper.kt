@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.helper
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto.Companion.tilDomene
@@ -8,6 +9,8 @@ import no.nav.pia.sykefravarsstatistikk.domene.BrregNæringskodeDto
 import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilDomene
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
+import no.nav.pia.sykefravarsstatistikk.persistering.BigDecimalSerializer
+import java.math.BigDecimal
 
 class TestdataHelper {
     companion object {
@@ -262,3 +265,23 @@ class TestdataHelper {
         }
     }
 }
+
+@Serializable
+data class KvartalsvisSykefraværshistorikkTestDto(
+    val type: String,
+    val label: String,
+    val kvartalsvisSykefraværsprosent: List<KvartalsvisSykefraværsprosentTestDto>,
+)
+
+@Serializable
+data class KvartalsvisSykefraværsprosentTestDto(
+    @Serializable(with = BigDecimalSerializer::class)
+    val tapteDagsverk: BigDecimal?,
+    @Serializable(with = BigDecimalSerializer::class)
+    val muligeDagsverk: BigDecimal?,
+    @Serializable(with = BigDecimalSerializer::class)
+    val prosent: BigDecimal?,
+    val erMaskert: Boolean,
+    val årstall: Int,
+    val kvartal: Int,
+)

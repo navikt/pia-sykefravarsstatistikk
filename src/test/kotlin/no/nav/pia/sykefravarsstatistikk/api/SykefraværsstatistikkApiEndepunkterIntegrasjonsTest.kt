@@ -8,13 +8,13 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværshistorikkDto
-import no.nav.pia.sykefravarsstatistikk.api.dto.KvartalsvisSykefraværsprosentDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.StatistikkJson
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.helper.KvartalsvisSykefraværshistorikkTestDto
+import no.nav.pia.sykefravarsstatistikk.helper.KvartalsvisSykefraværsprosentTestDto
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
@@ -177,8 +177,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         actualStatistikkForKategori.label shouldBe label
     }
 
-    private fun List<KvartalsvisSykefraværshistorikkDto>.shoudBeEqualForKategori(
-        expectedStatistikkForKategori: List<KvartalsvisSykefraværsprosentDto>,
+    private fun List<KvartalsvisSykefraværshistorikkTestDto>.shoudBeEqualForKategori(
+        expectedStatistikkForKategori: List<KvartalsvisSykefraværsprosentTestDto>,
         statistikkategori: Statistikkategori,
         label: String,
     ) {
@@ -190,7 +190,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         actualStatistikkForKategori.kvartalsvisSykefraværsprosent.shouldBeEqual(expectedStatistikkForKategori)
     }
 
-    private fun List<KvartalsvisSykefraværsprosentDto>.shouldBeEqual(expectedStatistikk: List<KvartalsvisSykefraværsprosentDto>) {
+    private fun List<KvartalsvisSykefraværsprosentTestDto>.shouldBeEqual(expectedStatistikk: List<KvartalsvisSykefraværsprosentTestDto>) {
         this.size shouldBe expectedStatistikk.size
         this.forEachIndexed { index, kvartalsvisSykefraværsprosentDto ->
             val expected = expectedStatistikk[index]
@@ -206,13 +206,13 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         (this.compareTo(expected) == 0) shouldBe true
     }
 
-    private fun lagVirksomhetStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
+    private fun lagVirksomhetStatistikkTestCase(): List<KvartalsvisSykefraværsprosentTestDto> {
         // Data er tatt fra sykefravar_statistikk_virksomhet_med_gradering (i dev)
         // tapteDv = sykefravar_statistikk_virksomhet_med_gradering.tapte_dagsverk
         //  men det kunne også har vært sum av tapteDV i tapteDagsverkMedVarighet lista
         // tapteDagsverGradert = = sykefravar_statistikk_virksomhet_med_gradering.tapte_dagsverk_gradert_sykemelding
         // antallPersoner = = sykefravar_statistikk_virksomhet_med_gradering.antall_personer
-        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentTestDto> = mutableListOf()
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
@@ -352,8 +352,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         return statistikk
     }
 
-    private fun lagBransjeStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
-        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+    private fun lagBransjeStatistikkTestCase(): List<KvartalsvisSykefraværsprosentTestDto> {
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentTestDto> = mutableListOf()
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
@@ -483,8 +483,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         return statistikk
     }
 
-    private fun lagSektorStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
-        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+    private fun lagSektorStatistikkTestCase(): List<KvartalsvisSykefraværsprosentTestDto> {
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentTestDto> = mutableListOf()
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.SEKTOR,
@@ -528,8 +528,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         return statistikk
     }
 
-    fun lagLandStatistikkTestCase(): List<KvartalsvisSykefraværsprosentDto> {
-        val statistikk: MutableList<KvartalsvisSykefraværsprosentDto> = mutableListOf()
+    fun lagLandStatistikkTestCase(): List<KvartalsvisSykefraværsprosentTestDto> {
+        val statistikk: MutableList<KvartalsvisSykefraværsprosentTestDto> = mutableListOf()
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.LAND,
@@ -582,7 +582,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         tapteDagsverGradert: BigDecimal = 0.0.toBigDecimal(),
         tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         antallPersoner: Int,
-    ): KvartalsvisSykefraværsprosentDto =
+    ): KvartalsvisSykefraværsprosentTestDto =
         sendSykefraværsstatistikk(
             årstallOgKvartal = årstallOgKvartal,
             kategori = kategori,
@@ -605,8 +605,8 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         tapteDagsverGradert: BigDecimal = 0.0.toBigDecimal(),
         tapteDagsverkMedVarighet: List<TapteDagsverkPerVarighet> = emptyList(),
         antallPersoner: Int,
-    ): KvartalsvisSykefraværsprosentDto {
-        val dto = KvartalsvisSykefraværsprosentDto(
+    ): KvartalsvisSykefraværsprosentTestDto {
+        val dto = KvartalsvisSykefraværsprosentTestDto(
             årstall = årstallOgKvartal.årstall,
             kvartal = årstallOgKvartal.kvartal,
             tapteDagsverk = tapteDagsverk,

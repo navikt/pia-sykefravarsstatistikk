@@ -3,7 +3,7 @@ package no.nav.pia.sykefravarsstatistikk.api.aggregering
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.pia.sykefravarsstatistikk.api.Statistikkfeil
+import no.nav.pia.sykefravarsstatistikk.exceptions.Statistikkfeil
 import no.nav.pia.sykefravarsstatistikk.api.dto.StatistikkJson
 import no.nav.pia.sykefravarsstatistikk.api.maskering.StatistikkUtils
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
