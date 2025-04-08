@@ -49,11 +49,7 @@ class AltinnTilgangerService {
         private fun AltinnTilganger?.harAltinn3Enkeltrettighet(
             orgnr: String?,
             enkeltrettighetIAltinn3: String,
-        ): Boolean {
-            val harTilgang = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
-            if (harTilgang) log.info("Fant altinn 3 enkelrettighet") else log.info("Fant ikke altinn 3 enkelrettighet")
-            return harTilgang
-        }
+        ): Boolean = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
 
         private fun AltinnTilganger?.harAltinn2Enkeltrettighet(
             orgnr: String?,
