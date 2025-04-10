@@ -5,5 +5,5 @@ class OverordnetEnhet(
     override val navn: String,
     override val næringskode: Næringskode,
     override val antallAnsatte: Int,
-    val sektor: Sektor,
+    val sektor: Sektor? = null,
 ) : Virksomhet

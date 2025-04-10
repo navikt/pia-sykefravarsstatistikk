@@ -82,7 +82,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
         // "tapteDagsverkTotalt": og "muligeDagsverkTotalt"
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
-            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor)
+            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor!!)
             kafkaContainerHelper.sendNæringsstatistikk(næring = underenhetMedTilhørighetUtenBransje.næringskode.næring)
             kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
                 virksomhet = underenhetMedTilhørighetUtenBransje,
@@ -124,7 +124,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendSektorstatistikk(
                 startÅr = 2023,
                 sluttÅr = 2024,
-                sektor = overordnetEnhetMedTilhørighetUtenBransje.sektor,
+                sektor = overordnetEnhetMedTilhørighetUtenBransje.sektor!!,
             )
             kafkaContainerHelper.sendNæringsstatistikk(
                 startÅr = 2023,
@@ -161,7 +161,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Kvartalsvis statistikk skal være maskert i response`() {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
-            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor)
+            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetMedTilhørighetUtenBransje.sektor!!)
             kafkaContainerHelper.sendNæringsstatistikk(næring = underenhetMedTilhørighetUtenBransje.næringskode.næring)
             kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
                 virksomhet = underenhetMedTilhørighetUtenBransje,
@@ -210,7 +210,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 )
             }
             kafkaContainerHelper.sendLandsstatistikk()
-            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetUtenStatistikk.sektor)
+            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetUtenStatistikk.sektor!!)
 
             val bransje = enUnderenhetUtenStatistikk.bransje()
             if (bransje != null) {
@@ -267,7 +267,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
-            sektorStatistikk.label shouldBe overordnetEnhetMedTilhørighetUtenBransje2.sektor.beskrivelse
+            sektorStatistikk.label shouldBe overordnetEnhetMedTilhørighetUtenBransje2.sektor?.beskrivelse
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
@@ -386,7 +386,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
-            sektorStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetUtenBransje.sektor.beskrivelse
+            sektorStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetUtenBransje.sektor?.beskrivelse
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
@@ -446,7 +446,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
-            sektorStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetBransjeBarnehage.sektor.beskrivelse
+            sektorStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetBransjeBarnehage.sektor?.beskrivelse
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000

@@ -14,6 +14,7 @@ data class BrregUnderenhetDto(
     val antallAnsatte: Int = 0,
 ) {
     fun tilDomene(): Underenhet =
+        // TODO: håndtere ikke-næringsdrivende virksomhet
         if (naeringskode1 != null) {
             Underenhet.Næringsdrivende(
                 orgnr = organisasjonsnummer,

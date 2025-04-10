@@ -255,6 +255,33 @@ class TestdataHelper {
             overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
         )
 
+        val overordnetEnhetMedTilhørighetBransjeByggUtenInstitusjonellSektorKode =
+            OverordnetEnhet(
+                orgnr = "100000019",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg uten sektor kode",
+                antallAnsatte = 150,
+                næringskode = BrregNæringskodeDto(
+                    kode = "41.200",
+                    beskrivelse = "Oppføring av bygninger",
+                ).tilDomene(),
+                sektor = BrregInstitusjonellSektorkodeDto(
+                    kode = "2100",
+                    beskrivelse = "Private aksjeselskaper mv.",
+                ).tilDomene(),
+            )
+
+        val underenhetMedTilhørighetBransjeByggUtenInstitusjonellSektorKode =
+            Underenhet.Næringsdrivende(
+                orgnr = "100000020",
+                navn = "Underenhet Med Tilhørighet Bransje Bygg uten sektor kode",
+                antallAnsatte = 150,
+                næringskode = BrregNæringskodeDto(
+                    kode = "41.200",
+                    beskrivelse = "Oppføring av bygninger",
+                ).tilDomene(),
+                overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeBygg.orgnr,
+            )
+
         @OptIn(ExperimentalSerializationApi::class)
         inline fun <reified T> prettyPrint(statistikk: T) {
             val prettyJson = Json {
