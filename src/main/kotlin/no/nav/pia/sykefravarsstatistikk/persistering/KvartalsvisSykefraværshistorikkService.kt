@@ -26,6 +26,8 @@ import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+const val INGEN_SEKTOR_LABEL = "Ingen sektor"
+
 class KvartalsvisSykefraværshistorikkService(
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkRepository: SykefraværsstatistikkRepository,
@@ -128,16 +130,31 @@ class KvartalsvisSykefraværshistorikkService(
         }
         response.add(umaskertLandstatistikk.tilMaskertDto(type = LAND.name, label = "Norge"))
 
-        val umaskertSektorstatistikk = hentSykefraværsstatistikkSektor(
-            sektor = overordnetEnhet.sektor,
-            førsteÅrstalOgKvartal = førsteKvartal,
-        ).ifEmpty {
-            return Feil(
-                feilmelding = "Ingen sektorstatistikk funnet",
-                httpStatusCode = HttpStatusCode.BadRequest,
-            ).left()
+        if (overordnetEnhet.sektor !== null) {
+            val umaskertSektorstatistikk = hentSykefraværsstatistikkSektor(
+                sektor = overordnetEnhet.sektor,
+                førsteÅrstalOgKvartal = førsteKvartal,
+            ).ifEmpty {
+                return Feil(
+                    feilmelding = "Ingen sektorstatistikk funnet",
+                    httpStatusCode = HttpStatusCode.BadRequest,
+                ).left()
+            }
+            response.add(
+                umaskertSektorstatistikk.tilMaskertDto(
+                    type = SEKTOR.name,
+                    label = overordnetEnhet.sektor.beskrivelse,
+                ),
+            )
+        } else {
+            response.add(
+                MaskertKvartalsvisSykefraværshistorikkDto(
+                    type = SEKTOR.name,
+                    label = INGEN_SEKTOR_LABEL,
+                    kvartalsvisSykefraværsprosent = emptyList(),
+                ),
+            )
         }
-        response.add(umaskertSektorstatistikk.tilMaskertDto(type = SEKTOR.name, label = overordnetEnhet.sektor.beskrivelse))
 
         if (underenhet is Underenhet.Næringsdrivende) {
             val bransje = underenhet.bransje()

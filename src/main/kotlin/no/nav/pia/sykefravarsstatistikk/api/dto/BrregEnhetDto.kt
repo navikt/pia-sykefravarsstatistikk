@@ -13,7 +13,7 @@ data class BrregEnhetDto(
     val naeringskode1: BrregNæringskodeDto,
     val overordnetEnhet: String? = null,
     val antallAnsatte: Int = 0,
-    val institusjonellSektorkode: BrregInstitusjonellSektorkodeDto,
+    val institusjonellSektorkode: BrregInstitusjonellSektorkodeDto? = null,
 ) {
     fun tilDomene(): OverordnetEnhet =
         OverordnetEnhet(
@@ -21,6 +21,6 @@ data class BrregEnhetDto(
             navn = this.navn,
             næringskode = this.naeringskode1.tilDomene(),
             antallAnsatte = this.antallAnsatte,
-            sektor = this.institusjonellSektorkode.tilDomene(),
+            sektor = this.institusjonellSektorkode?.tilDomene(),
         )
 }

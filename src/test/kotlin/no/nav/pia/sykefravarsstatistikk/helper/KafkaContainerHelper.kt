@@ -202,7 +202,7 @@ class KafkaContainerHelper(
     ) {
         sendLandsstatistikk()
 
-        sendSektorstatistikk(overordnetEnhet.sektor)
+        sendSektorstatistikk(overordnetEnhet.sektor!!)
 
         underenhet.bransje()?.let { bransje -> sendBransjestatistikk(bransje = bransje) }
             ?: sendNæringsstatistikk(næring = underenhet.næringskode.næring)
