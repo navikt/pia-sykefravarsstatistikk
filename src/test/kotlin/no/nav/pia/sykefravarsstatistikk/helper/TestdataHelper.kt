@@ -255,7 +255,7 @@ class TestdataHelper {
             overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
         )
 
-        val overordnetEnhetMedTilhørighetBransjeByggUtenInstitusjonellSektorKode =
+        val overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode =
             OverordnetEnhet(
                 orgnr = "100000019",
                 navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg uten sektor kode",
@@ -270,7 +270,7 @@ class TestdataHelper {
                 ).tilDomene(),
             )
 
-        val underenhetMedTilhørighetBransjeByggUtenInstitusjonellSektorKode =
+        val underenhetIBransjeByggUtenInstitusjonellSektorKode =
             Underenhet.Næringsdrivende(
                 orgnr = "100000020",
                 navn = "Underenhet Med Tilhørighet Bransje Bygg uten sektor kode",

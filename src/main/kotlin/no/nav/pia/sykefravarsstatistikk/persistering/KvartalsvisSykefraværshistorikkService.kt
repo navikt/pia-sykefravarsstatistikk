@@ -123,6 +123,7 @@ class KvartalsvisSykefraværshistorikkService(
         val umaskertLandstatistikk = hentSykefraværsstatistikkLand(
             førsteKvartal,
         ).ifEmpty {
+            logger.warn("Ingen landstatistikk funnet fra årstal/kvartal '$førsteKvartal'")
             return Feil(
                 feilmelding = "Ingen landstatistikk funnet",
                 httpStatusCode = HttpStatusCode.BadRequest,
@@ -135,6 +136,9 @@ class KvartalsvisSykefraværshistorikkService(
                 sektor = overordnetEnhet.sektor,
                 førsteÅrstalOgKvartal = førsteKvartal,
             ).ifEmpty {
+                logger.warn(
+                    "Ingen sektorstatistikk funnet for sektor '${overordnetEnhet.sektor.beskrivelse}' fra årstal/kvartal '$førsteKvartal'",
+                )
                 return Feil(
                     feilmelding = "Ingen sektorstatistikk funnet",
                     httpStatusCode = HttpStatusCode.BadRequest,
@@ -163,6 +167,7 @@ class KvartalsvisSykefraværshistorikkService(
                     bransje = bransje,
                     førsteÅrstalOgKvartal = førsteKvartal,
                 ).ifEmpty {
+                    logger.warn("Ingen bransjestatistikk funnet for bransje '${bransje.navn}' fra årstal/kvartal '$førsteKvartal'")
                     return Feil(
                         feilmelding = "Ingen bransjestatistikk funnet for bransje '${bransje.navn}'",
                         httpStatusCode = HttpStatusCode.BadRequest,
@@ -174,6 +179,9 @@ class KvartalsvisSykefraværshistorikkService(
                     næring = underenhet.næringskode.næring,
                     førsteÅrstalOgKvartal = førsteKvartal,
                 ).ifEmpty {
+                    logger.warn(
+                        "Ingen næringsstatistikk funnet for næring '${underenhet.næringskode.næring.tosifferIdentifikator}-${underenhet.næringskode.næring.navn}' fra årstal/kvartal '$førsteKvartal'",
+                    )
                     return Feil(
                         feilmelding = "Ingen næringsstatistikk funnet for næring " +
                             "med navn: '${underenhet.næringskode.næring.navn}' " +
