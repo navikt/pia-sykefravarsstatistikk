@@ -18,6 +18,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import no.nav.pia.sykefravarsstatistikk.Metrics
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.altinnTilgangerProxyUrl
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.cluster
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
@@ -44,7 +45,12 @@ class AltinnTilgangerService {
             orgnr: String?,
             enkeltrettighetIAltinn2: String,
             enkeltrettighetIAltinn3: String,
-        ): Boolean = harAltinn3Enkeltrettighet(orgnr, enkeltrettighetIAltinn3) || harAltinn2Enkeltrettighet(orgnr, enkeltrettighetIAltinn2)
+        ): Boolean {
+            val altinn3Tilgang = harAltinn3Enkeltrettighet(orgnr, enkeltrettighetIAltinn3)
+            val altinn2Tilgang = harAltinn2Enkeltrettighet(orgnr, enkeltrettighetIAltinn2)
+            Metrics.countAltinnTilgang(altinn2 = altinn2Tilgang, altinn3 = altinn3Tilgang)
+            return altinn3Tilgang || altinn2Tilgang
+        }
 
         private fun AltinnTilganger?.harAltinn3Enkeltrettighet(
             orgnr: String?,
