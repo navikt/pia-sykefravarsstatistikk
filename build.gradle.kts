@@ -67,8 +67,8 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
     testImplementation("org.testcontainers:kafka:$testcontainersVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("org.testcontainers:mockserver:$testcontainersVersion")
-    testImplementation("org.mock-server:mockserver-client-java:$testMockServerVersion")
+    testImplementation("software.xdev.mockserver:testcontainers:1.0.14")
+    testImplementation("software.xdev.mockserver:client:1.0.14")
 
     testImplementation("io.aiven:testcontainers-fake-gcs-server:0.2.0")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockStandaloneVersion")
@@ -88,30 +88,6 @@ dependencies {
                 require("4.1.119.Final")
             }
             because("From Ktor version: 2.3.5 -> io.netty:netty-codec-http2 vulnerable to HTTP/2 Rapid Reset Attack")
-        }
-        testImplementation("com.google.guava:guava") {
-            version {
-                require("33.4.0-jre")
-            }
-            because("Mockserver har sårbar guava versjon")
-        }
-        testImplementation("org.bouncycastle:bcprov-jdk18on") {
-            version {
-                require("1.80")
-            }
-            because("bcprov-jdk18on in Mockserver har sårbar versjon")
-        }
-        testImplementation("org.bouncycastle:bcpkix-jdk18on") {
-            version {
-                require("1.80")
-            }
-            because("bcpkix-jdk18on in Mockserver har sårbar versjon")
-        }
-        testImplementation("org.xmlunit:xmlunit-core") {
-            version {
-                require("2.10.0")
-            }
-            because("xmlunit-core in Mockserver har sårbar versjon")
         }
         testImplementation("org.apache.commons:commons-compress") {
             version {
