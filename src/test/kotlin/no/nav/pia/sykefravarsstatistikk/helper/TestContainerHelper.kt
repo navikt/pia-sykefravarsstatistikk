@@ -40,7 +40,6 @@ class TestContainerHelper {
         val authContainerHelper = AuthContainerHelper(network = network)
         val postgresContainerHelper = PostgrestContainerHelper(network = network, log = log)
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
-        private val wiremockContainerHelper = WiremockContainerHelper()
 
         // Setter lokal dato for å kunne teste /publiseringsdato uten å være avhengig av tidspunktet testen kjører
         private val lokalDato = LocalDateTime.parse("2025-03-01T15:59:59")
@@ -65,7 +64,6 @@ class TestContainerHelper {
             )
                 .plus(postgresContainerHelper.envVars())
                 .plus(kafkaContainerHelper.envVars())
-                .plus(wiremockContainerHelper.envVars())
                 .plus(altinnTilgangerContainerHelper.envVars())
                 .plus(enhetsregisteretContainerHelper.envVars())
                 .plus(authContainerHelper.envVars()),

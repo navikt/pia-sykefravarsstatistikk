@@ -1,17 +1,17 @@
 val arrowCoreVersion = "2.0.1"
+val iaFellesVersion = "1.10.2"
 val kafkClientVersion = "3.9.0"
 val kotestVersion = "6.0.0.M1"
 val kotlinVersion = "2.1.10"
 val ktorVersion = "3.1.1"
 val logbackVersion = "1.5.17"
-val iaFellesVersion = "1.10.2"
 val logstashLogbackEncoderVersion = "8.0"
 val mockOAuth2ServerVersion = "2.1.10"
+val mockServerVersion = "1.0.14"
 val nimbusJoseJwtVersion = "10.0.2"
 val prometeusVersion = "1.14.4"
 val testcontainersVersion = "1.20.6"
-val testMockServerVersion = "5.15.0"
-val wiremockStandaloneVersion = "3.12.1"
+val testcontainersFakeGCSVersion = "0.2.0"
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -67,11 +67,9 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
     testImplementation("org.testcontainers:kafka:$testcontainersVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("software.xdev.mockserver:testcontainers:1.0.14")
-    testImplementation("software.xdev.mockserver:client:1.0.14")
-
-    testImplementation("io.aiven:testcontainers-fake-gcs-server:0.2.0")
-    testImplementation("org.wiremock:wiremock-standalone:$wiremockStandaloneVersion")
+    testImplementation("software.xdev.mockserver:testcontainers:$mockServerVersion")
+    testImplementation("software.xdev.mockserver:client:$mockServerVersion")
+    testImplementation("io.aiven:testcontainers-fake-gcs-server:$testcontainersFakeGCSVersion")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
