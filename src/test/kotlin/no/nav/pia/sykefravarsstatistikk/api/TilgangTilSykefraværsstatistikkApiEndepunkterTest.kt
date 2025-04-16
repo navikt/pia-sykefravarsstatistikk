@@ -8,13 +8,10 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enhetsregisteretContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeBarnehage
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeBarnehage
@@ -30,7 +27,6 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun cleanUp() {
         runBlocking {
             altinnTilgangerContainerHelper.slettAlleRettigheter()
-            enhetsregisteretContainerHelper.slettAlleEnheterOgUnderenheter()
             postgresContainerHelper.slettAlleStatistikk()
         }
     }
@@ -50,11 +46,6 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response (kvartalsvis endepunkt)`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
-            )
-
             val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
                 orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withoutToken(),
@@ -67,11 +58,6 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response (aggregert endepunkt)`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
-            )
-
             val response = TestContainerHelper.hentAggregertStatistikkResponse(
                 orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withoutToken(),
@@ -84,11 +70,6 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response (kvartalsvis endepunkt)`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
-            )
-
             shouldFailWithMessage(
                 "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
             ) {
@@ -103,11 +84,6 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response (aggregert endepunkt)`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass,
-                underenhet = underenhetINæringUtvinningAvRåoljeOgGass,
-            )
-
             val response = TestContainerHelper.hentAggregertStatistikkResponse(
                 orgnr = underenhetINæringUtvinningAvRåoljeOgGass.somNæringsdrivende().orgnr,
                 config = withToken(),
@@ -119,10 +95,6 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Innlogget bruker uten enkeltrettighet for sykefraværsstatistikk får '403 - Forbidden' i response (kvartalsvis endepunkt)`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeBarnehage,
-                underenhet = underenhetIBransjeBarnehage,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
                 altinn2Rettighet = "enkeltrettighet_som_ikke_er_sykefraværsstatistikk",

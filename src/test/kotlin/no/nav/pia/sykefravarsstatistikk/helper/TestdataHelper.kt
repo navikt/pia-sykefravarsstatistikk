@@ -50,6 +50,7 @@ class TestdataHelper {
             sektor = this.institusjonellSektorkode?.tilDomene(),
         )
 
+        // Med bransje
         val overordnetEnhetIBransjeBarnehage =
             BrregEnhetDto(
                 organisasjonsnummer = "100000001",
@@ -67,24 +68,6 @@ class TestdataHelper {
                 antallAnsatte = 50,
                 naeringskode1 = NÆRINGSKODE_BARNEHAGER,
                 overordnetEnhet = overordnetEnhetIBransjeBarnehage.organisasjonsnummer,
-            )
-
-        val overordnetEnhetIBransjeBygg =
-            BrregEnhetDto(
-                organisasjonsnummer = "100000003",
-                navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg",
-                antallAnsatte = 150,
-                naeringskode1 = OPPFØRING_AV_BYGNINGER,
-                institusjonellSektorkode = PRIVAT_AKS,
-            )
-
-        val underenhetIBransjeBygg =
-            BrregUnderenhetDto(
-                organisasjonsnummer = "100000004",
-                navn = "Underenhet Med Tilhørighet Bransje Bygg",
-                antallAnsatte = 150,
-                naeringskode1 = OPPFØRING_AV_BYGNINGER,
-                overordnetEnhet = overordnetEnhetIBransjeBygg.organisasjonsnummer,
             )
 
         val overordnetEnhetIBransjeSykehus =
@@ -105,6 +88,61 @@ class TestdataHelper {
                 overordnetEnhet = overordnetEnhetIBransjeSykehus.organisasjonsnummer,
             )
 
+        val overordnetEnhetIBransjeAnlegg =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000013",
+                navn = "Overordnet Enhet Uten Statistikk",
+                antallAnsatte = 350,
+                naeringskode1 = BYGGING_AV_VEIER,
+                institusjonellSektorkode = PRIVAT_AKS,
+            )
+
+        val underenhetIBransjeAnlegg =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000014",
+                navn = "Underenhet Uten Statistikk",
+                antallAnsatte = 350,
+                naeringskode1 = BYGGING_AV_VEIER,
+                overordnetEnhet = overordnetEnhetIBransjeAnlegg.organisasjonsnummer,
+            )
+
+        val overordnetEnhetIBransjeSykehjem =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000017",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehjem",
+                antallAnsatte = 400,
+                naeringskode1 = SOMATISK_SYKEHJEM,
+                institusjonellSektorkode = STATLIG_EIDE_AKS,
+            )
+
+        val underenhetIBransjeSykehjem =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000018",
+                navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
+                antallAnsatte = 400,
+                naeringskode1 = SOMATISK_SYKEHJEM,
+                overordnetEnhet = overordnetEnhetIBransjeSykehjem.organisasjonsnummer,
+            )
+
+        val overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000019",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg uten sektor kode",
+                antallAnsatte = 150,
+                naeringskode1 = OPPFØRING_AV_BYGNINGER,
+                institusjonellSektorkode = null,
+            )
+
+        val underenhetIBransjeByggUtenInstitusjonellSektorKode =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000020",
+                navn = "Underenhet Med Tilhørighet Bransje Bygg uten sektor kode",
+                antallAnsatte = 150,
+                naeringskode1 = OPPFØRING_AV_BYGNINGER,
+                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode.organisasjonsnummer,
+            )
+
+        // Med næring (dvs uten bransje)
         val overordnetEnhetINæringUtleieAvEiendom =
             BrregEnhetDto(
                 organisasjonsnummer = "100000007",
@@ -160,24 +198,6 @@ class TestdataHelper {
                 overordnetEnhet = overordnetEnhetINæringSkogskjøtsel.organisasjonsnummer,
             )
 
-        val overordnetEnhetIBransjeAnlegg =
-            BrregEnhetDto(
-                organisasjonsnummer = "100000013",
-                navn = "Overordnet Enhet Uten Statistikk",
-                antallAnsatte = 350,
-                naeringskode1 = BYGGING_AV_VEIER,
-                institusjonellSektorkode = PRIVAT_AKS,
-            )
-
-        val underenhetIBransjeAnlegg =
-            BrregUnderenhetDto(
-                organisasjonsnummer = "100000014",
-                navn = "Underenhet Uten Statistikk",
-                antallAnsatte = 350,
-                naeringskode1 = BYGGING_AV_VEIER,
-                overordnetEnhet = overordnetEnhetIBransjeAnlegg.organisasjonsnummer,
-            )
-
         val overordnetEnhetINæringUtvinningAvRåoljeOgGass =
             BrregEnhetDto(
                 organisasjonsnummer = "100000015",
@@ -196,40 +216,24 @@ class TestdataHelper {
                 overordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.organisasjonsnummer,
             )
 
-        val overordnetEnhetIBransjeSykehjem =
-            BrregEnhetDto(
-                organisasjonsnummer = "100000017",
-                navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehjem",
-                antallAnsatte = 400,
-                naeringskode1 = SOMATISK_SYKEHJEM,
-                institusjonellSektorkode = STATLIG_EIDE_AKS,
+        val virksomheterMedBransje: List<Pair<BrregEnhetDto, BrregUnderenhetDto>> =
+            listOf(
+                Pair(overordnetEnhetIBransjeBarnehage, underenhetIBransjeBarnehage),
+                Pair(overordnetEnhetIBransjeSykehus, underenhetIBransjeSykehus),
+                Pair(overordnetEnhetIBransjeAnlegg, underenhetIBransjeAnlegg),
+                Pair(overordnetEnhetIBransjeSykehjem, underenhetIBransjeSykehjem),
+                Pair(
+                    overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode,
+                    underenhetIBransjeByggUtenInstitusjonellSektorKode
+                ),
             )
 
-        val underenhetIBransjeSykehjem =
-            BrregUnderenhetDto(
-                organisasjonsnummer = "100000018",
-                navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
-                antallAnsatte = 400,
-                naeringskode1 = SOMATISK_SYKEHJEM,
-                overordnetEnhet = overordnetEnhetIBransjeSykehjem.organisasjonsnummer,
-            )
-
-        val overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode =
-            BrregEnhetDto(
-                organisasjonsnummer = "100000019",
-                navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg uten sektor kode",
-                antallAnsatte = 150,
-                naeringskode1 = OPPFØRING_AV_BYGNINGER,
-                institusjonellSektorkode = null,
-            )
-
-        val underenhetIBransjeByggUtenInstitusjonellSektorKode =
-            BrregUnderenhetDto(
-                organisasjonsnummer = "100000020",
-                navn = "Underenhet Med Tilhørighet Bransje Bygg uten sektor kode",
-                antallAnsatte = 150,
-                naeringskode1 = OPPFØRING_AV_BYGNINGER,
-                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode.organisasjonsnummer,
+        val virksomheterMedNæring: List<Pair<BrregEnhetDto, BrregUnderenhetDto>> =
+            listOf(
+                Pair(overordnetEnhetINæringUtleieAvEiendom, underenhetINæringUtleieAvEiendom),
+                Pair(overordnetEnhetINæringProduksjonAvMatfisk, underenhetINæringProduksjonAvMatfisk),
+                Pair(overordnetEnhetINæringSkogskjøtsel, underenhetINæringSkogskjøtsel),
+                Pair(overordnetEnhetINæringUtvinningAvRåoljeOgGass, underenhetINæringUtvinningAvRåoljeOgGass),
             )
 
         @OptIn(ExperimentalSerializationApi::class)
@@ -252,10 +256,6 @@ internal class BrregInstitusjonellSektorkoder {
         val STATLIG_EIDE_AKS = BrregInstitusjonellSektorkodeDto(
             kode = "1120",
             beskrivelse = "Statlig eide aksjeselskaper mv.",
-        )
-        val KOMMUNAL_FORVALTNING = BrregInstitusjonellSektorkodeDto(
-            kode = "6500",
-            beskrivelse = "Kommunal forvaltning",
         )
         val STATSFORVALTNINGEN = BrregInstitusjonellSektorkodeDto(
             kode = "6100",
@@ -305,10 +305,6 @@ internal class BrregNæringskoder {
         val OPPFØRING_AV_BYGNINGER = BrregNæringskodeDto(
             kode = "41.200",
             beskrivelse = "Oppføring av bygninger",
-        )
-        val ANNEN_MEDISINSK_BEHANDLING = BrregNæringskodeDto(
-            kode = "86.909",
-            beskrivelse = "Annen spesialisert medisinsk behandling",
         )
     }
 }

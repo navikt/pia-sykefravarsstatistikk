@@ -23,24 +23,23 @@ import no.nav.pia.sykefravarsstatistikk.helper.KvartalsvisSykefraværshistorikkT
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enhetsregisteretContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeBarnehage
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringSkogskjøtsel
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeSykehus
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringProduksjonAvMatfisk
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeAnlegg
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeBarnehage
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeSykehus
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringProduksjonAvMatfisk
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringSkogskjøtsel
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeBarnehage
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehus
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringSkogskjøtsel
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringProduksjonAvMatfisk
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringSkogskjøtsel
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import kotlin.test.BeforeTest
@@ -51,7 +50,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun cleanUp() {
         runBlocking {
             altinnTilgangerContainerHelper.slettAlleRettigheter()
-            enhetsregisteretContainerHelper.slettAlleEnheterOgUnderenheter()
             postgresContainerHelper.slettAlleStatistikk()
         }
     }
@@ -65,10 +63,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendStatistikk(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet(),
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
@@ -99,10 +93,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 virksomhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 årstall = 2024,
                 harForFåAnsatte = true,
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
@@ -146,10 +136,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring,
                 harForFåAnsatte = true,
             )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
@@ -189,10 +175,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 årstall = 2020,
                 harForFåAnsatte = true,
             )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
@@ -221,10 +203,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Får IKKE feil ved manglende statistikk`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeAnlegg,
-                underenhet = underenhetIBransjeAnlegg,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetIBransjeAnlegg.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
@@ -274,10 +252,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendStatistikk(
                 overordnetEnhet = overordnetEnhetINæringProduksjonAvMatfisk.somOverordnetEnhet(),
                 underenhet = underenhetINæringProduksjonAvMatfisk.somNæringsdrivende(),
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringProduksjonAvMatfisk,
-                underenhet = underenhetINæringProduksjonAvMatfisk,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringProduksjonAvMatfisk.somNæringsdrivende(),
@@ -339,10 +313,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 overordnetEnhet = overordnetEnhetIBransjeSykehus.somOverordnetEnhet(),
                 underenhet = underenhetIBransjeSykehus.somNæringsdrivende(),
             )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeSykehus,
-                underenhet = underenhetIBransjeSykehus,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetIBransjeSykehus.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
@@ -401,10 +371,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendStatistikk(
                 overordnetEnhet = overordnetEnhetINæringSkogskjøtsel.somOverordnetEnhet(),
                 underenhet = underenhetINæringSkogskjøtsel.somNæringsdrivende(),
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringSkogskjøtsel,
-                underenhet = underenhetINæringSkogskjøtsel,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringSkogskjøtsel.somNæringsdrivende(),
@@ -465,10 +431,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendStatistikk(
                 overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
                 underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeBarnehage,
-                underenhet = underenhetIBransjeBarnehage,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
@@ -533,10 +495,6 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendStatistikk(
                 overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
                 underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeBarnehage,
-                underenhet = underenhetIBransjeBarnehage,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
