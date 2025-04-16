@@ -8,7 +8,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetSykehjemMedTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehjem
 import kotlin.test.Test
 
 class AggregeringskalkulatorTest {
@@ -37,16 +37,16 @@ class AggregeringskalkulatorTest {
         val resultat = Aggregeringskalkulator(
             sykefraværsdata = lagSykefraværsdata(
                 Aggregeringskategorier.Virksomhet(
-                    virksomhet = underenhetSykehjemMedTilgang.somNæringsdrivende()
+                    virksomhet = underenhetIBransjeSykehjem.somNæringsdrivende()
                 )),
             sistePubliserteKvartal = ÅrstallOgKvartal(2024, 4),
-        ).tapteDagsverkVirksomhet(bedriftsnavn = underenhetSykehjemMedTilgang.navn)
+        ).tapteDagsverkVirksomhet(bedriftsnavn = underenhetIBransjeSykehjem.navn)
 
         resultat shouldNotBe null
         resultat.right() shouldNotBe null
         val tapteDagsverkTotalt = resultat.getOrNull()
         tapteDagsverkTotalt!!.statistikkategori shouldBe Statistikkategori.VIRKSOMHET
-        tapteDagsverkTotalt.label shouldBe underenhetSykehjemMedTilgang.navn
+        tapteDagsverkTotalt.label shouldBe underenhetIBransjeSykehjem.navn
         tapteDagsverkTotalt.verdi shouldBe "1282348.0"
         tapteDagsverkTotalt.antallPersonerIBeregningen shouldBe 104737
         tapteDagsverkTotalt.kvartalerIBeregningen shouldBe listOf(

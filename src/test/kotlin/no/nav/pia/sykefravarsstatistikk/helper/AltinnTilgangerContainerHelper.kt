@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.log
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -87,7 +87,7 @@ class AltinnTilgangerContainerHelper(
     }
 
     internal fun leggTilRettigheter(
-        overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang.somOverordnetEnhet(),
+        overordnetEnhet: OverordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.somOverordnetEnhet(),
         underenhet: Underenhet,
         altinn2Rettighet: String = "",
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
