@@ -9,6 +9,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.log
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.Network
@@ -47,7 +48,7 @@ class AltinnTilgangerContainerHelper(
             .waitingFor(Wait.forHttp("/isRunning").forStatusCode(200)).apply {
                 start()
             }.also {
-                logger.info("Startet (mock) altinnTilganger container for network '$network' og port '$port'")
+                logger.info("Startet (mock) altinnTilganger container for network '${network.id}' og port '$port'")
             }
 
     fun envVars() =
@@ -86,7 +87,7 @@ class AltinnTilgangerContainerHelper(
     }
 
     internal fun leggTilRettigheter(
-        overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang,
+        overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang.somOverordnetEnhet(),
         underenhet: Underenhet,
         altinn2Rettighet: String = "",
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
