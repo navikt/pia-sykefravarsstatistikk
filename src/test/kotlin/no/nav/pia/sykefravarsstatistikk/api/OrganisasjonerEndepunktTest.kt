@@ -13,6 +13,8 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.alt
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetSykehjemMedTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetUtenTilgang
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
@@ -29,8 +31,8 @@ class OrganisasjonerEndepunktTest {
 
     @Test
     fun `Innlogget bruker får hente organisasjoner hen har tilgang til`() {
-        val underenhet: Underenhet = underenhetUtenTilgang
-        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
+        val underenhet: Underenhet = underenhetUtenTilgang.somNæringsdrivende()
+        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang.somOverordnetEnhet()
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
@@ -63,8 +65,8 @@ class OrganisasjonerEndepunktTest {
 
     @Test
     fun `Innlogget bruker får hente organisasjoner hen har enkeltrettigheter til`() {
-        val underenhet: Underenhet = underenhetUtenTilgang
-        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
+        val underenhet: Underenhet = underenhetUtenTilgang.somNæringsdrivende()
+        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang.somOverordnetEnhet()
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
@@ -85,8 +87,8 @@ class OrganisasjonerEndepunktTest {
 
     @Test
     fun `Innlogget bruker får hente organisasjoner hen har enkeltrettigheter til (Altinn2)`() {
-        val underenhet: Underenhet = underenhetSykehjemMedTilgang
-        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
+        val underenhet: Underenhet = underenhetSykehjemMedTilgang.somNæringsdrivende()
+        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang.somOverordnetEnhet()
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
@@ -114,8 +116,8 @@ class OrganisasjonerEndepunktTest {
 
     @Test
     fun `Innlogget bruker får hente organisasjoner hen har enkeltrettigheter til (Altinn3)`() {
-        val underenhet: Underenhet = underenhetUtenTilgang
-        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang
+        val underenhet: Underenhet = underenhetUtenTilgang.somNæringsdrivende()
+        val overordnetEnhet: OverordnetEnhet = overordnetEnhetUtenTilgang.somOverordnetEnhet()
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,

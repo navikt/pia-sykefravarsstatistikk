@@ -7,6 +7,7 @@ import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenPro
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetSykehjemMedTilgang
 import kotlin.test.Test
 
@@ -34,7 +35,10 @@ class AggregeringskalkulatorTest {
     @Test
     fun `aggregingskalkulator skal beregne tapteDagsverkTotalt`() {
         val resultat = Aggregeringskalkulator(
-            sykefraværsdata = lagSykefraværsdata(Aggregeringskategorier.Virksomhet(virksomhet = underenhetSykehjemMedTilgang)),
+            sykefraværsdata = lagSykefraværsdata(
+                Aggregeringskategorier.Virksomhet(
+                    virksomhet = underenhetSykehjemMedTilgang.somNæringsdrivende()
+                )),
             sistePubliserteKvartal = ÅrstallOgKvartal(2024, 4),
         ).tapteDagsverkVirksomhet(bedriftsnavn = underenhetSykehjemMedTilgang.navn)
 

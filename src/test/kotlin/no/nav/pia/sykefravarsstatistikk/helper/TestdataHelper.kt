@@ -3,12 +3,27 @@ package no.nav.pia.sykefravarsstatistikk.helper
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import no.nav.pia.sykefravarsstatistikk.api.dto.BrregEnhetDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregInstitusjonellSektorkodeDto.Companion.tilDomene
+import no.nav.pia.sykefravarsstatistikk.api.dto.BrregUnderenhetDto
 import no.nav.pia.sykefravarsstatistikk.domene.BrregNæringskodeDto
 import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilDomene
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
+import no.nav.pia.sykefravarsstatistikk.helper.BrregInstitusjonellSektorkoder.Companion.PERSONLIG_NÆRINGSDRIVENDE
+import no.nav.pia.sykefravarsstatistikk.helper.BrregInstitusjonellSektorkoder.Companion.PRIVAT_AKS
+import no.nav.pia.sykefravarsstatistikk.helper.BrregInstitusjonellSektorkoder.Companion.STATLIG_EIDE_AKS
+import no.nav.pia.sykefravarsstatistikk.helper.BrregInstitusjonellSektorkoder.Companion.STATSFORVALTNINGEN
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.ALMN_SOMATISKE_SYKEHUS
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.BYGGING_AV_VEIER
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.NÆRINGSKODE_BARNEHAGER
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.OPPFØRING_AV_BYGNINGER
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.PRODUKSJON_AV_MATFISK
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.SKOGSKJØTSEL
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.SOMATISK_SYKEHJEM
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.UTLEIE_AV_EIENDOM
+import no.nav.pia.sykefravarsstatistikk.helper.BrregNæringskoder.Companion.UTVINNING_AV_RÅOLJE_OG_GASS
 import no.nav.pia.sykefravarsstatistikk.persistering.BigDecimalSerializer
 import java.math.BigDecimal
 
@@ -19,267 +34,202 @@ class TestdataHelper {
         const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3 =
             "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk"
 
+        fun BrregUnderenhetDto.somNæringsdrivende() = Underenhet.Næringsdrivende(
+            orgnr = this.organisasjonsnummer,
+            navn = this.navn,
+            antallAnsatte = this.antallAnsatte,
+            næringskode = this.naeringskode1.tilDomene(),
+            overordnetEnhetOrgnr = this.overordnetEnhet,
+        )
+
+        fun BrregEnhetDto.somOverordnetEnhet() = OverordnetEnhet(
+            orgnr = this.organisasjonsnummer,
+            navn = this.navn,
+            antallAnsatte = this.antallAnsatte,
+            næringskode = this.naeringskode1.tilDomene(),
+            sektor = this.institusjonellSektorkode?.tilDomene(),
+        )
+
         val overordnetEnhetMedEnkelrettighetBransjeBarnehage =
-            OverordnetEnhet(
-                orgnr = "100000001",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000001",
                 navn = "Overordnet Enhet Med Enkelrettighet Bransje Barnehage",
                 antallAnsatte = 50,
-                næringskode = BrregNæringskodeDto(
-                    kode = "88.911",
-                    beskrivelse = "Barnehager",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "2100",
-                    beskrivelse = "Private aksjeselskaper mv.",
-                ).tilDomene(),
+                naeringskode1 = NÆRINGSKODE_BARNEHAGER,
+                overordnetEnhet = null,
+                institusjonellSektorkode = PRIVAT_AKS,
             )
 
         val underenhetMedEnkelrettighetBransjeBarnehage =
-            Underenhet.Næringsdrivende(
-                orgnr = "100000002",
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000002",
                 navn = "Underenhet Med Enkelrettighet Bransje Barnehage",
                 antallAnsatte = 50,
-                næringskode = BrregNæringskodeDto(
-                    kode = "88.911",
-                    beskrivelse = "Barnehager",
-                ).tilDomene(),
-                overordnetEnhetOrgnr = overordnetEnhetMedEnkelrettighetBransjeBarnehage.orgnr,
-            )
-
-        val overordnetEnhetMedTilhørighetBransjeSykehus =
-            OverordnetEnhet(
-                orgnr = "100000005",
-                navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehus",
-                antallAnsatte = 100,
-                næringskode = BrregNæringskodeDto(
-                    kode = "86.101",
-                    beskrivelse = "Alminnelige somatiske sykehus",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "6100",
-                    beskrivelse = "Statsforvaltningen",
-                ).tilDomene(),
-            )
-
-        val underenhetMedEnkelrettighetBransjeSykehus =
-            Underenhet.Næringsdrivende(
-                orgnr = "100000006",
-                navn = "Underenhet Med Enkelrettighet Bransje Sykehus",
-                antallAnsatte = 100,
-                næringskode = BrregNæringskodeDto(
-                    kode = "86.101",
-                    beskrivelse = "Alminnelige somatiske sykehus",
-                ).tilDomene(),
-                overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeSykehus.orgnr,
+                naeringskode1 = NÆRINGSKODE_BARNEHAGER,
+                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage.organisasjonsnummer,
             )
 
         val overordnetEnhetMedTilhørighetBransjeBygg =
-            OverordnetEnhet(
-                orgnr = "100000003",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000003",
                 navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg",
                 antallAnsatte = 150,
-                næringskode = BrregNæringskodeDto(
-                    kode = "41.200",
-                    beskrivelse = "Oppføring av bygninger",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "2100",
-                    beskrivelse = "Private aksjeselskaper mv.",
-                ).tilDomene(),
+                naeringskode1 = OPPFØRING_AV_BYGNINGER,
+                institusjonellSektorkode = PRIVAT_AKS,
             )
 
         val underenhetMedTilhørighetBransjeBygg =
-            Underenhet.Næringsdrivende(
-                orgnr = "100000004",
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000004",
                 navn = "Underenhet Med Tilhørighet Bransje Bygg",
                 antallAnsatte = 150,
-                næringskode = BrregNæringskodeDto(
-                    kode = "41.200",
-                    beskrivelse = "Oppføring av bygninger",
-                ).tilDomene(),
-                overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeBygg.orgnr,
+                naeringskode1 = OPPFØRING_AV_BYGNINGER,
+                overordnetEnhet = overordnetEnhetMedTilhørighetBransjeBygg.organisasjonsnummer,
+            )
+
+        val overordnetEnhetMedTilhørighetBransjeSykehus =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000005",
+                navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehus",
+                antallAnsatte = 100,
+                naeringskode1 = ALMN_SOMATISKE_SYKEHUS,
+                institusjonellSektorkode = STATSFORVALTNINGEN,
+            )
+
+        val underenhetMedEnkelrettighetBransjeSykehus =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000006",
+                navn = "Underenhet Med Enkelrettighet Bransje Sykehus",
+                antallAnsatte = 100,
+                naeringskode1 = ALMN_SOMATISKE_SYKEHUS,
+                overordnetEnhet = overordnetEnhetMedTilhørighetBransjeSykehus.organisasjonsnummer,
+            )
+
+        val overordnetEnhetMedTilhørighetUtenBransje =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000007",
+                navn = "Overordnet Enhet Med Tilhørighet Uten Bransje",
+                naeringskode1 = UTLEIE_AV_EIENDOM,
+                overordnetEnhet = null,
+                antallAnsatte = 300,
+                institusjonellSektorkode = PRIVAT_AKS,
+            )
+
+        val underenhetMedTilhørighetUtenBransje =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000008",
+                navn = "Underenhet Med Tilhørighet Uten Bransje",
+                antallAnsatte = 300,
+                naeringskode1 = UTLEIE_AV_EIENDOM,
+                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje.organisasjonsnummer,
+            )
+
+        val overordnetEnhetMedTilhørighetUtenBransje2 =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000009",
+                navn = "Overordnet Enhet Med Tilhørighet Uten Bransje 2",
+                antallAnsatte = 250,
+                naeringskode1 = PRODUKSJON_AV_MATFISK,
+                institusjonellSektorkode = PRIVAT_AKS,
+            )
+
+        val underenhetMedEnkelrettighetUtenBransje2 =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000010",
+                navn = "Underenhet Med Enkelrettighet Uten Bransje",
+                antallAnsatte = 250,
+                naeringskode1 = PRODUKSJON_AV_MATFISK,
+                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje2.organisasjonsnummer,
             )
 
         val overordnetEnhetMedEnkelrettighetUtenBransje =
-            OverordnetEnhet(
-                orgnr = "100000011",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000011",
                 navn = "Overordnet Enhet Med Enkelrettighet Uten Bransje",
                 antallAnsatte = 200,
-                næringskode = BrregNæringskodeDto(
-                    kode = "02.100",
-                    beskrivelse = "Skogskjøtsel og andre skogbruksaktiviteter",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "8200",
-                    beskrivelse = "Personlig næringsdrivende",
-                ).tilDomene(),
+                naeringskode1 = SKOGSKJØTSEL,
+                institusjonellSektorkode = PERSONLIG_NÆRINGSDRIVENDE,
             )
 
-        val underenhetMedEnkelrettighetUtenBransje2 = Underenhet.Næringsdrivende(
-            orgnr = "100000012",
-            navn = "Underenhet Med Enkelrettighet Uten Bransje 2",
-            antallAnsatte = 200,
-            næringskode = BrregNæringskodeDto(
-                kode = "02.100",
-                beskrivelse = "Skogskjøtsel og andre skogbruksaktiviteter",
-            ).tilDomene(),
-            overordnetEnhetOrgnr = overordnetEnhetMedEnkelrettighetUtenBransje.orgnr,
-        )
-
-        val overordnetEnhetMedTilhørighetUtenBransje2 =
-            OverordnetEnhet(
-                orgnr = "100000009",
-                navn = "Overordnet Enhet Med Tilhørighet Uten Bransje 2",
-                antallAnsatte = 250,
-                næringskode = BrregNæringskodeDto(
-                    kode = "03.211",
-                    beskrivelse = "Produksjon av matfisk og skalldyr i hav- og kystbasert fiskeoppdrett",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "2100",
-                    beskrivelse = "Private aksjeselskaper mv.",
-                ).tilDomene(),
+        val underenhetMedEnkelrettighetUtenBransje =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000012",
+                navn = "Underenhet Med Enkelrettighet Uten Bransje 2",
+                antallAnsatte = 200,
+                naeringskode1 = SKOGSKJØTSEL,
+                overordnetEnhet = overordnetEnhetMedEnkelrettighetUtenBransje.organisasjonsnummer,
             )
-
-        val underenhetMedEnkelrettighetUtenBransje = Underenhet.Næringsdrivende(
-            orgnr = "100000010",
-            navn = "Underenhet Med Enkelrettighet Uten Bransje",
-            antallAnsatte = 250,
-            næringskode = BrregNæringskodeDto(
-                kode = "03.211",
-                beskrivelse = "Produksjon av matfisk og skalldyr i hav- og kystbasert fiskeoppdrett",
-            ).tilDomene(),
-            overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetUtenBransje2.orgnr,
-        )
-
-        val overordnetEnhetMedTilhørighetUtenBransje =
-            OverordnetEnhet(
-                orgnr = "100000007",
-                navn = "Overordnet Enhet Med Tilhørighet Uten Bransje",
-                næringskode = BrregNæringskodeDto(
-                    kode = "68.209",
-                    beskrivelse = "Utleie av egen eller leid fast eiendom ellers",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "2100",
-                    beskrivelse = "Private aksjeselskaper mv.",
-                ).tilDomene(),
-                antallAnsatte = 300,
-            )
-
-        val underenhetMedTilhørighetUtenBransje = Underenhet.Næringsdrivende(
-            orgnr = "100000008",
-            navn = "Underenhet Med Tilhørighet Uten Bransje",
-            antallAnsatte = 300,
-            næringskode = BrregNæringskodeDto(
-                kode = "68.209",
-                beskrivelse = "Utleie av egen eller leid fast eiendom ellers",
-            ).tilDomene(),
-            overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetUtenBransje.orgnr,
-        )
 
         val overordnetEnhetUtenStatistikk =
-            OverordnetEnhet(
-                orgnr = "100000013",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000013",
                 navn = "Overordnet Enhet Uten Statistikk",
                 antallAnsatte = 350,
-                næringskode = BrregNæringskodeDto(
-                    kode = "42.110",
-                    beskrivelse = "Bygging av veier og motorveier",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "2100",
-                    beskrivelse = "Private aksjeselskaper mv.",
-                ).tilDomene(),
+                naeringskode1 = BYGGING_AV_VEIER,
+                institusjonellSektorkode = PRIVAT_AKS,
             )
 
-        val enUnderenhetUtenStatistikk = Underenhet.Næringsdrivende(
-            orgnr = "100000014",
-            navn = "Underenhet Uten Statistikk",
-            antallAnsatte = 350,
-            næringskode = BrregNæringskodeDto(
-                kode = "42.110",
-                beskrivelse = "Bygging av veier og motorveier",
-            ).tilDomene(),
-            overordnetEnhetOrgnr = overordnetEnhetUtenStatistikk.orgnr,
-        )
+        val enUnderenhetUtenStatistikk =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000014",
+                navn = "Underenhet Uten Statistikk",
+                antallAnsatte = 350,
+                naeringskode1 = BYGGING_AV_VEIER,
+                overordnetEnhet = overordnetEnhetUtenStatistikk.organisasjonsnummer,
+            )
 
         val overordnetEnhetUtenTilgang =
-            OverordnetEnhet(
-                orgnr = "100000015",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000015",
                 navn = "Overordnet Enhet Uten Tilgang",
                 antallAnsatte = 400,
-                næringskode = BrregNæringskodeDto(
-                    kode = "09.109",
-                    beskrivelse = "Andre tjenester tilknyttet utvinning av råolje og naturgass",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "1120",
-                    beskrivelse = "Statlig eide aksjeselskaper mv.",
-                ).tilDomene(),
+                naeringskode1 = UTVINNING_AV_RÅOLJE_OG_GASS,
+                institusjonellSektorkode = STATLIG_EIDE_AKS,
             )
 
-        val underenhetUtenTilgang = Underenhet.Næringsdrivende(
-            orgnr = "100000016",
-            navn = "Underenhet Uten Tilgang",
-            antallAnsatte = 400,
-            næringskode = BrregNæringskodeDto(
-                kode = "09.109",
-                beskrivelse = "Andre tjenester tilknyttet utvinning av råolje og naturgass",
-            ).tilDomene(),
-            overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
-        )
+        val underenhetUtenTilgang =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000016",
+                navn = "Underenhet Uten Tilgang",
+                antallAnsatte = 400,
+                naeringskode1 = UTVINNING_AV_RÅOLJE_OG_GASS,
+                overordnetEnhet = overordnetEnhetUtenTilgang.organisasjonsnummer,
+            )
+
         val overordnetSykehjemUtenTilgang =
-            OverordnetEnhet(
-                orgnr = "100000017",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000017",
                 navn = "Overordnet Enhet Med Tilhørighet Bransje Sykehjem",
                 antallAnsatte = 400,
-                næringskode = BrregNæringskodeDto(
-                    kode = "87.102",
-                    beskrivelse = "Somatisk sykehjem",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "1120",
-                    beskrivelse = "Statlig eide aksjeselskaper mv.",
-                ).tilDomene(),
+                naeringskode1 = SOMATISK_SYKEHJEM,
+                institusjonellSektorkode = STATLIG_EIDE_AKS,
             )
 
-        val underenhetSykehjemMedTilgang = Underenhet.Næringsdrivende(
-            orgnr = "100000018",
-            navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
-            antallAnsatte = 400,
-            næringskode = BrregNæringskodeDto(
-                kode = "87.102",
-                beskrivelse = "Somatisk sykehjem",
-            ).tilDomene(),
-            overordnetEnhetOrgnr = overordnetEnhetUtenTilgang.orgnr,
-        )
+        val underenhetSykehjemMedTilgang =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000018",
+                navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
+                antallAnsatte = 400,
+                naeringskode1 = SOMATISK_SYKEHJEM,
+                overordnetEnhet = overordnetEnhetUtenTilgang.organisasjonsnummer,
+            )
 
         val overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode =
-            OverordnetEnhet(
-                orgnr = "100000019",
+            BrregEnhetDto(
+                organisasjonsnummer = "100000019",
                 navn = "Overordnet Enhet Med Tilhørighet Bransje Bygg uten sektor kode",
                 antallAnsatte = 150,
-                næringskode = BrregNæringskodeDto(
-                    kode = "41.200",
-                    beskrivelse = "Oppføring av bygninger",
-                ).tilDomene(),
-                sektor = BrregInstitusjonellSektorkodeDto(
-                    kode = "2100",
-                    beskrivelse = "Private aksjeselskaper mv.",
-                ).tilDomene(),
+                naeringskode1 = OPPFØRING_AV_BYGNINGER,
+                institusjonellSektorkode = null,
             )
 
         val underenhetIBransjeByggUtenInstitusjonellSektorKode =
-            Underenhet.Næringsdrivende(
-                orgnr = "100000020",
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000020",
                 navn = "Underenhet Med Tilhørighet Bransje Bygg uten sektor kode",
                 antallAnsatte = 150,
-                næringskode = BrregNæringskodeDto(
-                    kode = "41.200",
-                    beskrivelse = "Oppføring av bygninger",
-                ).tilDomene(),
-                overordnetEnhetOrgnr = overordnetEnhetMedTilhørighetBransjeBygg.orgnr,
+                naeringskode1 = OPPFØRING_AV_BYGNINGER,
+                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode.organisasjonsnummer,
             )
 
         @OptIn(ExperimentalSerializationApi::class)
@@ -290,6 +240,76 @@ class TestdataHelper {
             }
             println("[DEBUG][Test] Statistikk: \n ${prettyJson.encodeToString(value = statistikk)}")
         }
+    }
+}
+
+internal class BrregInstitusjonellSektorkoder {
+    companion object {
+        val PRIVAT_AKS = BrregInstitusjonellSektorkodeDto(
+            kode = "2100",
+            beskrivelse = "Private aksjeselskaper mv.",
+        )
+        val STATLIG_EIDE_AKS = BrregInstitusjonellSektorkodeDto(
+            kode = "1120",
+            beskrivelse = "Statlig eide aksjeselskaper mv.",
+        )
+        val KOMMUNAL_FORVALTNING = BrregInstitusjonellSektorkodeDto(
+            kode = "6500",
+            beskrivelse = "Kommunal forvaltning",
+        )
+        val STATSFORVALTNINGEN = BrregInstitusjonellSektorkodeDto(
+            kode = "6100",
+            beskrivelse = "Statsforvaltningen",
+        )
+        val PERSONLIG_NÆRINGSDRIVENDE = BrregInstitusjonellSektorkodeDto(
+            kode = "8200",
+            beskrivelse = "Personlig næringsdrivende",
+        )
+    }
+}
+
+internal class BrregNæringskoder {
+    companion object {
+        val SKOGSKJØTSEL = BrregNæringskodeDto(
+            kode = "02.100",
+            beskrivelse = "Skogskjøtsel og andre skogbruksaktiviteter",
+        )
+        val PRODUKSJON_AV_MATFISK = BrregNæringskodeDto(
+            kode = "03.211",
+            beskrivelse = "Produksjon av matfisk og skalldyr i hav- og kystbasert fiskeoppdrett",
+        )
+        val UTVINNING_AV_RÅOLJE_OG_GASS = BrregNæringskodeDto(
+            kode = "09.109",
+            beskrivelse = "Andre tjenester tilknyttet utvinning av råolje og naturgass",
+        )
+        val BYGGING_AV_VEIER = BrregNæringskodeDto(
+            kode = "42.110",
+            beskrivelse = "Bygging av veier og motorveier",
+        )
+        val UTLEIE_AV_EIENDOM = BrregNæringskodeDto(
+            kode = "68.209",
+            beskrivelse = "Utleie av egen eller leid fast eiendom ellers",
+        )
+        val ALMN_SOMATISKE_SYKEHUS = BrregNæringskodeDto(
+            kode = "86.101",
+            beskrivelse = "Alminnelige somatiske sykehus",
+        )
+        val SOMATISK_SYKEHJEM = BrregNæringskodeDto(
+            kode = "87.102",
+            beskrivelse = "Somatisk sykehjem",
+        )
+        val NÆRINGSKODE_BARNEHAGER = BrregNæringskodeDto(
+            kode = "88.911",
+            beskrivelse = "Barnehager",
+        )
+        val OPPFØRING_AV_BYGNINGER = BrregNæringskodeDto(
+            kode = "41.200",
+            beskrivelse = "Oppføring av bygninger",
+        )
+        val ANNEN_MEDISINSK_BEHANDLING = BrregNæringskodeDto(
+            kode = "86.909",
+            beskrivelse = "Annen spesialisert medisinsk behandling",
+        )
     }
 }
 

@@ -36,6 +36,7 @@ class TestContainerHelper {
         val log: Logger = LoggerFactory.getLogger(TestContainerHelper::class.java)
         val network = Network.newNetwork()
         val altinnTilgangerContainerHelper = AltinnTilgangerContainerHelper(network = network)
+        val enhetsregisteretContainerHelper = EnhetsregisteretContainerHelper(network = network)
         val authContainerHelper = AuthContainerHelper(network = network)
         val postgresContainerHelper = PostgrestContainerHelper(network = network, log = log)
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
@@ -48,6 +49,7 @@ class TestContainerHelper {
             ImageFromDockerfile().withDockerfile(Path("./Dockerfile")),
         ).dependsOn(
             altinnTilgangerContainerHelper.altinnTilgangerContainer,
+            enhetsregisteretContainerHelper.enhetsregisteretContainer,
             kafkaContainerHelper.kafkaContainer,
             postgresContainerHelper.postgresContainer,
             authContainerHelper.authContainer,
@@ -65,6 +67,7 @@ class TestContainerHelper {
                 .plus(kafkaContainerHelper.envVars())
                 .plus(wiremockContainerHelper.envVars())
                 .plus(altinnTilgangerContainerHelper.envVars())
+                .plus(enhetsregisteretContainerHelper.envVars())
                 .plus(authContainerHelper.envVars()),
         ).waitingFor(HttpWaitStrategy().forPath("/internal/isalive").withStartupTimeout(Duration.ofSeconds(20)))
             .apply {
