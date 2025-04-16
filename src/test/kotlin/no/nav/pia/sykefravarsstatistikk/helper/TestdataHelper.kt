@@ -211,7 +211,7 @@ class TestdataHelper {
                 navn = "Underenhet Med Enkelrettighet Bransje Sykehjem",
                 antallAnsatte = 400,
                 naeringskode1 = SOMATISK_SYKEHJEM,
-                overordnetEnhet = overordnetEnhetUtenTilgang.organisasjonsnummer,
+                overordnetEnhet = overordnetSykehjemUtenTilgang.organisasjonsnummer,
             )
 
         val overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode =
