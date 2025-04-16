@@ -16,6 +16,8 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.pos
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeByggUtenInstitusjonellSektorKode
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.persistering.INGEN_SEKTOR_LABEL
@@ -38,22 +40,21 @@ class EdgeCasesSykefraværsstatistikkApiEndepunkterTest {
     fun `Virksomhet uten institusjonell sektor kode fungerer både for aggregert og kvartalsvis`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode,
-                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode,
+                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende(),
             )
-
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode,
+                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val aggregertStatistikkDto = TestContainerHelper.hentAggregertStatistikk(
-                orgnr = underenhetIBransjeByggUtenInstitusjonellSektorKode.orgnr,
+                orgnr = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
-            val bransje = underenhetIBransjeByggUtenInstitusjonellSektorKode.bransje()!!
+            val bransje = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende().bransje()!!
 
             val landStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
                 .firstOrNull { it.statistikkategori == LAND }
@@ -71,7 +72,7 @@ class EdgeCasesSykefraværsstatistikkApiEndepunkterTest {
             virksomhetStatistikk.label shouldBe underenhetIBransjeByggUtenInstitusjonellSektorKode.navn
 
             val kvartalsvisStatistikkDto = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetIBransjeByggUtenInstitusjonellSektorKode.orgnr,
+                orgnr = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 

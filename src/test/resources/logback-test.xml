@@ -4,6 +4,7 @@
             <pattern>%d{HH:mm:ss.SSS} %-5level %logger - %msg%n</pattern>
         </encoder>
     </appender>
+    <logger name="no.nav.pia.sykefravarsstatistikk.helper.EnhetsregisteretContainerHelper" level="WARN"/>
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
