@@ -24,9 +24,9 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kaf
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetSykehjemUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeSykehjem
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetSykehjemMedTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehjem
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
 import java.math.BigDecimal
@@ -54,12 +54,12 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
     @Test
     fun `Sjekk format og data fra aggregert statistikk`() {
-        val underenhet: Underenhet = underenhetSykehjemMedTilgang.somNæringsdrivende()
+        val underenhet: Underenhet = underenhetIBransjeSykehjem.somNæringsdrivende()
 
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetSykehjemUtenTilgang,
-                underenhet = underenhetSykehjemMedTilgang,
+                overordnetEnhet = overordnetEnhetIBransjeSykehjem,
+                underenhet = underenhetIBransjeSykehjem,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhet,
@@ -111,7 +111,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             ).onEach { aggregertStatistikkDto ->
                 aggregertStatistikkDto.shouldHaveStatistikkForKategori(
                     statistikkategori = Statistikkategori.VIRKSOMHET,
-                    label = underenhetSykehjemMedTilgang.navn,
+                    label = underenhetIBransjeSykehjem.navn,
                 )
             }
         }
@@ -119,12 +119,12 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
 
     @Test
     fun `Sjekk format og data fra kvartalsvis statistikk`() {
-        val underenhet: Underenhet = underenhetSykehjemMedTilgang.somNæringsdrivende()
+        val underenhet: Underenhet = underenhetIBransjeSykehjem.somNæringsdrivende()
 
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetSykehjemUtenTilgang,
-                underenhet = underenhetSykehjemMedTilgang,
+                overordnetEnhet = overordnetEnhetIBransjeSykehjem,
+                underenhet = underenhetIBransjeSykehjem,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhet,
@@ -155,13 +155,13 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             kvartalsvisStatistikk.shoudBeEqualForKategori(
                 expectedStatistikkVirksomhet,
                 Statistikkategori.VIRKSOMHET,
-                underenhetSykehjemMedTilgang.navn,
+                underenhetIBransjeSykehjem.navn,
             )
 
             kvartalsvisStatistikk.shoudBeEqualForKategori(
                 expectedStatistikkForKategori = emptyList(),
                 statistikkategori = Statistikkategori.OVERORDNET_ENHET,
-                label = overordnetSykehjemUtenTilgang.navn,
+                label = overordnetEnhetIBransjeSykehjem.navn,
             )
         }
     }
@@ -227,7 +227,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
-                kode = underenhetSykehjemMedTilgang.somNæringsdrivende().orgnr,
+                kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
                 årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
                 tapteDagsverk = 440.0.toBigDecimal(),
                 muligeDagsverk = 1254.0.toBigDecimal(),
@@ -264,7 +264,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
-                kode = underenhetSykehjemMedTilgang.somNæringsdrivende().orgnr,
+                kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
                 årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
                 tapteDagsverk = 85.0.toBigDecimal(),
                 muligeDagsverk = 1653.0.toBigDecimal(),
@@ -297,7 +297,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
-                kode = underenhetSykehjemMedTilgang.somNæringsdrivende().orgnr,
+                kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
                 årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
                 tapteDagsverk = 118.0.toBigDecimal(),
                 muligeDagsverk = 1197.0.toBigDecimal(),
@@ -330,7 +330,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         statistikk.add(
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
-                kode = underenhetSykehjemMedTilgang.somNæringsdrivende().orgnr,
+                kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
                 årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
                 tapteDagsverk = 41.0.toBigDecimal(),
                 muligeDagsverk = 1140.0.toBigDecimal(),

@@ -12,14 +12,14 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enh
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.performGet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedEnkelrettighetBransjeBarnehage
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedTilhørighetUtenBransje
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeBarnehage
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedEnkelrettighetBransjeBarnehage
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedTilhørighetUtenBransje
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetUtenTilgang
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeBarnehage
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.helper.withoutToken
 import kotlin.test.BeforeTest
@@ -39,7 +39,7 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker som når et ukjent endepunkt får '404 - Not found' i response`() {
         runBlocking {
             val resultat = TestContainerHelper.applikasjon.performGet(
-                url = "/${underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr}/sykefravarshistorikk/alt",
+                url = "/${underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr}/sykefravarshistorikk/alt",
                 config = withToken(),
             )
             resultat.shouldNotBeNull()
@@ -51,12 +51,12 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response (kvartalsvis endepunkt)`() {
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
 
             val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
-                orgnr = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withoutToken(),
             )
 
@@ -68,12 +68,12 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker som ikke er innlogget får en '401 - Unauthorized' i response (aggregert endepunkt)`() {
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
 
             val response = TestContainerHelper.hentAggregertStatistikkResponse(
-                orgnr = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withoutToken(),
             )
 
@@ -85,15 +85,15 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response (kvartalsvis endepunkt)`() {
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
 
             shouldFailWithMessage(
                 "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
             ) {
                 TestContainerHelper.hentKvartalsvisStatistikk(
-                    orgnr = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr,
+                    orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                     config = withToken(),
                 )
             }
@@ -104,12 +104,12 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Innlogget bruker uten tilgang til virksomhet får '403 - Forbidden' i response (aggregert endepunkt)`() {
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetUtenTilgang,
-                underenhet = underenhetUtenTilgang,
+                overordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass,
+                underenhet = underenhetINæringUtvinningAvRåoljeOgGass,
             )
 
             val response = TestContainerHelper.hentAggregertStatistikkResponse(
-                orgnr = underenhetUtenTilgang.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringUtvinningAvRåoljeOgGass.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
             response.status shouldBe HttpStatusCode.Forbidden
@@ -120,21 +120,21 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
     fun `Innlogget bruker uten enkeltrettighet for sykefraværsstatistikk får '403 - Forbidden' i response (kvartalsvis endepunkt)`() {
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage,
+                underenhet = underenhetIBransjeBarnehage,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende(),
+                underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
                 altinn2Rettighet = "enkeltrettighet_som_ikke_er_sykefraværsstatistikk",
             )
             kafkaContainerHelper.sendStatistikk(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende(),
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
             )
 
             val expectedMessage = "{\"message\":\"You don't have access to this resource\"}"
             val response = TestContainerHelper.hentKvartalsvisStatistikkResponse(
-                orgnr = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende().orgnr,
+                orgnr = underenhetIBransjeBarnehage.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 

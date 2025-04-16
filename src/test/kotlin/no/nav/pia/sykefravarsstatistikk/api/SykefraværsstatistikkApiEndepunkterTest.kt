@@ -28,20 +28,20 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kaf
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.enUnderenhetUtenStatistikk
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedEnkelrettighetBransjeBarnehage
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedEnkelrettighetUtenBransje
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedTilhørighetBransjeSykehus
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedTilhørighetUtenBransje
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedTilhørighetUtenBransje2
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenStatistikk
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeBarnehage
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringSkogskjøtsel
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeSykehus
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringProduksjonAvMatfisk
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeAnlegg
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedEnkelrettighetBransjeBarnehage
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedEnkelrettighetBransjeSykehus
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedEnkelrettighetUtenBransje
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedEnkelrettighetUtenBransje2
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedTilhørighetUtenBransje
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeBarnehage
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehus
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringSkogskjøtsel
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringProduksjonAvMatfisk
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -63,21 +63,21 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Innlogget bruker får en 200`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                underenhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje.somOverordnetEnhet(),
+                underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet(),
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
+                underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetMedTilhørighetUtenBransje.organisasjonsnummer,
+                orgnr = underenhetINæringUtleieAvEiendom.organisasjonsnummer,
                 config = withToken(),
             ).shouldNotBeNull()
         }
@@ -90,28 +90,28 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk(
-                overordnetEnhetMedTilhørighetUtenBransje.somOverordnetEnhet().sektor!!
+                overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!
             )
             kafkaContainerHelper.sendNæringsstatistikk(
-                næring = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().næringskode.næring
+                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring
             )
             kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
-                virksomhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
+                virksomhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 årstall = 2024,
                 harForFåAnsatte = true,
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
+                underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val statistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
-                orgnr = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -138,26 +138,26 @@ class SykefraværsstatistikkApiEndepunkterTest {
             kafkaContainerHelper.sendSektorstatistikk(
                 startÅr = 2023,
                 sluttÅr = 2024,
-                sektor = overordnetEnhetMedTilhørighetUtenBransje.somOverordnetEnhet().sektor!!,
+                sektor = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!,
             )
             kafkaContainerHelper.sendNæringsstatistikk(
                 startÅr = 2023,
                 sluttÅr = 2024,
-                næring = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().næringskode.næring,
+                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring,
                 harForFåAnsatte = true,
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
+                underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val statistikk = TestContainerHelper.hentAggregertStatistikk(
-                orgnr = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -179,28 +179,28 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk(
-                sektor = overordnetEnhetMedTilhørighetUtenBransje.somOverordnetEnhet().sektor!!
+                sektor = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!
             )
             kafkaContainerHelper.sendNæringsstatistikk(
-                næring = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().næringskode.næring
+                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring
             )
             kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
-                virksomhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
+                virksomhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 årstall = 2020,
                 harForFåAnsatte = true,
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje,
-                underenhet = underenhetMedTilhørighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
+                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedTilhørighetUtenBransje.somNæringsdrivende(),
+                underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val statistikk = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetMedTilhørighetUtenBransje.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -222,35 +222,35 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Får IKKE feil ved manglende statistikk`() {
         runBlocking {
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetUtenStatistikk,
-                underenhet = enUnderenhetUtenStatistikk,
+                overordnetEnhet = overordnetEnhetIBransjeAnlegg,
+                underenhet = underenhetIBransjeAnlegg,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = enUnderenhetUtenStatistikk.somNæringsdrivende(),
+                underenhet = underenhetIBransjeAnlegg.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             shouldFail {
                 TestContainerHelper.hentKvartalsvisStatistikk(
-                    orgnr = enUnderenhetUtenStatistikk.organisasjonsnummer,
+                    orgnr = underenhetIBransjeAnlegg.organisasjonsnummer,
                     config = withToken(),
                 )
             }
             kafkaContainerHelper.sendLandsstatistikk()
-            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetUtenStatistikk.somOverordnetEnhet().sektor!!)
+            kafkaContainerHelper.sendSektorstatistikk(overordnetEnhetIBransjeAnlegg.somOverordnetEnhet().sektor!!)
 
-            val bransje = enUnderenhetUtenStatistikk.somNæringsdrivende().bransje()
+            val bransje = underenhetIBransjeAnlegg.somNæringsdrivende().bransje()
             if (bransje != null) {
                 kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
             } else {
                 kafkaContainerHelper.sendNæringsstatistikk(
-                    næring = enUnderenhetUtenStatistikk.somNæringsdrivende().næringskode.næring
+                    næring = underenhetIBransjeAnlegg.somNæringsdrivende().næringskode.næring
                 )
             }
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = enUnderenhetUtenStatistikk.somNæringsdrivende().orgnr,
+                orgnr = underenhetIBransjeAnlegg.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -272,21 +272,21 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker med tilhørighet til virksomhet og enkelttilgang får kvartalsvis statistikk`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje2.somOverordnetEnhet(),
-                underenhet = underenhetMedEnkelrettighetUtenBransje2.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetINæringProduksjonAvMatfisk.somOverordnetEnhet(),
+                underenhet = underenhetINæringProduksjonAvMatfisk.somNæringsdrivende(),
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetUtenBransje2,
-                underenhet = underenhetMedEnkelrettighetUtenBransje2,
+                overordnetEnhet = overordnetEnhetINæringProduksjonAvMatfisk,
+                underenhet = underenhetINæringProduksjonAvMatfisk,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetUtenBransje2.somNæringsdrivende(),
+                underenhet = underenhetINæringProduksjonAvMatfisk.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetMedEnkelrettighetUtenBransje2.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringProduksjonAvMatfisk.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -301,7 +301,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe
-                overordnetEnhetMedTilhørighetUtenBransje2.somOverordnetEnhet().sektor?.beskrivelse
+                overordnetEnhetINæringProduksjonAvMatfisk.somOverordnetEnhet().sektor?.beskrivelse
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
@@ -312,7 +312,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val næringsStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }
             næringsStatistikk.shouldNotBeNull()
             næringsStatistikk.label shouldBe
-                underenhetMedEnkelrettighetUtenBransje2.somNæringsdrivende().næringskode.næring.navn
+                underenhetINæringProduksjonAvMatfisk.somNæringsdrivende().næringskode.næring.navn
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
@@ -320,14 +320,14 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
-            underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje2.navn
+            underenhetStatistikk.label shouldBe underenhetINæringProduksjonAvMatfisk.navn
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             val overordnetEnhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }
             overordnetEnhetStatistikk.shouldNotBeNull()
-            overordnetEnhetStatistikk.label shouldBe overordnetEnhetMedTilhørighetUtenBransje2.navn
+            overordnetEnhetStatistikk.label shouldBe overordnetEnhetINæringProduksjonAvMatfisk.navn
             overordnetEnhetStatistikk.kvartalsvisSykefraværsprosent shouldBe emptyList<KvartalsvisSykefraværshistorikkTestDto>()
         }
     }
@@ -336,21 +336,21 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker med tilhørighet til virksomhet (i bransje) og enkelttilgang får kvartalsvis statistikk`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                overordnetEnhet = overordnetEnhetMedTilhørighetBransjeSykehus.somOverordnetEnhet(),
-                underenhet = underenhetMedEnkelrettighetBransjeSykehus.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetIBransjeSykehus.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeSykehus.somNæringsdrivende(),
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedTilhørighetBransjeSykehus,
-                underenhet = underenhetMedEnkelrettighetBransjeSykehus,
+                overordnetEnhet = overordnetEnhetIBransjeSykehus,
+                underenhet = underenhetIBransjeSykehus,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeSykehus.somNæringsdrivende(),
+                underenhet = underenhetIBransjeSykehus.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetMedEnkelrettighetBransjeSykehus.somNæringsdrivende().orgnr,
+                orgnr = underenhetIBransjeSykehus.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -372,7 +372,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }.shouldBeNull()
 
-            val bransje = underenhetMedEnkelrettighetBransjeSykehus.somNæringsdrivende().bransje()!!
+            val bransje = underenhetIBransjeSykehus.somNæringsdrivende().bransje()!!
             val bransjeStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == BRANSJE.name }
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
@@ -383,14 +383,14 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
-            underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetBransjeSykehus.navn
+            underenhetStatistikk.label shouldBe underenhetIBransjeSykehus.navn
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             val overordnetEnhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }
             overordnetEnhetStatistikk.shouldNotBeNull()
-            overordnetEnhetStatistikk.label shouldBe overordnetEnhetMedTilhørighetBransjeSykehus.navn
+            overordnetEnhetStatistikk.label shouldBe overordnetEnhetIBransjeSykehus.navn
             overordnetEnhetStatistikk.kvartalsvisSykefraværsprosent shouldBe emptyList<KvartalsvisSykefraværshistorikkTestDto>()
         }
     }
@@ -399,21 +399,21 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker med tilhørighet til virksomhet, enkelttilgang og overordnet enhet får kvartalsvis statistikk`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetUtenBransje.somOverordnetEnhet(),
-                underenhet = underenhetMedEnkelrettighetUtenBransje.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetINæringSkogskjøtsel.somOverordnetEnhet(),
+                underenhet = underenhetINæringSkogskjøtsel.somNæringsdrivende(),
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetUtenBransje,
-                underenhet = underenhetMedEnkelrettighetUtenBransje,
+                overordnetEnhet = overordnetEnhetINæringSkogskjøtsel,
+                underenhet = underenhetINæringSkogskjøtsel,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetUtenBransje.somNæringsdrivende(),
+                underenhet = underenhetINæringSkogskjøtsel.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetMedEnkelrettighetUtenBransje.somNæringsdrivende().orgnr,
+                orgnr = underenhetINæringSkogskjøtsel.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -428,7 +428,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe
-                overordnetEnhetMedEnkelrettighetUtenBransje.somOverordnetEnhet().sektor?.beskrivelse
+                overordnetEnhetINæringSkogskjøtsel.somOverordnetEnhet().sektor?.beskrivelse
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
@@ -439,7 +439,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val næringsStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }
             næringsStatistikk.shouldNotBeNull()
             næringsStatistikk.label shouldBe
-                underenhetMedEnkelrettighetUtenBransje.somNæringsdrivende().næringskode.næring.navn
+                underenhetINæringSkogskjøtsel.somNæringsdrivende().næringskode.næring.navn
             næringsStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 5.9
             næringsStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 1239902.548524
@@ -447,14 +447,14 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
-            underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetUtenBransje.navn
+            underenhetStatistikk.label shouldBe underenhetINæringSkogskjøtsel.navn
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             val overordnetEnhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }
             overordnetEnhetStatistikk.shouldNotBeNull()
-            overordnetEnhetStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetUtenBransje.navn
+            overordnetEnhetStatistikk.label shouldBe overordnetEnhetINæringSkogskjøtsel.navn
             overordnetEnhetStatistikk.kvartalsvisSykefraværsprosent shouldBe emptyList<KvartalsvisSykefraværshistorikkTestDto>()
         }
     }
@@ -463,22 +463,22 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker med tilhørighet til virksomhet (i bransje), enkelttilgang og overordnet enhet får kvartalsvis statistikk`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage.somOverordnetEnhet(),
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage,
+                underenhet = underenhetIBransjeBarnehage,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage.somOverordnetEnhet(),
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val kvartalsvisStatistikk = TestContainerHelper.hentKvartalsvisStatistikk(
-                orgnr = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende().orgnr,
+                orgnr = underenhetIBransjeBarnehage.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
@@ -493,7 +493,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val sektorStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == SEKTOR.name }
             sektorStatistikk.shouldNotBeNull()
             sektorStatistikk.label shouldBe
-                overordnetEnhetMedEnkelrettighetBransjeBarnehage.somOverordnetEnhet().sektor?.beskrivelse
+                overordnetEnhetIBransjeBarnehage.somOverordnetEnhet().sektor?.beskrivelse
             sektorStatistikk.kvartalsvisSykefraværsprosent.size shouldBe 20 // Skal være 5 år
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 6.3
             sektorStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 1275292.330000
@@ -501,7 +501,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             kvartalsvisStatistikk.firstOrNull { it.type == NÆRING.name }.shouldBeNull()
 
-            val bransje = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende().bransje()!!
+            val bransje = underenhetIBransjeBarnehage.somNæringsdrivende().bransje()!!
             val bransjeStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == BRANSJE.name }
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
@@ -512,14 +512,14 @@ class SykefraværsstatistikkApiEndepunkterTest {
 
             val underenhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == VIRKSOMHET.name }
             underenhetStatistikk.shouldNotBeNull()
-            underenhetStatistikk.label shouldBe underenhetMedEnkelrettighetBransjeBarnehage.navn
+            underenhetStatistikk.label shouldBe underenhetIBransjeBarnehage.navn
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().tapteDagsverk bigDecimalShouldBe 154.5439
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().prosent bigDecimalShouldBe 28.3
             underenhetStatistikk.kvartalsvisSykefraværsprosent.first().muligeDagsverk bigDecimalShouldBe 761.3
 
             val overordnetEnhetStatistikk = kvartalsvisStatistikk.firstOrNull { it.type == OVERORDNET_ENHET.name }
             overordnetEnhetStatistikk.shouldNotBeNull()
-            overordnetEnhetStatistikk.label shouldBe overordnetEnhetMedEnkelrettighetBransjeBarnehage.navn
+            overordnetEnhetStatistikk.label shouldBe overordnetEnhetIBransjeBarnehage.navn
             overordnetEnhetStatistikk.kvartalsvisSykefraværsprosent shouldBe emptyList<KvartalsvisSykefraværshistorikkTestDto>()
         }
     }
@@ -531,25 +531,25 @@ class SykefraværsstatistikkApiEndepunkterTest {
     fun `Bruker får aggregert statistikk`() {
         runBlocking {
             kafkaContainerHelper.sendStatistikk(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage.somOverordnetEnhet(),
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende(),
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
             )
             enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetMedEnkelrettighetBransjeBarnehage,
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage,
+                overordnetEnhet = overordnetEnhetIBransjeBarnehage,
+                underenhet = underenhetIBransjeBarnehage,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
-                underenhet = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende(),
+                underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
                 altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             val aggregertStatistikkDto = TestContainerHelper.hentAggregertStatistikk(
-                orgnr = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende().orgnr,
+                orgnr = underenhetIBransjeBarnehage.somNæringsdrivende().orgnr,
                 config = withToken(),
             )
 
-            val bransje = underenhetMedEnkelrettighetBransjeBarnehage.somNæringsdrivende().bransje()!!
+            val bransje = underenhetIBransjeBarnehage.somNæringsdrivende().bransje()!!
 
             val landStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
                 .firstOrNull { it.statistikkategori == LAND }
@@ -576,7 +576,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             val virksomhetStatistikk = aggregertStatistikkDto.prosentSiste4KvartalerTotalt
                 .firstOrNull { it.statistikkategori == VIRKSOMHET }
             virksomhetStatistikk.shouldNotBeNull()
-            virksomhetStatistikk.label shouldBe underenhetMedEnkelrettighetBransjeBarnehage.navn
+            virksomhetStatistikk.label shouldBe underenhetIBransjeBarnehage.navn
         }
     }
 }
