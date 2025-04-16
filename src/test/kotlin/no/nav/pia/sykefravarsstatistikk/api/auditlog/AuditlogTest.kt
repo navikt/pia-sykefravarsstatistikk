@@ -6,12 +6,10 @@ import no.nav.pia.sykefravarsstatistikk.helper.AuthContainerHelper.Companion.FNR
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enhetsregisteretContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
@@ -25,7 +23,6 @@ class AuditlogTest {
     fun cleanUp() {
         runBlocking {
             altinnTilgangerContainerHelper.slettAlleRettigheter()
-            enhetsregisteretContainerHelper.slettAlleEnheterOgUnderenheter()
         }
     }
 
@@ -35,10 +32,6 @@ class AuditlogTest {
             kafkaContainerHelper.sendStatistikk(
                 overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet(),
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
-            )
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtleieAvEiendom,
-                underenhet = underenhetINæringUtleieAvEiendom,
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
@@ -59,10 +52,6 @@ class AuditlogTest {
     @Test
     fun `auditlogger feil ved manglende rettigheter`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass,
-                underenhet = underenhetINæringUtvinningAvRåoljeOgGass,
-            )
             shouldFailWithMessage(
                 "Feil ved henting av kvartalsvis statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
             ) {
@@ -85,10 +74,6 @@ class AuditlogTest {
     @Test
     fun `auditlogger feil ved manglende rettigheter i kall mot aggregert endepunkt`() {
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass,
-                underenhet = underenhetINæringUtvinningAvRåoljeOgGass,
-            )
             shouldFailWithMessage(
                 "Feil ved henting av aggregert statistikk, status: 403 Forbidden, body: {\"message\":\"You don't have access to this resource\"}",
             ) {

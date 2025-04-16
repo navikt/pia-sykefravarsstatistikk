@@ -67,9 +67,12 @@ class TestContainerHelper {
                 .plus(altinnTilgangerContainerHelper.envVars())
                 .plus(enhetsregisteretContainerHelper.envVars())
                 .plus(authContainerHelper.envVars()),
-        ).waitingFor(HttpWaitStrategy().forPath("/internal/isalive").withStartupTimeout(Duration.ofSeconds(20)))
+        ).waitingFor(HttpWaitStrategy().forPath("/internal/isalive")
+            .withStartupTimeout(Duration.ofSeconds(20)))
             .apply {
                 start()
+            }.also {
+                enhetsregisteretContainerHelper.opprettAlleTestvirksomheterIEnhetsregisteret()
             }
 
         internal suspend fun GenericContainer<*>.performGet(

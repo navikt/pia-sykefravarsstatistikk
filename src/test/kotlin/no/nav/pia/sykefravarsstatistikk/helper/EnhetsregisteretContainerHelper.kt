@@ -6,6 +6,8 @@ import no.nav.pia.sykefravarsstatistikk.api.dto.BrregEnhetDto
 import no.nav.pia.sykefravarsstatistikk.api.dto.BrregUnderenhetDto
 import no.nav.pia.sykefravarsstatistikk.helper.AltinnTilgangerContainerHelper.Expectation
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.log
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.virksomheterMedBransje
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.virksomheterMedNæring
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.Network
@@ -34,6 +36,8 @@ class EnhetsregisteretContainerHelper(
     val enhetsregisteretContainer = MockServerContainer(dockerImageName)
         .withNetwork(network)
         .withNetworkAliases(networkAlias)
+        // OBS: logging starter på level WARN i logback-test.xml (mockserver er veldig verbose),
+        // -> skru ned til INFO ved feilsøking i testene
         .withLogConsumer(Slf4jLogConsumer(logger).withPrefix(networkAlias).withSeparateOutputStreams())
         .withEnv(
             mapOf(
@@ -54,6 +58,22 @@ class EnhetsregisteretContainerHelper(
             "ENHETSREGISTERET_URL" to "http://$networkAlias:$port",
         )
 
+    fun opprettAlleTestvirksomheterIEnhetsregisteret() {
+        slettAlleEnheterOgUnderenheter()
+        virksomheterMedBransje.forEach {
+            leggTilIEnhetsregisteret(it.first, it.second)
+        }
+        log.info("Opprettet ${virksomheterMedBransje.size} virksomheter (med bransje) i enhetsregisteret")
+
+        virksomheterMedNæring.forEach {
+            leggTilIEnhetsregisteret(it.first, it.second)
+        }
+        log.info("Opprettet ${virksomheterMedNæring.size} virksomheter (med næring) i enhetsregisteret")
+        val antallExpectationsOpprettet = hentAlleExpectationIds()
+        log.info("Har nå $antallExpectationsOpprettet testvirksomheter i enhetsregisteret")
+    }
+
+
     private fun getMockServerClient(): MockServerClient {
         if (mockServerClient == null) {
             log.info(
@@ -69,17 +89,26 @@ class EnhetsregisteretContainerHelper(
         return mockServerClient!!
     }
 
-
-    internal fun slettAlleEnheterOgUnderenheter() {
+    // private funksjon så det skal ikke være mulig å slette alle virksomheter i enhetsregisteret,
+    // da de kan være tatt i bruk av flere tester (lag en slett(expectationId) funksjon i stedet)
+    private fun slettAlleEnheterOgUnderenheter() {
         val client = getMockServerClient()
+        val allExpectations = hentAlleExpectationIds()
+
         runBlocking {
-            val alleAktiveRequestDefinition: RequestDefinition? = null
-            val activeExpectations = client.retrieveActiveExpectations(alleAktiveRequestDefinition, Format.JSON)
-            val expectations: List<Expectation> = Json.decodeFromString(activeExpectations)
-            expectations.forEach { expectation ->
+            allExpectations.forEach { expectation ->
                 client.clear(expectation.id)
             }
-            log.info("Funnet og slettet '${expectations.size}' aktive expectations")
+            log.info("Funnet og slettet '${allExpectations.size}' aktive expectations")
+        }
+    }
+
+    internal fun hentAlleExpectationIds(): List<Expectation> {
+        val client = getMockServerClient()
+        return runBlocking {
+            val alleAktiveRequestDefinition: RequestDefinition? = null
+            val activeExpectations = client.retrieveActiveExpectations(alleAktiveRequestDefinition, Format.JSON)
+            Json.decodeFromString<List<Expectation>>(activeExpectations)
         }
     }
 
@@ -182,7 +211,9 @@ class EnhetsregisteretContainerHelper(
                 "beskrivelse": "${overordnetEnhet.institusjonellSektorkode!!.beskrivelse}"
             },
             """.trimIndent()
-        } else {""}
+        } else {
+            ""
+        }
 
         val client = getMockServerClient()
         runBlocking {

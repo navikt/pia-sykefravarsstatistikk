@@ -19,7 +19,6 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.enhetsregisteretContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
@@ -39,7 +38,6 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
     fun cleanUp() {
         runBlocking {
             altinnTilgangerContainerHelper.slettAlleRettigheter()
-            enhetsregisteretContainerHelper.slettAlleEnheterOgUnderenheter()
             postgresContainerHelper.slettAlleStatistikk()
         }
     }
@@ -57,10 +55,6 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         val underenhet: Underenhet = underenhetIBransjeSykehjem.somNæringsdrivende()
 
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeSykehjem,
-                underenhet = underenhetIBransjeSykehjem,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhet,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
@@ -122,10 +116,6 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         val underenhet: Underenhet = underenhetIBransjeSykehjem.somNæringsdrivende()
 
         runBlocking {
-            enhetsregisteretContainerHelper.leggTilIEnhetsregisteret(
-                overordnetEnhet = overordnetEnhetIBransjeSykehjem,
-                underenhet = underenhetIBransjeSykehjem,
-            )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhet,
                 altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
