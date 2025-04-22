@@ -37,8 +37,14 @@ class TestdataHelper {
         fun BrregUnderenhetDto.somNæringsdrivende() = Underenhet.Næringsdrivende(
             orgnr = this.organisasjonsnummer,
             navn = this.navn,
-            antallAnsatte = this.antallAnsatte,
-            næringskode = this.naeringskode1.tilDomene(),
+            antallAnsatte = this.antallAnsatte?: 0,
+            næringskode = this.naeringskode1!!.tilDomene(),
+            overordnetEnhetOrgnr = this.overordnetEnhet,
+        )
+
+        fun BrregUnderenhetDto.somIkkeNæringsdrivende() = Underenhet.IkkeNæringsdrivende(
+            orgnr = this.organisasjonsnummer,
+            navn = this.navn,
             overordnetEnhetOrgnr = this.overordnetEnhet,
         )
 
@@ -215,6 +221,24 @@ class TestdataHelper {
                 naeringskode1 = UTVINNING_AV_RÅOLJE_OG_GASS,
                 overordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.organisasjonsnummer,
             )
+        // Edge case
+        val overordnetEnhetMedUnderenhetUtenNæringskode =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000021",
+                navn = "Overordnet Enhet Uten Næringskode",
+                antallAnsatte = 150,
+                naeringskode1 = UTVINNING_AV_RÅOLJE_OG_GASS, // usikker om det er mulig å IKKE ha næringskode her
+                institusjonellSektorkode = PRIVAT_AKS,
+            )
+
+        val underenhetUtenNæringskode =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000022",
+                navn = "Underenhet Uten Næringskode",
+                antallAnsatte = 150,
+                naeringskode1 = null,
+                overordnetEnhet = overordnetEnhetMedUnderenhetUtenNæringskode.organisasjonsnummer,
+            )
 
         val virksomheterMedBransje: List<Pair<BrregEnhetDto, BrregUnderenhetDto>> =
             listOf(
@@ -222,10 +246,6 @@ class TestdataHelper {
                 Pair(overordnetEnhetIBransjeSykehus, underenhetIBransjeSykehus),
                 Pair(overordnetEnhetIBransjeAnlegg, underenhetIBransjeAnlegg),
                 Pair(overordnetEnhetIBransjeSykehjem, underenhetIBransjeSykehjem),
-                Pair(
-                    overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode,
-                    underenhetIBransjeByggUtenInstitusjonellSektorKode
-                ),
             )
 
         val virksomheterMedNæring: List<Pair<BrregEnhetDto, BrregUnderenhetDto>> =
@@ -235,6 +255,19 @@ class TestdataHelper {
                 Pair(overordnetEnhetINæringSkogskjøtsel, underenhetINæringSkogskjøtsel),
                 Pair(overordnetEnhetINæringUtvinningAvRåoljeOgGass, underenhetINæringUtvinningAvRåoljeOgGass),
             )
+
+        val virksomheterMedEdgeCase: List<Pair<BrregEnhetDto, BrregUnderenhetDto>> =
+            listOf(
+                Pair(
+                    overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode,
+                    underenhetIBransjeByggUtenInstitusjonellSektorKode,
+                ),
+                Pair(
+                    overordnetEnhetMedUnderenhetUtenNæringskode,
+                    underenhetUtenNæringskode,
+                ),
+            )
+
 
         @OptIn(ExperimentalSerializationApi::class)
         inline fun <reified T> prettyPrint(statistikk: T) {

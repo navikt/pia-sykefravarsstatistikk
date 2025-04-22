@@ -105,7 +105,7 @@ class KvartalsvisSykefraværshistorikkService(
 
     fun hentSykefraværshistorikk(
         overordnetEnhet: OverordnetEnhet,
-        underenhet: Underenhet,
+        underenhet: Underenhet.Næringsdrivende,
         tilganger: VerifiserteTilganger,
     ): Either<Feil, List<MaskertKvartalsvisSykefraværshistorikkDto>> {
         if (!tilganger.harEnkeltTilgang) {
@@ -160,66 +160,57 @@ class KvartalsvisSykefraværshistorikkService(
             )
         }
 
-        if (underenhet is Underenhet.Næringsdrivende) {
-            val bransje = underenhet.bransje()
-            if (bransje != null) {
-                val umaskertBransjestatistikk = hentSykefraværsstatistikkBransje(
-                    bransje = bransje,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                ).ifEmpty {
-                    logger.warn("Ingen bransjestatistikk funnet for bransje '${bransje.navn}' fra årstal/kvartal '$førsteKvartal'")
-                    return Feil(
-                        feilmelding = "Ingen bransjestatistikk funnet for bransje '${bransje.navn}'",
-                        httpStatusCode = HttpStatusCode.BadRequest,
-                    ).left()
-                }
-                response.add(umaskertBransjestatistikk.tilMaskertDto(type = "BRANSJE", label = bransje.navn))
-            } else {
-                val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
-                    næring = underenhet.næringskode.næring,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                ).ifEmpty {
-                    logger.warn(
-                        "Ingen næringsstatistikk funnet for næring '${underenhet.næringskode.næring.tosifferIdentifikator}-${underenhet.næringskode.næring.navn}' fra årstal/kvartal '$førsteKvartal'",
-                    )
-                    return Feil(
-                        feilmelding = "Ingen næringsstatistikk funnet for næring " +
-                            "med navn: '${underenhet.næringskode.næring.navn}' " +
-                            "og kode: '${underenhet.næringskode.næring.tosifferIdentifikator}'",
-                        httpStatusCode = HttpStatusCode.BadRequest,
-                    ).left()
-                }
-                response.add(
-                    umaskertNæringsstatistikk.tilMaskertDto(
-                        type = "NÆRING",
-                        label = underenhet.næringskode.næring.navn,
-                    ),
-                )
-            }
-            val umaskertVirksomhetsstatistikkForVirksomhet =
-                hentSykefraværsstatistikkVirksomhet(
-                    virksomhet = underenhet,
-                    førsteÅrstalOgKvartal = førsteKvartal,
-                ).ifEmpty {
-                    logger.info("Ingen virksomhetsstatistikk funnet for underenhet")
-                    emptyList()
-                }
 
-            response.add(
-                umaskertVirksomhetsstatistikkForVirksomhet.tilMaskertDto(
-                    type = VIRKSOMHET.name,
-                    label = underenhet.navn,
-                ),
-            )
+        val bransje = underenhet.bransje()
+        if (bransje != null) {
+            val umaskertBransjestatistikk = hentSykefraværsstatistikkBransje(
+                bransje = bransje,
+                førsteÅrstalOgKvartal = førsteKvartal,
+            ).ifEmpty {
+                logger.warn("Ingen bransjestatistikk funnet for bransje '${bransje.navn}' fra årstal/kvartal '$førsteKvartal'")
+                return Feil(
+                    feilmelding = "Ingen bransjestatistikk funnet for bransje '${bransje.navn}'",
+                    httpStatusCode = HttpStatusCode.BadRequest,
+                ).left()
+            }
+            response.add(umaskertBransjestatistikk.tilMaskertDto(type = "BRANSJE", label = bransje.navn))
         } else {
+            val umaskertNæringsstatistikk = hentSykefraværsstatistikkNæring(
+                næring = underenhet.næringskode.næring,
+                førsteÅrstalOgKvartal = førsteKvartal,
+            ).ifEmpty {
+                logger.warn(
+                    "Ingen næringsstatistikk funnet for næring '${underenhet.næringskode.næring.tosifferIdentifikator}-${underenhet.næringskode.næring.navn}' fra årstal/kvartal '$førsteKvartal'",
+                )
+                return Feil(
+                    feilmelding = "Ingen næringsstatistikk funnet for næring " +
+                        "med navn: '${underenhet.næringskode.næring.navn}' " +
+                        "og kode: '${underenhet.næringskode.næring.tosifferIdentifikator}'",
+                    httpStatusCode = HttpStatusCode.BadRequest,
+                ).left()
+            }
             response.add(
-                MaskertKvartalsvisSykefraværshistorikkDto(
+                umaskertNæringsstatistikk.tilMaskertDto(
                     type = "NÆRING",
-                    label = "Ikke næringsdrivende",
-                    kvartalsvisSykefraværsprosent = emptyList(),
+                    label = underenhet.næringskode.næring.navn,
                 ),
             )
         }
+        val umaskertVirksomhetsstatistikkForVirksomhet =
+            hentSykefraværsstatistikkVirksomhet(
+                virksomhet = underenhet,
+                førsteÅrstalOgKvartal = førsteKvartal,
+            ).ifEmpty {
+                logger.info("Ingen virksomhetsstatistikk funnet for underenhet")
+                emptyList()
+            }
+
+        response.add(
+            umaskertVirksomhetsstatistikkForVirksomhet.tilMaskertDto(
+                type = VIRKSOMHET.name,
+                label = underenhet.navn,
+            ),
+        )
 
         val umaskertVirksomhetsstatistikk = if (tilganger.harEnkeltTilgangOverordnetEnhet) {
             hentSykefraværsstatistikkVirksomhet(

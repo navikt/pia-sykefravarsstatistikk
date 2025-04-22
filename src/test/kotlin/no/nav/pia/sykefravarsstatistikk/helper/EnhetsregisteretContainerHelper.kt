@@ -7,6 +7,7 @@ import no.nav.pia.sykefravarsstatistikk.api.dto.BrregUnderenhetDto
 import no.nav.pia.sykefravarsstatistikk.helper.AltinnTilgangerContainerHelper.Expectation
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.log
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.virksomheterMedBransje
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.virksomheterMedEdgeCase
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.virksomheterMedNæring
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -64,11 +65,14 @@ class EnhetsregisteretContainerHelper(
             leggTilIEnhetsregisteret(it.first, it.second)
         }
         log.info("Opprettet ${virksomheterMedBransje.size} virksomheter (med bransje) i enhetsregisteret")
-
         virksomheterMedNæring.forEach {
             leggTilIEnhetsregisteret(it.first, it.second)
         }
         log.info("Opprettet ${virksomheterMedNæring.size} virksomheter (med næring) i enhetsregisteret")
+        virksomheterMedEdgeCase.forEach {
+            leggTilIEnhetsregisteret(it.first, it.second)
+        }
+        log.info("Opprettet ${virksomheterMedEdgeCase.size} virksomheter (med 'edge case') i enhetsregisteret")
         val antallExpectationsOpprettet = hentAlleExpectationIds()
         log.info("Har nå $antallExpectationsOpprettet testvirksomheter i enhetsregisteret")
     }
@@ -126,6 +130,17 @@ class EnhetsregisteretContainerHelper(
         log.debug(
             "Legger til underenhet med orgnr '${underenhet.organisasjonsnummer}' og navn '${underenhet.navn}'",
         )
+        val næringskode = if (underenhet.naeringskode1 != null) {
+            """
+              "naeringskode1": {
+                "kode": "${underenhet.naeringskode1!!.kode}",
+                "beskrivelse": "${underenhet.naeringskode1!!.beskrivelse}"
+              },
+            """.trimIndent()
+        } else {
+            ""
+        }
+
         val client = getMockServerClient()
         runBlocking {
             client.`when`(
@@ -160,10 +175,7 @@ class EnhetsregisteretContainerHelper(
                       },
                       "registreringsdatoEnhetsregisteret": "1992-09-18",
                       "registrertIMvaregisteret": true,
-                      "naeringskode1": {
-                        "kode": "${underenhet.naeringskode1.kode}",
-                        "beskrivelse": "${underenhet.naeringskode1.beskrivelse}"
-                      },
+                      ${næringskode}
                       "antallAnsatte": ${underenhet.antallAnsatte},
                       "harRegistrertAntallAnsatte": true,
                       "overordnetEnhet": "${underenhet.overordnetEnhet}",

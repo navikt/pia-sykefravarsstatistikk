@@ -26,8 +26,8 @@ class EnhetsregisteretService {
             val url = "$enhetsregisteretApi/underenheter/$orgnr"
 
             val response: HttpResponse = HttpClient.client.get(url)
-            val underenhet = response.body<BrregUnderenhetDto>()
-            return underenhet.tilDomene().right()
+            val brregUnderenhetDto = response.body<BrregUnderenhetDto>()
+            return brregUnderenhetDto.tilDomene().right()
         } catch (e: Error) {
             logger.error("Feil ved kall til Enhetsregisteret ved henting av enhet '$orgnr'", e)
             return Feil(

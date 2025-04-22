@@ -118,7 +118,7 @@ class AltinnTilgangerContainerHelper(
                                 "$altinn2Rettighet"
                               ],
                               "underenheter": [],
-                              "navn": "${(underenhet as Underenhet.Næringsdrivende).navn}",
+                              "navn": "${underenhet.navn}",
                               "organisasjonsform": "BEDR"
                             }
                           ],

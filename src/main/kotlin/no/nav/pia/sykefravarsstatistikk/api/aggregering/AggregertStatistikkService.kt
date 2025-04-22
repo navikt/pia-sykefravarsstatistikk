@@ -1,25 +1,20 @@
 package no.nav.pia.sykefravarsstatistikk.api.aggregering
 
 import arrow.core.Either
-import arrow.core.left
 import arrow.core.right
 import ia.felles.definisjoner.bransjer.Bransje
-import io.ktor.http.HttpStatusCode
-import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkService.HentAggregertStatistikkFeil.`virksomhet er ikke næringsdrivende`
 import no.nav.pia.sykefravarsstatistikk.api.auth.VerifiserteTilganger
 import no.nav.pia.sykefravarsstatistikk.api.dto.AggregertStatistikkResponseDto
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
-import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.exceptions.Feil
 import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkGraderingRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkMedVarighetRepository
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkRepository
-import org.slf4j.LoggerFactory
 
 class AggregertStatistikkService(
     private val importtidspunktRepository: ImporttidspunktRepository,
@@ -27,25 +22,11 @@ class AggregertStatistikkService(
     private val sykefraværsstatistikkMedVarighetRepository: SykefraværsstatistikkMedVarighetRepository,
     private val sykefraværsstatistikkGraderingRepository: SykefraværsstatistikkGraderingRepository,
 ) {
-    private val log = LoggerFactory.getLogger(this::class.java)
-
-    object HentAggregertStatistikkFeil {
-        val `virksomhet er ikke næringsdrivende` = Feil(
-            feilmelding = "Virksomhet er ikke næringsdrivende",
-            httpStatusCode = HttpStatusCode.BadRequest,
-        )
-    }
-
     fun hentAggregertStatistikk(
-        underenhet: Underenhet,
+        underenhet: Underenhet.Næringsdrivende,
         tilganger: VerifiserteTilganger,
     ): Either<Feil, AggregertStatistikkResponseDto> {
-        if (underenhet is Underenhet.IkkeNæringsdrivende) {
-            log.info("Underenhet ${underenhet.orgnr} er ikke næringsdrivende")
-            return `virksomhet er ikke næringsdrivende`.left()
-        }
-        val virksomhet = underenhet as Underenhet.Næringsdrivende
-
+        val virksomhet = underenhet
         val gjeldendePeriode = ÅrstallOgKvartal(årstall = 2024, kvartal = 4)
 
         val aggregeringskategorier = buildList {
@@ -98,7 +79,7 @@ class AggregertStatistikkService(
     }
 
     private fun aggregerData(
-        virksomhet: Virksomhet,
+        virksomhet: Underenhet.Næringsdrivende,
         totalfravær: Sykefraværsdata,
         gradertFravær: Sykefraværsdata,
         korttidsfravær: Sykefraværsdata,
@@ -156,10 +137,10 @@ class AggregertStatistikkService(
         )
     }
 
-    fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring =
-        Bransje.fra(virksomhet.næringskode.femsifferIdentifikator)?.let {
+    fun finnBransjeEllerNæring(underenhet: Underenhet.Næringsdrivende): BransjeEllerNæring =
+        Bransje.fra(underenhet.næringskode.femsifferIdentifikator)?.let {
             BransjeEllerNæring(it)
-        } ?: BransjeEllerNæring(Næring(tosifferIdentifikator = virksomhet.næringskode.næring.tosifferIdentifikator))
+        } ?: BransjeEllerNæring(Næring(tosifferIdentifikator = underenhet.næringskode.næring.tosifferIdentifikator))
 
     fun hentTotaltSykefraværAlleKategorier(
         kvartaler: List<ÅrstallOgKvartal>,

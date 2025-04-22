@@ -197,14 +197,17 @@ class KafkaContainerHelper(
     }
 
     fun sendStatistikk(
-        underenhet: Underenhet.Næringsdrivende,
+        underenhet: Underenhet,
         overordnetEnhet: OverordnetEnhet,
     ) {
         sendLandsstatistikk()
         overordnetEnhet.sektor?.let { sektor -> sendSektorstatistikk(sektor = sektor) }
-        underenhet.bransje()?.let { bransje -> sendBransjestatistikk(bransje = bransje) }
-            ?: sendNæringsstatistikk(næring = underenhet.næringskode.næring)
-        sendVirksomhetsstatistikk(virksomhet = underenhet)
+
+        if (underenhet is Underenhet.Næringsdrivende) {
+            underenhet.bransje()?.let { bransje -> sendBransjestatistikk(bransje = bransje) }
+                ?: sendNæringsstatistikk(næring = underenhet.næringskode.næring)
+            sendVirksomhetsstatistikk(virksomhet = underenhet)
+        }
         sendVirksomhetsstatistikk(virksomhet = overordnetEnhet)
     }
 
