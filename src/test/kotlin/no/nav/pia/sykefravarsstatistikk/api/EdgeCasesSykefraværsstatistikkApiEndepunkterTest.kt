@@ -3,12 +3,15 @@ package no.nav.pia.sykefravarsstatistikk.api
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.BRANSJE
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.LAND
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
+import no.nav.pia.sykefravarsstatistikk.helper.KvartalsvisSykefraværshistorikkTestDto
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
@@ -16,9 +19,12 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.pos
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetMedUnderenhetUtenNæringskode
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somIkkeNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeByggUtenInstitusjonellSektorKode
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetUtenNæringskode
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.persistering.INGEN_SEKTOR_LABEL
 import kotlin.test.BeforeTest
@@ -83,6 +89,37 @@ class EdgeCasesSykefraværsstatistikkApiEndepunkterTest {
             actualStatistikkForSektor.shouldNotBeNull()
             actualStatistikkForSektor.label shouldBe INGEN_SEKTOR_LABEL
             actualStatistikkForSektor.kvartalsvisSykefraværsprosent shouldBe emptyList()
+        }
+    }
+
+    @Test
+    fun `Virksomhet uten næringskode fungerer (dvs ikke krasjer med 500) både for aggregert og kvartalsvis`() {
+        runBlocking {
+            kafkaContainerHelper.sendStatistikk(
+                overordnetEnhet = overordnetEnhetMedUnderenhetUtenNæringskode.somOverordnetEnhet(),
+                underenhet = underenhetUtenNæringskode.somIkkeNæringsdrivende(),
+            )
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetUtenNæringskode.somIkkeNæringsdrivende(),
+                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+            )
+
+            val aggregertStatistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
+                orgnr = underenhetUtenNæringskode.somIkkeNæringsdrivende().orgnr,
+                config = withToken(),
+            )
+            aggregertStatistikkResponse.status shouldBe HttpStatusCode.BadRequest
+
+            val kvartalsvisStatistikkResponse = TestContainerHelper.hentKvartalsvisStatistikkResponse(
+                orgnr = underenhetUtenNæringskode.somIkkeNæringsdrivende().orgnr,
+                config = withToken(),
+            )
+
+            kvartalsvisStatistikkResponse.status shouldBe HttpStatusCode.OK
+            val kvartalsvisStatistikkDto: List<KvartalsvisSykefraværshistorikkTestDto> =
+                kvartalsvisStatistikkResponse.body()
+            kvartalsvisStatistikkDto shouldBe emptyList()
         }
     }
 }

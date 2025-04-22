@@ -9,23 +9,24 @@ import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 data class BrregUnderenhetDto(
     val organisasjonsnummer: String,
     val navn: String,
-    val naeringskode1: BrregNæringskodeDto,
     val overordnetEnhet: String,
-    val antallAnsatte: Int = 0,
+    val naeringskode1: BrregNæringskodeDto? = null,
+    val antallAnsatte: Int? = 0,
 ) {
     fun tilDomene(): Underenhet =
-        // TODO: håndtere ikke-næringsdrivende virksomhet
         if (naeringskode1 != null) {
             Underenhet.Næringsdrivende(
                 orgnr = organisasjonsnummer,
                 overordnetEnhetOrgnr = overordnetEnhet,
                 navn = navn,
                 næringskode = naeringskode1.tilDomene(),
-                antallAnsatte = antallAnsatte,
+                antallAnsatte = antallAnsatte?: 0,
             )
         } else {
             Underenhet.IkkeNæringsdrivende(
                 orgnr = organisasjonsnummer,
+                navn = navn,
+                overordnetEnhetOrgnr = overordnetEnhet,
             )
         }
 }

@@ -42,10 +42,6 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                 val underenhet: Underenhet = enhetsregisteretService.hentUnderEnhet(orgnr)
                     .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
 
-                val overordnetEnhet: OverordnetEnhet =
-                    enhetsregisteretService.hentEnhet((underenhet as Underenhet.Næringsdrivende).overordnetEnhetOrgnr)
-                        .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
-
                 val altinnTilganger = call.attributes[AltinnTilgangerKey].altinnTilganger
                 val harTilgangTilOrgnr = altinnTilganger.harTilgangTilOrgnr(
                     orgnr = underenhet.orgnr,
@@ -56,6 +52,10 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                     enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
                     enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                 )
+
+                val overordnetEnhet: OverordnetEnhet =
+                    enhetsregisteretService.hentEnhet(underenhet.overordnetEnhetOrgnr)
+                        .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
 
                 val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltrettighet(
                     orgnr = overordnetEnhet.orgnr,
