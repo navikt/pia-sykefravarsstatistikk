@@ -65,7 +65,7 @@ jobs:
       id-token: write
     name: Deploy app to dev
     needs: build
-    if: github.ref == 'refs/heads/erstatte-mockserver-med-sin-nyere-fork'
+    if: github.ref == 'refs/heads/ikke-naringsdrivende-underenheter'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
