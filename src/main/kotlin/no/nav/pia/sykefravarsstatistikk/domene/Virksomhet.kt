@@ -8,5 +8,5 @@ interface Virksomhet {
     val næringskode: Næringskode?
     val antallAnsatte: Int
 
-    fun bransje(): Bransje? = næringskode?.let { Bransje.fra(næringskode = næringskode!!.femsifferIdentifikator)}
+    fun bransje(): Bransje? = næringskode?.let { Bransje.fra(næringskode = it.femsifferIdentifikator)}
 }
