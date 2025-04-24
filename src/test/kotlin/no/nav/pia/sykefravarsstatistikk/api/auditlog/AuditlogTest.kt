@@ -8,6 +8,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.alt
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldNotContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
@@ -46,6 +47,8 @@ class AuditlogTest {
             applikasjon shouldContainLog "CEF:0\\|pia-sykefravarsstatistikk\\|auditLog\\|1.0\\|audit:access\\|Sporingslogg\\|INFO".toRegex()
             applikasjon shouldContainLog
                 "msg=$FNR har utført følgende kall mot organisajonsnummer ${underenhetINæringUtleieAvEiendom.somNæringsdrivende().orgnr} path: ".toRegex()
+            applikasjon shouldNotContainLog
+                "flexString2Label=VirksomheterSomBrukerRepresenterer".toRegex()
         }
     }
 

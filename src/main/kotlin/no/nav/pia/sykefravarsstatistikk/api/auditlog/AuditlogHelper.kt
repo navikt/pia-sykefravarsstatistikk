@@ -47,7 +47,6 @@ fun ApplicationCall.auditLogVedUkjentOrgnummer(
         fnr = fnr,
         tillat = Tillat.Nei,
         beskrivelse = "finner ikke organisjasjonsnummeret i requesten fra bruker $fnr",
-        virksomheter = emptyList(),
     )
 }
 
@@ -59,28 +58,24 @@ fun ApplicationCall.auditLogVedUgyldigOrgnummer(
         fnr = fnr,
         tillat = Tillat.Nei,
         beskrivelse = "ugyldig organisjasjonsnummer $orgnr i requesten fra bruker $fnr",
-        virksomheter = emptyList(),
     )
 }
 
 fun ApplicationCall.auditLogVedIkkeTilgangTilOrg(
     fnr: String,
     orgnr: String,
-    virksomheter: List<String>,
 ) {
     this.auditLog(
         fnr = fnr,
         orgnummer = orgnr,
         tillat = Tillat.Nei,
         beskrivelse = "$fnr har ikke tilgang til organisasjonsnummer $orgnr",
-        virksomheter = virksomheter,
     )
 }
 
 suspend fun ApplicationCall.auditLogVedOkKall(
     fnr: String,
     orgnr: String,
-    virksomheter: List<String>,
 ) {
     this.auditLog(
         fnr = fnr,
@@ -90,7 +85,6 @@ suspend fun ApplicationCall.auditLogVedOkKall(
             "path: ${this.request.path()} " +
             "arg: ${this.request.queryParameters.toMap()} " +
             "body: ${this.receiveText()}",
-        virksomheter = virksomheter,
     )
 }
 
@@ -99,13 +93,11 @@ private fun ApplicationCall.auditLog(
     orgnummer: String? = null,
     tillat: Tillat,
     beskrivelse: String,
-    virksomheter: List<String>,
 ) {
     val auditType = this.request.httpMethod.tilAuditType()
     val method = this.request.httpMethod.value
     val uri = this.request.uri
     val severity = if (orgnummer.isNullOrEmpty()) "WARN" else "INFO"
-    val virksomheterSomBrukerRepresenterer = virksomheter.joinToString()
     val logstring =
         "CEF:0|$APP_IDENTIFIKATOR|auditLog|1.0|audit:${auditType.name}|Sporingslogg|$severity|end=${System.currentTimeMillis()} " +
             "suid=$fnr " +
@@ -120,8 +112,6 @@ private fun ApplicationCall.auditLog(
             } " +
             "flexString1Label=Decision " +
             "flexString1=${tillat.tillat} " +
-            "flexString2Label=VirksomheterSomBrukerRepresenterer " +
-            "flexString2=$virksomheterSomBrukerRepresenterer " +
             "msg=$beskrivelse "
 
     when (Systemmiljø.cluster) {

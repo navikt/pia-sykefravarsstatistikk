@@ -13,7 +13,6 @@ import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighet
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.virksomheterVedkommendeHarTilgangTil
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.exceptions.UgyldigForespørselException
@@ -73,14 +72,12 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                             call.auditLogVedIkkeTilgangTilOrg(
                                 fnr = fnr,
                                 orgnr = orgnr,
-                                virksomheter = altinnTilganger.virksomheterVedkommendeHarTilgangTil(),
                             )
                         }
                 } else {
                     call.auditLogVedOkKall(
                         fnr = fnr,
                         orgnr = orgnr,
-                        virksomheter = altinnTilganger.virksomheterVedkommendeHarTilgangTil(),
                     )
                     call.attributes.put(
                         VerifiserteTilgangerKey,

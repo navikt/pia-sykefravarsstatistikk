@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.helper
 
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -170,6 +171,7 @@ class TestContainerHelper {
         }
 
         infix fun GenericContainer<*>.shouldContainLog(regex: Regex) = logs shouldContain regex
+        infix fun GenericContainer<*>.shouldNotContainLog(regex: Regex) = logs shouldNotContain regex
 
         internal fun accessToken(
             subject: String = FNR,
