@@ -2,15 +2,16 @@ package no.nav.pia.sykefravarsstatistikk.api.auth
 
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilgang
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.AltinnTilganger
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.altinnOrganisasjonerVedkommendeHarTilgangTil
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.finnOverordnetEnhet
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighet
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighetIAltinn3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerTestCase.Companion.jsonResponseFraAltinnTilgangerIDevMiljø
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon
 import kotlin.test.Test
 
@@ -29,27 +30,25 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
+                enkeltrettigheterAltinn3 = emptySet(),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = "989898989",
                     navn = "Ikke den underenheten vi leter etter",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe false
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = underenhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = overordnetEnhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
@@ -60,27 +59,25 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
+                enkeltrettigheterAltinn3 = emptySet(),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = emptySet(),
+                    enkeltrettigheterAltinn3 = emptySet(),
                 ),
             ),
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = underenhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = overordnetEnhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
@@ -91,13 +88,12 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
+                enkeltrettigheterAltinn3 = emptySet(),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
                     enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
@@ -105,14 +101,12 @@ class AltinnTilgangerServiceUnitTest {
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = underenhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = overordnetEnhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
@@ -123,13 +117,12 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
+                enkeltrettigheterAltinn3 = emptySet(),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = emptySet(),
                     enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
@@ -137,14 +130,12 @@ class AltinnTilgangerServiceUnitTest {
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = underenhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = overordnetEnhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe false
     }
@@ -155,27 +146,25 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
         )
 
         altinnTilganger.harTilgangTilOrgnr(underenhet) shouldBe true
         altinnTilganger.harTilgangTilOrgnr(overordnetEnhet) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = underenhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
-        altinnTilganger.harEnkeltrettighet(
+        altinnTilganger.harEnkeltrettighetIAltinn3(
             orgnr = overordnetEnhet,
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe true
     }
@@ -191,53 +180,8 @@ class AltinnTilgangerServiceUnitTest {
 
         altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil() shouldBe emptyList()
         altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe emptyList()
-    }
-
-    @Test
-    fun `listen av AltinnVirksomheter en bruker har tilgang til inneholder riktige virksomheter (bare med Altinn 2)`() {
-        val altinnTilganger = lagAltinnTilganger(
-            overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
-                orgnr = overordnetEnhet,
-                navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
-            ),
-            underenheter = listOf(
-                EnkeltrettigheterTilEnVirksomhet(
-                    orgnr = underenhet,
-                    navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
-                ),
-            ),
-        )
-
-        altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil() shouldContainExactlyInAnyOrder listOf(
-            AltinnOrganisasjon(
-                name = "Underenhet",
-                organizationNumber = underenhet,
-                organizationForm = "BEDR",
-                parentOrganizationNumber = overordnetEnhet,
-            ),
-            AltinnOrganisasjon(
-                name = "Overordnet enhet",
-                organizationNumber = overordnetEnhet,
-                organizationForm = "ORG",
-                parentOrganizationNumber = "",
-            ),
-        )
-        altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
-            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
-        ) shouldBe listOf(
-            AltinnOrganisasjon(
-                name = "Underenhet",
-                organizationNumber = underenhet,
-                organizationForm = "BEDR",
-                parentOrganizationNumber = overordnetEnhet,
-            ),
-        )
     }
 
     @Test
@@ -246,13 +190,12 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
+                enkeltrettigheterAltinn3 = emptySet(),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
                     enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
@@ -273,52 +216,6 @@ class AltinnTilgangerServiceUnitTest {
             ),
         )
         altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
-            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
-        ) shouldBe listOf(
-            AltinnOrganisasjon(
-                name = "Underenhet",
-                organizationNumber = underenhet,
-                organizationForm = "BEDR",
-                parentOrganizationNumber = overordnetEnhet,
-            ),
-        )
-    }
-
-    @Test
-    fun `listen av AltinnVirksomheter en bruker har tilgang til inneholder riktige virksomheter (med Altinn 2 og Altinn 3)`() {
-        val altinnTilganger = lagAltinnTilganger(
-            overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
-                orgnr = overordnetEnhet,
-                navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = emptySet(),
-            ),
-            underenheter = listOf(
-                EnkeltrettigheterTilEnVirksomhet(
-                    orgnr = underenhet,
-                    navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
-                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
-                ),
-            ),
-        )
-
-        altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil() shouldContainExactlyInAnyOrder listOf(
-            AltinnOrganisasjon(
-                name = "Underenhet",
-                organizationNumber = underenhet,
-                organizationForm = "BEDR",
-                parentOrganizationNumber = overordnetEnhet,
-            ),
-            AltinnOrganisasjon(
-                name = "Overordnet enhet",
-                organizationNumber = overordnetEnhet,
-                organizationForm = "ORG",
-                parentOrganizationNumber = "",
-            ),
-        )
-        altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         ) shouldBe listOf(
             AltinnOrganisasjon(
@@ -336,25 +233,25 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet2,
                     navn = "Underenhet 2",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
             underenheterNivå2 = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhetNivå2,
                     navn = "Underenhet nivå 2",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
         )
@@ -386,35 +283,33 @@ class AltinnTilgangerServiceUnitTest {
             ),
         )
         altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
-        ) shouldContainExactlyInAnyOrder
-            listOf(
-                AltinnOrganisasjon(
-                    name = "Underenhet",
-                    organizationNumber = underenhet,
-                    organizationForm = "BEDR",
-                    parentOrganizationNumber = overordnetEnhet,
-                ),
-                AltinnOrganisasjon(
-                    name = "Underenhet 2",
-                    organizationNumber = underenhet2,
-                    organizationForm = "BEDR",
-                    parentOrganizationNumber = overordnetEnhet,
-                ),
-                AltinnOrganisasjon(
-                    name = "Underenhet nivå 2",
-                    organizationNumber = underenhetNivå2,
-                    organizationForm = "BEDR",
-                    parentOrganizationNumber = underenhet,
-                ),
-                AltinnOrganisasjon(
-                    name = "Overordnet enhet",
-                    organizationNumber = overordnetEnhet,
-                    organizationForm = "ORG",
-                    parentOrganizationNumber = "",
-                ),
-            )
+        ) shouldContainExactlyInAnyOrder listOf(
+            AltinnOrganisasjon(
+                name = "Underenhet",
+                organizationNumber = underenhet,
+                organizationForm = "BEDR",
+                parentOrganizationNumber = overordnetEnhet,
+            ),
+            AltinnOrganisasjon(
+                name = "Underenhet 2",
+                organizationNumber = underenhet2,
+                organizationForm = "BEDR",
+                parentOrganizationNumber = overordnetEnhet,
+            ),
+            AltinnOrganisasjon(
+                name = "Underenhet nivå 2",
+                organizationNumber = underenhetNivå2,
+                organizationForm = "BEDR",
+                parentOrganizationNumber = underenhet,
+            ),
+            AltinnOrganisasjon(
+                name = "Overordnet enhet",
+                organizationNumber = overordnetEnhet,
+                organizationForm = "ORG",
+                parentOrganizationNumber = "",
+            ),
+        )
     }
 
     @Test
@@ -423,32 +318,32 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                    enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
                 ),
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet2,
                     navn = "Underenhet 2",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
             underenheterNivå2 = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhetNivå2,
                     navn = "Underenhet nivå 2",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                    enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
                 ),
             ),
             underenheterNivå3 = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhetNivå3,
                     navn = "Underenhet nivå 3",
-                    enkeltrettigheterAltinn2 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2),
+                    enkeltrettigheterAltinn3 = setOf(ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3),
                 ),
             ),
         )
@@ -486,23 +381,21 @@ class AltinnTilgangerServiceUnitTest {
             ),
         )
         altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
             enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
-        ) shouldContainExactlyInAnyOrder
-            listOf(
-                AltinnOrganisasjon(
-                    name = "Underenhet 2",
-                    organizationNumber = underenhet2,
-                    organizationForm = "BEDR",
-                    parentOrganizationNumber = overordnetEnhet,
-                ),
-                AltinnOrganisasjon(
-                    name = "Underenhet nivå 3",
-                    organizationNumber = underenhetNivå3,
-                    organizationForm = "BEDR",
-                    parentOrganizationNumber = underenhetNivå2,
-                ),
-            )
+        ) shouldContainExactlyInAnyOrder listOf(
+            AltinnOrganisasjon(
+                name = "Underenhet 2",
+                organizationNumber = underenhet2,
+                organizationForm = "BEDR",
+                parentOrganizationNumber = overordnetEnhet,
+            ),
+            AltinnOrganisasjon(
+                name = "Underenhet nivå 3",
+                organizationNumber = underenhetNivå3,
+                organizationForm = "BEDR",
+                parentOrganizationNumber = underenhetNivå2,
+            ),
+        )
     }
 
     @Test
@@ -511,13 +404,13 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                    enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
                 ),
             ),
         )
@@ -531,27 +424,27 @@ class AltinnTilgangerServiceUnitTest {
             overordnetEnhet = EnkeltrettigheterTilEnVirksomhet(
                 orgnr = overordnetEnhet,
                 navn = "Overordnet enhet",
-                enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
             ),
             underenheter = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhet,
                     navn = "Underenhet",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                    enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
                 ),
             ),
             underenheterNivå2 = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhetNivå2,
                     navn = "Underenhet nivå 2",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                    enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
                 ),
             ),
             underenheterNivå3 = listOf(
                 EnkeltrettigheterTilEnVirksomhet(
                     orgnr = underenhetNivå3,
                     navn = "Underenhet nivå 3",
-                    enkeltrettigheterAltinn2 = setOf("En annen enkelrettighet"),
+                    enkeltrettigheterAltinn3 = setOf("En annen enkelrettighet"),
                 ),
             ),
         )
@@ -561,76 +454,86 @@ class AltinnTilgangerServiceUnitTest {
         altinnTilganger.finnOverordnetEnhet(underenhetNivå3) shouldBe underenhetNivå2
     }
 
+    @Test
+    fun `verif fra en use-case i dev miljø`() {
+        val altinnTilganger = Json.decodeFromString<AltinnTilganger>(jsonResponseFraAltinnTilgangerIDevMiljø)
+
+        altinnTilganger.harTilgangTilOrgnr(orgnr = "310529915") shouldBe true
+        altinnTilganger.harTilgangTilOrgnr(orgnr = "313068420") shouldBe true
+        altinnTilganger.harEnkeltrettighetIAltinn3(
+            orgnr = "313068420",
+            enkeltrettighetIAltinn3 = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
+        ) shouldBe false
+    }
+
     private fun lagAltinnTilganger(
         overordnetEnhet: EnkeltrettigheterTilEnVirksomhet,
         underenheter: List<EnkeltrettigheterTilEnVirksomhet>,
         underenheterNivå2: List<EnkeltrettigheterTilEnVirksomhet> = emptyList(),
         underenheterNivå3: List<EnkeltrettigheterTilEnVirksomhet> = emptyList(),
-    ): AltinnTilganger =
-        AltinnTilganger(
-            hierarki = listOf(
-                AltinnTilgang(
-                    overordnetEnhet.orgnr,
-                    altinn2Tilganger = overordnetEnhet.enkeltrettigheterAltinn2,
-                    altinn3Tilganger = overordnetEnhet.enkeltrettigheterAltinn3,
-                    navn = overordnetEnhet.navn,
-                    organisasjonsform = "ORG",
-                    underenheter = listOf(
-                        AltinnTilgang(
-                            orgnr = underenheter.first().orgnr,
-                            altinn2Tilganger = underenheter.first().enkeltrettigheterAltinn2,
-                            altinn3Tilganger = underenheter.first().enkeltrettigheterAltinn3,
-                            navn = underenheter.first().navn,
-                            underenheter = if (underenheterNivå2.isNotEmpty()) {
-                                underenheterNivå2.map { underenhetNivå2 ->
-                                    AltinnTilgang(
-                                        orgnr = underenhetNivå2.orgnr,
-                                        altinn2Tilganger = underenhetNivå2.enkeltrettigheterAltinn2,
-                                        altinn3Tilganger = underenhetNivå2.enkeltrettigheterAltinn3,
-                                        navn = underenhetNivå2.navn,
-                                        underenheter = if (underenheterNivå3.isNotEmpty()) {
-                                            underenheterNivå3.map { underenhetNivå3 ->
-                                                AltinnTilgang(
-                                                    orgnr = underenhetNivå3.orgnr,
-                                                    altinn2Tilganger = underenhetNivå3.enkeltrettigheterAltinn2,
-                                                    altinn3Tilganger = underenhetNivå3.enkeltrettigheterAltinn3,
-                                                    navn = underenhetNivå3.navn,
-                                                    underenheter = emptyList(),
-                                                    organisasjonsform = "BEDR",
-                                                )
-                                            }
-                                        } else {
-                                            emptyList()
-                                        },
-                                        organisasjonsform = "BEDR",
-                                    )
-                                }
-                            } else {
-                                emptyList()
-                            },
-                            organisasjonsform = "BEDR",
-                        ),
-                    ).plus(
-                        underenheter.drop(1).map { underenhet ->
-                            AltinnTilgang(
-                                orgnr = underenhet.orgnr,
-                                altinn2Tilganger = underenhet.enkeltrettigheterAltinn2,
-                                altinn3Tilganger = underenhet.enkeltrettigheterAltinn3,
-                                navn = underenhet.navn,
-                                underenheter = emptyList(),
-                                organisasjonsform = "BEDR",
-                            )
+    ): AltinnTilganger = AltinnTilganger(
+        hierarki = listOf(
+            AltinnTilgang(
+                overordnetEnhet.orgnr,
+                altinn2Tilganger = emptySet(),
+                altinn3Tilganger = overordnetEnhet.enkeltrettigheterAltinn3,
+                navn = overordnetEnhet.navn,
+                organisasjonsform = "ORG",
+                underenheter = listOf(
+                    AltinnTilgang(
+                        orgnr = underenheter.first().orgnr,
+                        altinn2Tilganger = emptySet(),
+                        altinn3Tilganger = underenheter.first().enkeltrettigheterAltinn3,
+                        navn = underenheter.first().navn,
+                        underenheter = if (underenheterNivå2.isNotEmpty()) {
+                            underenheterNivå2.map { underenhetNivå2 ->
+                                AltinnTilgang(
+                                    orgnr = underenhetNivå2.orgnr,
+                                    altinn2Tilganger = emptySet(),
+                                    altinn3Tilganger = underenhetNivå2.enkeltrettigheterAltinn3,
+                                    navn = underenhetNivå2.navn,
+                                    underenheter = if (underenheterNivå3.isNotEmpty()) {
+                                        underenheterNivå3.map { underenhetNivå3 ->
+                                            AltinnTilgang(
+                                                orgnr = underenhetNivå3.orgnr,
+                                                altinn2Tilganger = emptySet(),
+                                                altinn3Tilganger = underenhetNivå3.enkeltrettigheterAltinn3,
+                                                navn = underenhetNivå3.navn,
+                                                underenheter = emptyList(),
+                                                organisasjonsform = "BEDR",
+                                            )
+                                        }
+                                    } else {
+                                        emptyList()
+                                    },
+                                    organisasjonsform = "BEDR",
+                                )
+                            }
+                        } else {
+                            emptyList()
                         },
+                        organisasjonsform = "BEDR",
                     ),
+                ).plus(
+                    underenheter.drop(1).map { underenhet ->
+                        AltinnTilgang(
+                            orgnr = underenhet.orgnr,
+                            altinn2Tilganger = emptySet(),
+                            altinn3Tilganger = underenhet.enkeltrettigheterAltinn3,
+                            navn = underenhet.navn,
+                            underenheter = emptyList(),
+                            organisasjonsform = "BEDR",
+                        )
+                    },
                 ),
             ),
-            orgNrTilTilganger = mapOf(
-                overordnetEnhet.orgnr to overordnetEnhet.enkeltrettigheterAltinn2.plus(overordnetEnhet.enkeltrettigheterAltinn3),
-            ).plus(underenheter.toPair()).plus(underenheterNivå2.toPair()),
-            tilgangTilOrgNr = listOf(overordnetEnhet).plus(underenheter).plus(underenheterNivå2)
-                .splitByEnkeltrettighet(),
-            isError = false,
-        )
+        ),
+        orgNrTilTilganger = mapOf(
+            overordnetEnhet.orgnr to overordnetEnhet.enkeltrettigheterAltinn3
+        ).plus(underenheter.toPair()).plus(underenheterNivå2.toPair()),
+        tilgangTilOrgNr = listOf(overordnetEnhet).plus(underenheter).plus(underenheterNivå2).splitByEnkeltrettighet(),
+        isError = false,
+    )
 
     @Test
     fun `Selftest -- splitByEnkeltrettighet`() {
@@ -638,22 +541,22 @@ class AltinnTilgangerServiceUnitTest {
             EnkeltrettigheterTilEnVirksomhet(
                 orgnr = "111111111",
                 navn = "Test 1",
-                enkeltrettigheterAltinn2 = setOf("ENKELRETTIGHET_1"),
+                enkeltrettigheterAltinn3 = setOf("ENKELRETTIGHET_1"),
             ),
             EnkeltrettigheterTilEnVirksomhet(
                 orgnr = "222222222",
                 navn = "Test 2",
-                enkeltrettigheterAltinn2 = setOf("ENKELRETTIGHET_1", "ENKELRETTIGHET_2"),
+                enkeltrettigheterAltinn3 = setOf("ENKELRETTIGHET_1", "ENKELRETTIGHET_2"),
             ),
             EnkeltrettigheterTilEnVirksomhet(
                 orgnr = "333333333",
                 navn = "Test 3",
-                enkeltrettigheterAltinn2 = setOf("ENKELRETTIGHET_3", "ENKELRETTIGHET_2"),
+                enkeltrettigheterAltinn3 = setOf("ENKELRETTIGHET_3", "ENKELRETTIGHET_2"),
             ),
             EnkeltrettigheterTilEnVirksomhet(
                 orgnr = "444444444",
                 navn = "Test 4",
-                enkeltrettigheterAltinn2 = setOf("ENKELRETTIGHET_4"),
+                enkeltrettigheterAltinn3 = setOf("ENKELRETTIGHET_4"),
             ),
         )
         liste.splitByEnkeltrettighet() shouldBe mapOf(
@@ -667,16 +570,13 @@ class AltinnTilgangerServiceUnitTest {
     private data class EnkeltrettigheterTilEnVirksomhet(
         val orgnr: String,
         val navn: String,
-        val enkeltrettigheterAltinn2: Set<String>,
         val enkeltrettigheterAltinn3: Set<String> = emptySet(),
     )
 
-    private fun List<EnkeltrettigheterTilEnVirksomhet>.toPair(): Map<String, Set<String>> = this.associate { it.toPair() }
+    private fun List<EnkeltrettigheterTilEnVirksomhet>.toPair(): Map<String, Set<String>> =
+        this.associate { it.toPair() }
 
-    private fun EnkeltrettigheterTilEnVirksomhet.toPair(): Pair<String, Set<String>> =
-        orgnr to enkeltrettigheterAltinn2.plus(
-            enkeltrettigheterAltinn3,
-        )
+    private fun EnkeltrettigheterTilEnVirksomhet.toPair(): Pair<String, Set<String>> = orgnr to enkeltrettigheterAltinn3
 
     private fun List<EnkeltrettigheterTilEnVirksomhet>.splitByEnkeltrettighet(): Map<String, Set<String>> =
         this.associate { it.toPair() }.flatMap { (orgnr, enkeltrettigheter) ->

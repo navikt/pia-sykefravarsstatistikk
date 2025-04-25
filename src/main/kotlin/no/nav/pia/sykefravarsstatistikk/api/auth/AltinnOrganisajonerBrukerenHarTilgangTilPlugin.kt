@@ -25,7 +25,6 @@ fun AltinnOrganisajonerBrukerenHarTilgangTilPlugin(altinnTilgangerService: Altin
                     altinnTilganger.altinnOrganisasjonerVedkommendeHarTilgangTil()
                 val altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil =
                     altinnTilganger.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-                        enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
                         enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                     )
 

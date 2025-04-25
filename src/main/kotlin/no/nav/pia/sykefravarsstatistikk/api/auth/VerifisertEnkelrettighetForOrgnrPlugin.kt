@@ -6,12 +6,14 @@ import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.auth.AuthenticationChecked
 import io.ktor.server.response.respond
 import io.ktor.util.AttributeKey
+import no.nav.pia.sykefravarsstatistikk.Metrics
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedIkkeTilgangTilOrg
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedOkKall
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighet
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighetIAltinn2
+import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighetIAltinn3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
@@ -47,21 +49,31 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                     orgnr = underenhet.orgnr,
                 )
 
-                val harEnkeltTilgang = altinnTilganger.harEnkeltrettighet(
+                val harEnkeltRettighetTilUnderenhet = altinnTilganger.harEnkeltrettighetIAltinn3(
                     orgnr = underenhet.orgnr,
-                    enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
                     enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
-                )
+                ).also {
+                    metricsCountAltinnTilgang(
+                        altinnTilganger = altinnTilganger,
+                        orgnr = underenhet.orgnr,
+                        harEnkeltRettighetIAtinn3 = it
+                    )
+                }
 
                 val overordnetEnhet: OverordnetEnhet =
                     enhetsregisteretService.hentEnhet(underenhet.overordnetEnhetOrgnr)
                         .getOrElse { return@on call.respond(it.httpStatusCode, it.feilmelding) }
 
-                val harEnkeltTilgangOverordnetEnhet = altinnTilganger.harEnkeltrettighet(
+                val harEnkeltRettighetTilOverordnetEnhet = altinnTilganger.harEnkeltrettighetIAltinn3(
                     orgnr = overordnetEnhet.orgnr,
-                    enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
                     enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
-                )
+                ).also {
+                    metricsCountAltinnTilgang(
+                        altinnTilganger = altinnTilganger,
+                        orgnr = overordnetEnhet.orgnr,
+                        harEnkeltRettighetIAtinn3 = it
+                    )
+                }
 
                 if (!harTilgangTilOrgnr) {
                     call.respond(
@@ -82,8 +94,8 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                     call.attributes.put(
                         VerifiserteTilgangerKey,
                         VerifiserteTilganger(
-                            harEnkeltTilgang = harEnkeltTilgang,
-                            harEnkeltTilgangOverordnetEnhet = harEnkeltTilgangOverordnetEnhet,
+                            harEnkeltTilgang = harEnkeltRettighetTilUnderenhet,
+                            harEnkeltTilgangOverordnetEnhet = harEnkeltRettighetTilOverordnetEnhet,
                         ),
                     )
                     call.attributes.put(UnderenhetKey, underenhet)
@@ -92,6 +104,21 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
             }
         }
     }
+
+private fun metricsCountAltinnTilgang(
+    altinnTilganger: AltinnTilgangerService.AltinnTilganger?,
+    orgnr: String,
+    harEnkeltRettighetIAtinn3: Boolean
+) {
+    val harFortsattEnkeltRettighetIAltinn2 = altinnTilganger.harEnkeltrettighetIAltinn2(
+        orgnr = orgnr,
+        enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
+    )
+    Metrics.countAltinnTilgang(
+        altinn2 = harFortsattEnkeltRettighetIAltinn2,
+        altinn3 = harEnkeltRettighetIAtinn3
+    )
+}
 
 private fun String.erEtOrgNummer() = this.matches("^[0-9]{9}$".toRegex())
 

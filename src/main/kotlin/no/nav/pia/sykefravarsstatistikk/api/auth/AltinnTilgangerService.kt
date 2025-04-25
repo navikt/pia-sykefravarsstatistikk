@@ -41,22 +41,27 @@ class AltinnTilgangerService {
                 flatten(it) { o -> o.orgnr }
             }?.toList() ?: emptyList()
 
-        fun AltinnTilganger?.harEnkeltrettighet(
+        fun AltinnTilganger?.harEnkeltrettighetIAltinn3(
             orgnr: String?,
-            enkeltrettighetIAltinn2: String,
             enkeltrettighetIAltinn3: String,
         ): Boolean {
             val altinn3Tilgang = harAltinn3Enkeltrettighet(orgnr, enkeltrettighetIAltinn3)
-            val altinn2Tilgang = harAltinn2Enkeltrettighet(orgnr, enkeltrettighetIAltinn2)
-            Metrics.countAltinnTilgang(altinn2 = altinn2Tilgang, altinn3 = altinn3Tilgang)
-            return altinn3Tilgang || altinn2Tilgang
+            return altinn3Tilgang
         }
+
+        @Deprecated("Brukes bare til å lage metrikker")
+        fun AltinnTilganger?.harEnkeltrettighetIAltinn2(
+            orgnr: String?,
+            enkeltrettighetIAltinn2: String,
+        ): Boolean = harAltinn2Enkeltrettighet(orgnr, enkeltrettighetIAltinn2)
+
 
         private fun AltinnTilganger?.harAltinn3Enkeltrettighet(
             orgnr: String?,
             enkeltrettighetIAltinn3: String,
         ): Boolean = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
 
+        @Deprecated("Brukes bare til å lage metrikker")
         private fun AltinnTilganger?.harAltinn2Enkeltrettighet(
             orgnr: String?,
             enkeltrettighetIAltinn2: String,
@@ -75,24 +80,21 @@ class AltinnTilgangerService {
             }?.toList() ?: emptyList()
 
         fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarEnkeltrettighetTil(
-            enkeltrettighetIAltinn2: String,
             enkeltrettighetIAltinn3: String,
         ): List<AltinnOrganisasjon> =
             this?.hierarki?.flatMap { altinnTilgang ->
                 flatten(altinnTilgang) { it }.filter {
-                    it.altinn2Tilganger.contains(enkeltrettighetIAltinn2) ||
-                        it.altinn3Tilganger.contains(
-                            enkeltrettighetIAltinn3,
-                        )
+                    it.altinn3Tilganger.contains(
+                        enkeltrettighetIAltinn3,
+                    )
+                }.map {
+                    AltinnOrganisasjon(
+                        name = it.navn,
+                        organizationNumber = it.orgnr,
+                        organizationForm = it.organisasjonsform,
+                        parentOrganizationNumber = this.finnOverordnetEnhet(it.orgnr) ?: "",
+                    )
                 }
-                    .map {
-                        AltinnOrganisasjon(
-                            name = it.navn,
-                            organizationNumber = it.orgnr,
-                            organizationForm = it.organisasjonsform,
-                            parentOrganizationNumber = this.finnOverordnetEnhet(it.orgnr) ?: "",
-                        )
-                    }
             }?.toList() ?: emptyList()
 
         fun AltinnTilganger?.finnOverordnetEnhet(orgnr: String): String? {

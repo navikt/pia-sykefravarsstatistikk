@@ -30,7 +30,6 @@ import java.math.BigDecimal
 class TestdataHelper {
     companion object {
         // Variabler som kan brukes hvor det ikke er behov for å starte TestContainers (unit tester)
-        const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2 = "3403:1"
         const val ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3 =
             "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk"
 

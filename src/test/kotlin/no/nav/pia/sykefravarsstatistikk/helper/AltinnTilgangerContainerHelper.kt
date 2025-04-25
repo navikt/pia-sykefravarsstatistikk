@@ -89,9 +89,9 @@ class AltinnTilgangerContainerHelper(
     internal fun leggTilRettigheter(
         overordnetEnhet: OverordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.somOverordnetEnhet(),
         underenhet: Underenhet,
-        altinn2Rettighet: String = "",
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
     ) {
+        val altinn2Rettighet: String = ""
         log.info("Legger til rettigheter [altinn2: '$altinn2Rettighet' og altinn3: '$altinn3Rettighet'] for underenhet '${underenhet.orgnr}'")
         val client = getMockServerClient()
         runBlocking {
@@ -138,6 +138,86 @@ class AltinnTilgangerContainerHelper(
                         ],
                         "$altinn2Rettighet": [
                           "${underenhet.orgnr}"
+                        ]
+                      },
+                      "isError": false
+                    }
+                    """.trimIndent(),
+                ),
+            )
+        }
+    }
+
+    internal fun leggTilRettigheter(
+        overordnetEnhet: OverordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.somOverordnetEnhet(),
+        underenheter: List<Underenhet>,
+        altinn2Rettighet: String = "",
+        altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
+    ) {
+        log.info("Legger til rettigheter [altinn2: '$altinn2Rettighet' og altinn3: '$altinn3Rettighet'] for '${underenheter.size}' underenheter")
+        val client = getMockServerClient()
+        runBlocking {
+            client.`when`(
+                request()
+                    .withMethod("POST")
+                    .withPath("/altinn-tilganger"),
+            ).respond(
+                response().withBody(
+                    """
+                    {
+                      "hierarki": [
+                        {
+                          "orgnr": "${overordnetEnhet.orgnr}",
+                          "altinn3Tilganger": [],
+                          "altinn2Tilganger": [],
+                          "underenheter": [
+                            ${
+                        underenheter.joinToString(",\n") { underenhet ->
+                            """
+                                {
+                                  "orgnr": "${underenhet.orgnr}",
+                                  "altinn3Tilganger": [
+                                    "$altinn3Rettighet"
+                                  ],
+                                  "altinn2Tilganger": [
+                                    "$altinn2Rettighet"
+                                  ],
+                                  "underenheter": [],
+                                  "navn": "${(underenhet as Underenhet.Næringsdrivende).navn}",
+                                  "organisasjonsform": "BEDR"
+                                }
+                                """.trimIndent()
+                        }}
+                          ],
+                          "navn": "${overordnetEnhet.navn}",
+                          "organisasjonsform": "ORGL"
+                        }
+                      ],
+                      "orgNrTilTilganger": {
+                      ${
+                        underenheter.joinToString(",\n") { underenhet ->
+                            """
+                        "${underenhet.orgnr}": [
+                          "$altinn3Rettighet",
+                          "$altinn2Rettighet"
+                        ]
+                        """.trimIndent()
+                        }}
+                      },
+                      "tilgangTilOrgNr": {
+                        "$altinn3Rettighet": [
+                            ${underenheter.joinToString(",\n") { underenhet ->
+                            """
+                            "${underenhet.orgnr}"
+                            """.trimIndent() 
+                            }}
+                        ],
+                        "$altinn2Rettighet": [
+                            ${underenheter.joinToString(",\n") { underenhet ->
+                            """
+                            "${underenhet.orgnr}"
+                            """.trimIndent() 
+                            }}
                         ]
                       },
                       "isError": false
