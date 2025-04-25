@@ -10,7 +10,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
@@ -36,7 +35,7 @@ class OrganisasjonerEndepunktTest {
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
-            altinn2Rettighet = "En annen enkeltrettighet",
+            altinn3Rettighet = "En annen enkeltrettighet",
         )
 
         runBlocking {
@@ -70,7 +69,7 @@ class OrganisasjonerEndepunktTest {
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
-            altinn2Rettighet = "En annen enkeltrettighet",
+            altinn3Rettighet = "En annen enkeltrettighet",
         )
 
         runBlocking {
@@ -92,7 +91,7 @@ class OrganisasjonerEndepunktTest {
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
-            altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+            altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         )
 
         runBlocking {
@@ -121,7 +120,6 @@ class OrganisasjonerEndepunktTest {
         altinnTilgangerContainerHelper.leggTilRettigheter(
             overordnetEnhet = overordnetEnhet,
             underenhet = underenhet,
-            altinn2Rettighet = "En annen enkeltrettighet",
             altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
         )
 

@@ -97,7 +97,7 @@ class TilgangTilSykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),
-                altinn2Rettighet = "enkeltrettighet_som_ikke_er_sykefraværsstatistikk",
+                altinn3Rettighet = "enkeltrettighet_som_ikke_er_sykefraværsstatistikk",
             )
             kafkaContainerHelper.sendStatistikk(
                 underenhet = underenhetIBransjeBarnehage.somNæringsdrivende(),

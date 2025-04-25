@@ -9,7 +9,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.app
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldNotContainLog
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
@@ -36,7 +36,7 @@ class AuditlogTest {
             )
             altinnTilgangerContainerHelper.leggTilRettigheter(
                 underenhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
-                altinn2Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_2,
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
             )
 
             TestContainerHelper.hentKvartalsvisStatistikk(
