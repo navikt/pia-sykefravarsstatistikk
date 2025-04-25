@@ -18,7 +18,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import no.nav.pia.sykefravarsstatistikk.Metrics
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.altinnTilgangerProxyUrl
 import no.nav.pia.sykefravarsstatistikk.Systemmiljø.cluster
 import no.nav.pia.sykefravarsstatistikk.domene.AltinnOrganisasjon

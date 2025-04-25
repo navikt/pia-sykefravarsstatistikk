@@ -91,7 +91,7 @@ class AltinnTilgangerContainerHelper(
         underenhet: Underenhet,
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
     ) {
-        val altinn2Rettighet: String = ""
+        val altinn2Rettighet = ""
         log.info("Legger til rettigheter [altinn2: '$altinn2Rettighet' og altinn3: '$altinn3Rettighet'] for underenhet '${underenhet.orgnr}'")
         val client = getMockServerClient()
         runBlocking {

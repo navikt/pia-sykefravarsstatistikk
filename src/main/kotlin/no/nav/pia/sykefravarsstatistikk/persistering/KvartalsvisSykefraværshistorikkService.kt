@@ -108,7 +108,7 @@ class KvartalsvisSykefraværshistorikkService(
         underenhet: Underenhet.Næringsdrivende,
         tilganger: VerifiserteTilganger,
     ): Either<Feil, List<MaskertKvartalsvisSykefraværshistorikkDto>> {
-        if (!tilganger.harEnkeltTilgang) {
+        if (!tilganger.harEnkeltrettighetUnderenhet) {
             return Feil(
                 feilmelding = "{\"message\":\"You don't have access to this resource\"}",
                 httpStatusCode = HttpStatusCode.Forbidden,
@@ -212,7 +212,7 @@ class KvartalsvisSykefraværshistorikkService(
             ),
         )
 
-        val umaskertVirksomhetsstatistikk = if (tilganger.harEnkeltTilgangOverordnetEnhet) {
+        val umaskertVirksomhetsstatistikk = if (tilganger.harEnkeltrettighetOverordnetEnhet) {
             hentSykefraværsstatistikkVirksomhet(
                 virksomhet = overordnetEnhet,
                 førsteÅrstalOgKvartal = førsteKvartal,
