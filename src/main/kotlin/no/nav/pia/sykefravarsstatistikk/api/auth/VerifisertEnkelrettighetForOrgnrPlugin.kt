@@ -94,8 +94,8 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                     call.attributes.put(
                         VerifiserteTilgangerKey,
                         VerifiserteTilganger(
-                            harEnkeltTilgang = harEnkeltRettighetTilUnderenhet,
-                            harEnkeltTilgangOverordnetEnhet = harEnkeltRettighetTilOverordnetEnhet,
+                            harEnkeltrettighetUnderenhet = harEnkeltRettighetTilUnderenhet,
+                            harEnkeltrettighetOverordnetEnhet = harEnkeltRettighetTilOverordnetEnhet,
                         ),
                     )
                     call.attributes.put(UnderenhetKey, underenhet)
@@ -127,6 +127,6 @@ val UnderenhetKey = AttributeKey<Underenhet>("Underenhet")
 val OverordnetEnhetKey = AttributeKey<OverordnetEnhet>("OverordnetEnhet")
 
 data class VerifiserteTilganger(
-    val harEnkeltTilgang: Boolean,
-    val harEnkeltTilgangOverordnetEnhet: Boolean,
+    val harEnkeltrettighetUnderenhet: Boolean,
+    val harEnkeltrettighetOverordnetEnhet: Boolean,
 )

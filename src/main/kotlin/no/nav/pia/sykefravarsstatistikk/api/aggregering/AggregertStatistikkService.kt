@@ -31,7 +31,7 @@ class AggregertStatistikkService(
 
         val aggregeringskategorier = buildList {
             add(Aggregeringskategorier.Land)
-            if (tilganger.harEnkeltTilgang) {
+            if (tilganger.harEnkeltrettighetUnderenhet) {
                 add(Aggregeringskategorier.Virksomhet(virksomhet))
             }
 
