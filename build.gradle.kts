@@ -1,21 +1,21 @@
-val arrowCoreVersion = "2.0.1"
+val arrowCoreVersion = "2.1.1"
 val iaFellesVersion = "1.10.2"
 val kafkClientVersion = "3.9.0"
-val kotestVersion = "6.0.0.M1"
-val kotlinVersion = "2.1.10"
-val ktorVersion = "3.1.1"
-val logbackVersion = "1.5.17"
-val logstashLogbackEncoderVersion = "8.0"
+val kotestVersion = "5.9.1"
+val kotlinVersion = "2.1.20"
+val ktorVersion = "3.1.3"
+val logbackVersion = "1.5.18"
+val logstashLogbackEncoderVersion = "8.1"
 val mockOAuth2ServerVersion = "2.1.10"
 val mockServerVersion = "1.0.14"
-val nimbusJoseJwtVersion = "10.0.2"
-val prometeusVersion = "1.14.4"
-val testcontainersVersion = "1.20.6"
+val nimbusJoseJwtVersion = "10.2"
+val prometeusVersion = "1.14.6"
+val testcontainersVersion = "1.21.0"
 val testcontainersFakeGCSVersion = "0.2.0"
 
 plugins {
-    kotlin("jvm") version "2.1.10"
-    kotlin("plugin.serialization") version "2.1.10"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
@@ -53,8 +53,8 @@ dependencies {
 
     // Database
     implementation("org.postgresql:postgresql:42.7.5")
-    implementation("com.zaxxer:HikariCP:6.2.1")
-    implementation("org.flywaydb:flyway-database-postgresql:11.3.4")
+    implementation("com.zaxxer:HikariCP:6.3.0")
+    implementation("org.flywaydb:flyway-database-postgresql:11.8.1")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Felles definisjoner for IA-domenet
@@ -83,7 +83,7 @@ dependencies {
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.1.119.Final")
+                require("4.2.0.Final")
             }
             because("From Ktor version: 2.3.5 -> io.netty:netty-codec-http2 vulnerable to HTTP/2 Rapid Reset Attack")
         }
