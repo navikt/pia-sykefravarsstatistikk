@@ -52,7 +52,7 @@ class KafkaContainerHelper(
     private var kafkaProducer: KafkaProducer<String, String>
 
     val kafkaContainer = ConfluentKafkaContainer(
-        DockerImageName.parse("confluentinc/cp-kafka:7.4.3"),
+        DockerImageName.parse("confluentinc/cp-kafka:7.8.2"),
     )
         .withNetwork(network)
         .withNetworkAliases(kafkaNetworkAlias)
