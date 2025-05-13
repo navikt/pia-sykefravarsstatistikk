@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.tilVirksomhetMetadataDto
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -21,7 +21,7 @@ import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
 class VirksomhetMetadataConsumer(
-    val topic: KafkaTopics,
+    val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
     val metadataService: MetadataService,
     val applikasjonsHelse: ApplikasjonsHelse,
 ) : CoroutineScope {
@@ -44,9 +44,9 @@ class VirksomhetMetadataConsumer(
         launch {
             kafkaConsumer.use { consumer ->
                 try {
-                    consumer.subscribe(listOf(topic.navnMedNamespace))
+                    consumer.subscribe(listOf(topic.navn))
                     logger.info(
-                        "Kafka consumer subscribed to topic '${topic.navnMedNamespace}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
+                        "Kafka consumer subscribed to topic '${topic.navn}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
                     )
                     while (applikasjonsHelse.alive) {
                         try {
@@ -54,10 +54,11 @@ class VirksomhetMetadataConsumer(
                             if (!records.isEmpty) {
                                 records.map { it.value().tilVirksomhetMetadataDto() }.let {
                                     metadataService.lagreVirksomhetMetadata(it)
+                                    // TODO: Videresend til eksportservice og send på kafka
                                 }
                                 logger.info("Lagret ${records.count()} meldinger i VirksomhetMetadataConsumer (topic '$topic') ")
                                 consumer.commitSync()
-                                logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navnMedNamespace}")
+                                logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navn}")
                             }
                         } catch (e: RetriableException) {
                             logger.warn(

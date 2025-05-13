@@ -5,7 +5,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.VirksomhetMetadataImportTestUtils.Companion.hentVirksomhetMetadataStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.VirksomhetMetadataImportTestUtils.VirksomhetMetadataJsonMelding
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import kotlin.test.Test
 
 class KvartalsvisVirksomhetMetadataConsumerTest {
@@ -22,7 +22,7 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             virksomhetMetadataStatistikk.toJsonKey(),
             virksomhetMetadataStatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
         )
 
         val metadataQ32024 = hentVirksomhetMetadataStatistikk(
@@ -50,7 +50,7 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             virksomhetMetadataStatistikk.toJsonKey(),
             virksomhetMetadataStatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
         )
 
         val metadataQ32024 = hentVirksomhetMetadataStatistikk(

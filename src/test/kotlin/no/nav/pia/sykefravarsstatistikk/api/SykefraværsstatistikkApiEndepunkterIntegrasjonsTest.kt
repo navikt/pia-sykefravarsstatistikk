@@ -26,7 +26,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordn
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehjem
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.test.BeforeTest
@@ -626,7 +626,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             nøkkel = jsonMelding.toJsonKey(),
             melding = jsonMelding.toJsonValue(),
-            topic = KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
         return dto
     }
