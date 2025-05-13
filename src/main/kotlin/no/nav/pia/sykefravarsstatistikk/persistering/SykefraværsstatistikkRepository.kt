@@ -23,16 +23,13 @@ class SykefraværsstatistikkRepository(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun insertSykefraværsstatistikk(sykefraværsstatistikk: List<SykefraværsstatistikkDto>) {
-        logger.info("Lagrer '${sykefraværsstatistikk.size}' statistikk")
+    fun insertSykefraværsstatistikk(sykefraværsstatistikk: SykefraværsstatistikkDto) {
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    sykefraværsstatistikk.forEach {
-                        tx.insertStatistikk(
-                            sykefraværsstatistikkDto = it,
-                        )
-                    }
+                    tx.insertStatistikk(
+                        sykefraværsstatistikkDto = sykefraværsstatistikk,
+                    )
                 }
             }
         } catch (e: Exception) {

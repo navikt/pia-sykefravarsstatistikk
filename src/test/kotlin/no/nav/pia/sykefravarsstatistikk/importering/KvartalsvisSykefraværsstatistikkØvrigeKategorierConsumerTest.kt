@@ -10,7 +10,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import kotlin.test.Test
 
 class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
@@ -28,7 +28,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
         val statistikkQ12023 = hentStatistikkGjeldendeKvartal(
@@ -59,7 +59,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
         val statistikkQ32024 = hentStatistikkGjeldendeKvartal(
@@ -103,7 +103,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
         val statistikkQ32024 = hentStatistikkGjeldendeKvartalMedGradering(
@@ -157,7 +157,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
         val statistikkQ32024 = hentStatistikkGjeldendeKvartalMedGradering(
@@ -212,7 +212,7 @@ class KvartalsvisSykefraværsstatistikkØvrigeKategorierConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
         )
 
         val statistikkQ32024 = hentStatistikkGjeldendeKvartalMedGradering(

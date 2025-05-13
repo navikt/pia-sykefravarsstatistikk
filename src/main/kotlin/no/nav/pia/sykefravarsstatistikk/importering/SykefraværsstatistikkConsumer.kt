@@ -6,12 +6,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.eksport.SykefraværsstatistikkEksportService
+import no.nav.pia.sykefravarsstatistikk.importering.KafkaImportMelding.Companion.erNøkkelGyldig
 import no.nav.pia.sykefravarsstatistikk.importering.KafkaImportMelding.Companion.toSykefraværsstatistikkDto
 import no.nav.pia.sykefravarsstatistikk.importering.KafkaImportMelding.Companion.toSykefraværsstatistikkImportKafkaMelding
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
-import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkService
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
@@ -23,8 +24,10 @@ import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
 class SykefraværsstatistikkConsumer(
-    val topic: KafkaTopics,
-    val sykefraværsstatistikkService: SykefraværsstatistikkService,
+    val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
+    val sykefraværsstatistikkImportService: SykefraværsstatistikkImportService,
+    val sykefraværsstatistikkEksportService: SykefraværsstatistikkEksportService,
+    // TODO:  Import produsent
     val applikasjonsHelse: ApplikasjonsHelse,
 ) : CoroutineScope {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -46,24 +49,34 @@ class SykefraværsstatistikkConsumer(
         launch {
             kafkaConsumer.use { consumer ->
                 try {
-                    consumer.subscribe(listOf(topic.navnMedNamespace))
+                    consumer.subscribe(listOf(topic.navn))
                     logger.info(
-                        "Kafka consumer subscribed to topic '${topic.navnMedNamespace}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
+                        "Kafka consumer subscribed to topic '${topic.navn}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
                     )
                     while (applikasjonsHelse.alive) {
                         try {
                             val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                records.toSykefraværsstatistikkImportKafkaMelding().let {
-                                    sykefraværsstatistikkService.lagreSykefraværsstatistikk(
-                                        it.toSykefraværsstatistikkDto(),
+                                records.filter { erNøkkelGyldig(it) }.forEach { consumerRecord ->
+                                    // Les melding
+                                    val melding = consumerRecord.toSykefraværsstatistikkImportKafkaMelding()
+                                    val sykefraværstatistikkDto = melding.verdi.toSykefraværsstatistikkDto()
+
+                                    // Lagre melding
+                                    sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(
+                                        sykefraværstatistikkDto = sykefraværstatistikkDto,
+                                    )
+
+                                    // Eksporter til kafka
+                                    sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(
+                                        sykefraværstatistikkDto = sykefraværstatistikkDto,
                                     )
                                 }
                                 logger.info(
                                     "Lagret ${records.count()} meldinger i SykefraværsstatistikkConsumer (topic '$topic') ",
                                 )
                                 consumer.commitSync()
-                                logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navnMedNamespace}")
+                                logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navn}")
                             }
                         } catch (e: RetriableException) {
                             logger.warn(

@@ -6,7 +6,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.persistering.SykefraværsstatistikkDto
 import no.nav.pia.sykefravarsstatistikk.persistering.serializeToSykefraværsstatistikkDto
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -14,27 +13,22 @@ class KafkaImportMelding {
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-        fun ConsumerRecords<String, String>.toSykefraværsstatistikkImportKafkaMelding(): List<SykefraværsstatistikkImportKafkaMelding> =
-            this.filter {
-                erMeldingenGyldig(it)
-            }.map {
-                val key = Json.decodeFromString<SykefraværsstatistikkImportKafkaMeldingNøkkel>(it.key())
-                SykefraværsstatistikkImportKafkaMelding(nøkkel = key, verdi = it.value())
-            }
+        fun ConsumerRecord<String, String>.toSykefraværsstatistikkImportKafkaMelding(): SykefraværsstatistikkImportKafkaMelding {
+            val key = Json.decodeFromString<SykefraværsstatistikkImportKafkaMeldingNøkkel>(this.key())
+            return SykefraværsstatistikkImportKafkaMelding(nøkkel = key, verdi = this.value())
+        }
 
-        private fun erMeldingenGyldig(consumerRecord: ConsumerRecord<String, String>): Boolean {
+        fun erNøkkelGyldig(consumerRecord: ConsumerRecord<String, String>): Boolean {
             val key = Json.decodeFromString<SykefraværsstatistikkImportKafkaMeldingNøkkel>(consumerRecord.key())
-
-            return if (Statistikkategori.entries.map { it }.contains(key.kategori) && key.kode.isNotEmpty()) {
-                true
-            } else {
+            val nøkkelErGyldig = Statistikkategori.entries.contains(key.kategori) && key.kode.isNotEmpty()
+            if (!nøkkelErGyldig) {
                 logger.warn(
                     "Feil formatert Kafka melding i topic ${consumerRecord.topic()} for key ${
                         consumerRecord.key().trim()
                     }",
                 )
-                false
             }
+            return nøkkelErGyldig
         }
 
         fun String.toSykefraværsstatistikkDto(): SykefraværsstatistikkDto = this.serializeToSykefraværsstatistikkDto()
