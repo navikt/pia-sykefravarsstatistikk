@@ -1,5 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
@@ -33,10 +34,40 @@ class EksportTest {
         )
 
         applikasjon.shouldContainLog(
-            "Eksporterer sykefraværsstatistikk for LAND fra 2. kvartal 2024 til 1. kvartal 2025".toRegex(),
+            "Eksporterer sykefraværsstatistikk for LAND - 1. kvartal 2025".toRegex(),
         )
         applikasjon.shouldContainLog(
             "Melding eksportert på Kafka for statistikkategori LAND, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
+        )
+    }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori SEKTOR blir eksportert til kafka`() {
+        kafkaContainerHelper.sendSektorstatistikk(Sektor.STATLIG)
+
+        val kvartal20251 = ÅrstallOgKvartal(2025, 1)
+
+        val sykefraværsstatistikk = JsonMelding(
+            kategori = Statistikkategori.SEKTOR,
+            kode = "1",
+            årstallOgKvartal = kvartal20251,
+            tapteDagsverk = 17.5.toBigDecimal(),
+            muligeDagsverk = 761.3.toBigDecimal(),
+            prosent = 2.3.toBigDecimal(),
+            antallPersoner = 4,
+        )
+
+        kafkaContainerHelper.sendOgVentTilKonsumert(
+            sykefraværsstatistikk.toJsonKey(),
+            sykefraværsstatistikk.toJsonValue(),
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+
+        applikasjon.shouldContainLog(
+            "Eksporterer sykefraværsstatistikk for SEKTOR - 1. kvartal 2025".toRegex(),
+        )
+        applikasjon.shouldContainLog(
+            "Melding eksportert på Kafka for statistikkategori SEKTOR, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
         )
     }
 }

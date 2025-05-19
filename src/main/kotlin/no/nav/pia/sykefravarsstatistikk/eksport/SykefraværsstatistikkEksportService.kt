@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
@@ -8,6 +9,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkFor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
+import no.nav.pia.sykefravarsstatistikk.domene.tilSektor
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.persistering.BransjeSykefraværsstatistikkDto
 import no.nav.pia.sykefravarsstatistikk.persistering.LandSykefraværsstatistikkDto
@@ -34,92 +36,95 @@ class SykefraværsstatistikkEksportService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun eksporterSykefraværsstatistikk(sykefraværstatistikkDto: SykefraværsstatistikkDto) {
-        val inneværendeKvartal = ÅrstallOgKvartal(
+        val eksportkvartal = ÅrstallOgKvartal(
             årstall = sykefraværstatistikkDto.årstall,
             kvartal = sykefraværstatistikkDto.kvartal,
         )
-        val førsteKvartal: ÅrstallOgKvartal = inneværendeKvartal.minusKvartaler(3)
 
         when (sykefraværstatistikkDto) {
-            is LandSykefraværsstatistikkDto -> eksporterSykefraværsstatistikkLand(
-                førsteKvartal = førsteKvartal,
-                eksportkvartal = inneværendeKvartal,
-            )
-            is SektorSykefraværsstatistikkDto -> eksporterSykefraværsstatistikkSektor(
-                førsteKvartal = førsteKvartal,
-                inneværendeKvartal = inneværendeKvartal,
-            )
-            is NæringSykefraværsstatistikkDto -> eksporterSykefraværsstatistikkNæring(
-                førsteKvartal = førsteKvartal,
-                inneværendeKvartal = inneværendeKvartal,
-            )
-            is BransjeSykefraværsstatistikkDto -> eksporterSykefraværsstatistikkBransje(
-                førsteKvartal = førsteKvartal,
-                inneværendeKvartal = inneværendeKvartal,
-            )
-            is NæringskodeSykefraværsstatistikkDto -> eksporterSykefraværsstatistikkNæringskode(
-                førsteKvartal = førsteKvartal,
-                inneværendeKvartal = inneværendeKvartal,
-            )
-            is VirksomhetSykefraværsstatistikkDto -> eksporterSykefraværsstatistikkVirksomhet(
-                førsteKvartal = førsteKvartal,
-                inneværendeKvartal = inneværendeKvartal,
-            )
+            is LandSykefraværsstatistikkDto -> {
+                eksporterSykefraværsstatistikkLand(
+                    eksportkvartal = eksportkvartal,
+                )
+            }
+            is SektorSykefraværsstatistikkDto -> {
+                eksporterSykefraværsstatistikkSektor(
+                    eksportkvartal = eksportkvartal,
+                    sektor = sykefraværstatistikkDto.sektor.tilSektor(),
+                )
+            }
+            is NæringSykefraværsstatistikkDto -> {
+                eksporterSykefraværsstatistikkNæring(
+                    eksportkvartal = eksportkvartal,
+                )
+            }
+            is BransjeSykefraværsstatistikkDto -> {
+                eksporterSykefraværsstatistikkBransje(
+                    eksportkvartal = eksportkvartal,
+                )
+            }
+            is NæringskodeSykefraværsstatistikkDto -> {
+                eksporterSykefraværsstatistikkNæringskode(
+                    eksportkvartal = eksportkvartal,
+                )
+            }
+            is VirksomhetSykefraværsstatistikkDto -> {
+                eksporterSykefraværsstatistikkVirksomhet(
+                    eksportkvartal = eksportkvartal,
+                )
+            }
         }
     }
 
-    private fun eksporterSykefraværsstatistikkLand(
-        førsteKvartal: ÅrstallOgKvartal,
-        eksportkvartal: ÅrstallOgKvartal,
-    ) {
+    private fun eksporterSykefraværsstatistikkLand(eksportkvartal: ÅrstallOgKvartal) {
+        val statistikkategori = Statistikkategori.LAND
+        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkLand()
-        val statistikkSiste4Kvartaler = sykefraværsstatistikk.filter {
-            it.årstallOgKvartal() >= førsteKvartal && it.årstallOgKvartal() <= eksportkvartal
-        }
-
-        logger.info("Eksporterer sykefraværsstatistikk for ${Statistikkategori.LAND} fra $førsteKvartal til $eksportkvartal")
+        val kode = sykefraværsstatistikk.first().land
+        val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
 
         eksporterSykefraværsstatistikkPerKategori(
             eksportkvartal = eksportkvartal,
-            kode = sykefraværsstatistikk.first().land,
-            statistikkategori = Statistikkategori.LAND,
-            statistikk = statistikkSiste4Kvartaler,
+            kode = kode,
+            statistikkategori = statistikkategori,
+            statistikk = statistikk,
             produsent = statistikkLandProdusent,
         )
     }
 
     private fun eksporterSykefraværsstatistikkSektor(
-        førsteKvartal: ÅrstallOgKvartal,
-        inneværendeKvartal: ÅrstallOgKvartal,
+        eksportkvartal: ÅrstallOgKvartal,
+        sektor: Sektor,
     ) {
-        logger.warn("Eksport av sykefraværsstatistikk for sektor ikke implementert")
+        val statistikkategori = Statistikkategori.SEKTOR
+        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkSektor(sektor = sektor)
+        val kode = sykefraværsstatistikk.first().sektor
+        // TODO: er dette det samme som sektor.kode? Hva er bedre, kode fra db eller kode fra input?
+        val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
+
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = eksportkvartal,
+            kode = kode,
+            statistikkategori = statistikkategori,
+            statistikk = statistikk,
+            produsent = statistikkSektorProdusent,
+        )
     }
 
-    private fun eksporterSykefraværsstatistikkNæring(
-        førsteKvartal: ÅrstallOgKvartal,
-        inneværendeKvartal: ÅrstallOgKvartal,
-    ) {
+    private fun eksporterSykefraværsstatistikkNæring(eksportkvartal: ÅrstallOgKvartal) {
         logger.warn("Eksport av sykefraværsstatistikk for næring ikke implementert")
     }
 
-    private fun eksporterSykefraværsstatistikkBransje(
-        førsteKvartal: ÅrstallOgKvartal,
-        inneværendeKvartal: ÅrstallOgKvartal,
-    ) {
+    private fun eksporterSykefraværsstatistikkBransje(eksportkvartal: ÅrstallOgKvartal) {
         logger.warn("Eksport av sykefraværsstatistikk for bransje ikke implementert")
     }
 
-    private fun eksporterSykefraværsstatistikkNæringskode(
-        førsteKvartal: ÅrstallOgKvartal,
-        inneværendeKvartal: ÅrstallOgKvartal,
-    ) {
+    private fun eksporterSykefraværsstatistikkNæringskode(eksportkvartal: ÅrstallOgKvartal) {
         logger.warn("Eksport av sykefraværsstatistikk for næringskode ikke implementert")
     }
 
-    private fun eksporterSykefraværsstatistikkVirksomhet(
-        førsteKvartal: ÅrstallOgKvartal,
-        inneværendeKvartal: ÅrstallOgKvartal,
-    ) {
+    private fun eksporterSykefraværsstatistikkVirksomhet(eksportkvartal: ÅrstallOgKvartal) {
         logger.warn("Eksport av sykefraværsstatistikk for virksomhet ikke implementert")
     }
 
@@ -156,6 +161,13 @@ class SykefraværsstatistikkEksportService(
         logger.info(
             "Melding eksportert på Kafka for statistikkategori ${statistikkategori.name}, ${umaskertSykefraværsstatistikk.size} kvartaler fram til $eksportkvartal.",
         )
+    }
+
+    private fun List<Sykefraværsstatistikk>.siste4Kvartaler(eksportkvartal: ÅrstallOgKvartal): List<Sykefraværsstatistikk> {
+        val førsteKvartal: ÅrstallOgKvartal = eksportkvartal.minusKvartaler(3)
+        return this.filter {
+            it.årstallOgKvartal() >= førsteKvartal && it.årstallOgKvartal() <= eksportkvartal
+        }
     }
 }
 
