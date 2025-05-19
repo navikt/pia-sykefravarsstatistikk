@@ -11,7 +11,7 @@ import no.nav.pia.sykefravarsstatistikk.importering.KafkaImportMelding.Companion
 import no.nav.pia.sykefravarsstatistikk.importering.KafkaImportMelding.Companion.toSykefraværsstatistikkDto
 import no.nav.pia.sykefravarsstatistikk.importering.KafkaImportMelding.Companion.toSykefraværsstatistikkImportKafkaMelding
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -27,13 +27,12 @@ class SykefraværsstatistikkConsumer(
     val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
     val sykefraværsstatistikkImportService: SykefraværsstatistikkImportService,
     val sykefraværsstatistikkEksportService: SykefraværsstatistikkEksportService,
-    // TODO:  Import produsent
     val applikasjonsHelse: ApplikasjonsHelse,
 ) : CoroutineScope {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val job: Job = Job()
     private val kafkaConsumer = KafkaConsumer(
-        KafkaConfig().consumerProperties(konsumentGruppe = topic.konsumentGruppe),
+        Kafka().consumerProperties(konsumentGruppe = topic.konsumentGruppe),
         StringDeserializer(),
         StringDeserializer(),
     )
@@ -86,7 +85,7 @@ class SykefraværsstatistikkConsumer(
                         }
                     }
                 } catch (e: WakeupException) {
-                    logger.info("SykefraværsstatistikkConsumer (topic '$topic')  is shutting down...")
+                    logger.info("SykefraværsstatistikkConsumer (topic '$topic')  is shutting down...", e)
                 } catch (e: Exception) {
                     logger.error(
                         "Exception is shutting down kafka listner i SykefraværsstatistikkConsumer (topic '$topic')",

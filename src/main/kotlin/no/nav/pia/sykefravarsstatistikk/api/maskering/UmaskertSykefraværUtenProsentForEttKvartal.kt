@@ -25,9 +25,6 @@ open class UmaskertSykefraværUtenProsentForEttKvartal(
         statistikk.antallPersoner,
     )
 
-    /*
-     * Denne metoden skal tas i bruk ved eksportering til Kafka
-     */
     fun tilSykefraværMedKategori(
         kategori: Statistikkategori,
         kode: String,

@@ -8,6 +8,7 @@ import no.nav.pia.sykefravarsstatistikk.api.aggregering.AggregertStatistikkServi
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.eksport.SykefraværsstatistikkEksportService
+import no.nav.pia.sykefravarsstatistikk.eksport.SykefraværsstatistikkProducer
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkImportService
@@ -46,8 +47,48 @@ fun main() {
     val sykefraværsstatistikkImportService = SykefraværsstatistikkImportService(
         sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
     )
+    val statistikkLandProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_LAND,
+    )
+    val statistikkSektorProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_SEKTOR,
+    )
+    val statistikkNæringProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_NÆRING,
+    )
+    val statistikkBransjeProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_BRANSJE,
+    )
+    val statistikkNæringskodeProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_NÆRINGSKODE,
+    )
+    val statistikkVirksomhetProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_VIRKSOMHET,
+    )
+    val statistikkVirksomhetGradertProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_VIRKSOMHET_GRADERT,
+    )
+    val statistikkMetadataVirksomhetProdusent = SykefraværsstatistikkProducer(
+        kafka = naisEnvironment.kafka,
+        topic = Topic.STATISTIKK_EKSPORT_METADATA_VIRKSOMHET,
+    )
     val sykefraværsstatistikkEksportService = SykefraværsstatistikkEksportService(
         sykefraværsstatistikkRepository = sykefraværsstatistikkRepository,
+        statistikkLandProdusent = statistikkLandProdusent,
+        statistikkSektorProdusent = statistikkSektorProdusent,
+        statistikkNæringProdusent = statistikkNæringProdusent,
+        statistikkBransjeProdusent = statistikkBransjeProdusent,
+        statistikkNæringskodeProdusent = statistikkNæringskodeProdusent,
+        statistikkVirksomhetProdusent = statistikkVirksomhetProdusent,
+        statistikkVirksomhetGradertProdusent = statistikkVirksomhetGradertProdusent,
+        statistikkMetadataVirksomhetProdusent = statistikkMetadataVirksomhetProdusent,
     )
     val kvartalsvisSykefraværshistorikkService = KvartalsvisSykefraværshistorikkService(
         importtidspunktRepository = importtidspunktRepository,

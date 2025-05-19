@@ -1,12 +1,14 @@
 package no.nav.pia.sykefravarsstatistikk
 
 import no.nav.pia.sykefravarsstatistikk.NaisEnvironment.Companion.getEnvVar
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 class NaisEnvironment(
     val database: Database = Database(),
+    val kafka: Kafka = Kafka(),
 ) {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(this::class.java)
