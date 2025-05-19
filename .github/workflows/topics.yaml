@@ -1,0 +1,36 @@
+name: Deploy pia-sykefravarsstatistikk topics
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .nais/topics/** # Deploy topics ved endringer i topics-mappen
+      - .github/workflows/topics.yaml # Deploy topics ved endringer i topics.yaml
+
+permissions:
+  id-token: write
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        cluster: [dev, prod]
+    name: Deploy app to ${{ matrix.cluster }}
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy topics to ${{ matrix.cluster }}
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: ${{ matrix.cluster }}-gcp
+          RESOURCE: "\
+            .nais/topics/sykefravarsstatistikk-land-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-sektor-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-naring-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-bransje-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-naringskode-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-virksomhet-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-virksomhet-gradert-topic.yaml,\
+            .nais/topics/sykefravarsstatistikk-metadata-virksomhet-topic.yaml"
+          VARS: .nais/${{ matrix.cluster }}.yaml
