@@ -7,7 +7,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.tilVirksomhetMetadataDto
@@ -28,7 +28,7 @@ class VirksomhetMetadataConsumer(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val job: Job = Job()
     private val kafkaConsumer = KafkaConsumer(
-        KafkaConfig().consumerProperties(konsumentGruppe = topic.konsumentGruppe),
+        Kafka().consumerProperties(konsumentGruppe = topic.konsumentGruppe),
         StringDeserializer(),
         StringDeserializer(),
     )
@@ -68,7 +68,7 @@ class VirksomhetMetadataConsumer(
                         }
                     }
                 } catch (e: WakeupException) {
-                    logger.info("VirksomhetMetadataConsumer (topic '$topic')  is shutting down...")
+                    logger.info("VirksomhetMetadataConsumer (topic '$topic')  is shutting down...", e)
                 } catch (e: Exception) {
                     logger.error(
                         "Exception is shutting down kafka listner i VirksomhetMetadataConsumer (topic '$topic')",

@@ -18,7 +18,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.PubliseringsdatoImportTestUtils.Companion.toJson
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoDto
 import org.apache.kafka.clients.CommonClientConfigs
@@ -78,7 +78,7 @@ class KafkaContainerHelper(
         }
 
     fun nyKonsument(topic: Topic) =
-        KafkaConfig(
+        Kafka(
             brokers = kafkaContainer.bootstrapServers,
             truststoreLocation = "",
             keystoreLocation = "",
