@@ -48,7 +48,7 @@ enum class Topic(
         navn = "pia.sykefravarsstatistikk-virksomhet-gradert-v1",
         konsumentGruppe = "pia-sykefravarsstatistikk-virksomhet-gradert-produsent",
     ),
-    STATISTIKK_EKSPORT_VIRKSOMHET_METADATA(
+    STATISTIKK_EKSPORT_METADATA_VIRKSOMHET(
         navn = "pia.sykefravarsstatistikk-metadata-virksomhet-v1",
         konsumentGruppe = "pia-sykefravarsstatistikk-metadata-virksomhet-produsent",
     ),
