@@ -1,10 +1,10 @@
-apiVersion: nais.io/v1alpha1
-kind: Application
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
 metadata:
-  name: pia-sykefravarsstatistikk
-  namespace: pia
+  name: "pia-sykefravarsstatistikk"
+  namespace: "pia"
   labels:
-    team: pia
+    team: "pia"
 spec:
   image: {{image}}
   resources:
@@ -19,8 +19,6 @@ spec:
     port: 8080
     initialDelay: 20
     timeout: 60
-  tokenx:
-    enabled: true
   readiness:
     path: "/internal/isready"
     port: 8080
@@ -29,15 +27,6 @@ spec:
   prometheus:
     enabled: true
     path: "/metrics"
-  gcp:
-    sqlInstances:
-      - type: POSTGRES_17
-        diskAutoresize: {{dbAutoresizeDisk}}
-        tier: {{dbTier}}
-        databases:
-          - name: "pia-sykefravarsstatistikk-db"
-  kafka:
-    pool: {{kafkaPool}}
   observability:
     autoInstrumentation:
       enabled: true
@@ -49,16 +38,27 @@ spec:
         - id: loki
         - id: elastic
   accessPolicy:
-    inbound:
-      rules:
-        - application: min-ia
-          namespace: pia
     outbound:
       rules:
         - application: arbeidsgiver-altinn-tilganger
           namespace: fager
       external:
         - host: {{ enhetsregisteretHost }}
+    inbound:
+      rules:
+        - application: min-ia
+          namespace: pia
+  tokenx:
+    enabled: true
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_17
+        diskAutoresize: {{dbAutoresizeDisk}}
+        tier: {{dbTier}}
+        databases:
+          - name: "pia-sykefravarsstatistikk-db"
+  kafka:
+    pool: {{kafkaPool}}
   env:
     - name: ENHETSREGISTERET_URL
       value: {{ enhetsregisteretUrl }}
