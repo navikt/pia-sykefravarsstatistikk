@@ -13,7 +13,6 @@ class SykefraværsstatistikkProducer(
 ) : KafkaProdusent<StatistikkategoriKafkamelding>(kafka = kafka, topic = topic) {
     private val jsonMapper = ObjectMapper()
 
-    // Inputmelding
     override fun tilKafkaMelding(input: StatistikkategoriKafkamelding): Pair<String, String> {
         val nøkkel: String = jsonMapper.writeValueAsString(
             mapOf(

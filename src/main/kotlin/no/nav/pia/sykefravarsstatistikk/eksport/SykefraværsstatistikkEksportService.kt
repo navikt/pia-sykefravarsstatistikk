@@ -1,6 +1,7 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
+import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
@@ -56,6 +57,7 @@ class SykefraværsstatistikkEksportService(
             is NæringSykefraværsstatistikkDto -> {
                 eksporterSykefraværsstatistikkNæring(
                     eksportkvartal = eksportkvartal,
+                    næring = Næring(sykefraværstatistikkDto.næring),
                 )
             }
             is BransjeSykefraværsstatistikkDto -> {
@@ -112,8 +114,24 @@ class SykefraværsstatistikkEksportService(
         )
     }
 
-    private fun eksporterSykefraværsstatistikkNæring(eksportkvartal: ÅrstallOgKvartal) {
-        logger.warn("Eksport av sykefraværsstatistikk for næring ikke implementert")
+    private fun eksporterSykefraværsstatistikkNæring(
+        eksportkvartal: ÅrstallOgKvartal,
+        næring: Næring,
+    ) {
+        val statistikkategori = Statistikkategori.NÆRING
+        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
+        val kode = sykefraværsstatistikk.first().næring.tosifferIdentifikator
+        // TODO: Sjekk om dette er rett kode
+        val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
+
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = eksportkvartal,
+            kode = kode,
+            statistikkategori = statistikkategori,
+            statistikk = statistikk,
+            produsent = statistikkNæringProdusent,
+        )
     }
 
     private fun eksporterSykefraværsstatistikkBransje(eksportkvartal: ÅrstallOgKvartal) {
