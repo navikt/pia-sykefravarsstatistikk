@@ -1,5 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
@@ -29,10 +30,10 @@ class SykefraværsstatistikkEksportService(
     private val statistikkSektorProdusent: SykefraværsstatistikkProducer,
     private val statistikkNæringProdusent: SykefraværsstatistikkProducer,
     private val statistikkBransjeProdusent: SykefraværsstatistikkProducer,
-    private val statistikkNæringskodeProdusent: SykefraværsstatistikkProducer,
-    private val statistikkVirksomhetProdusent: SykefraværsstatistikkProducer,
-    private val statistikkVirksomhetGradertProdusent: SykefraværsstatistikkProducer,
-    private val statistikkMetadataVirksomhetProdusent: SykefraværsstatistikkProducer,
+//    private val statistikkNæringskodeProdusent: SykefraværsstatistikkProducer,
+//    private val statistikkVirksomhetProdusent: SykefraværsstatistikkProducer,
+//    private val statistikkVirksomhetGradertProdusent: SykefraværsstatistikkProducer,
+//    private val statistikkMetadataVirksomhetProdusent: SykefraværsstatistikkProducer,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -61,8 +62,16 @@ class SykefraværsstatistikkEksportService(
                 )
             }
             is BransjeSykefraværsstatistikkDto -> {
+                val bransjenavn = sykefraværstatistikkDto.bransje
+                val bransje = Bransje.entries.firstOrNull { it.navn == bransjenavn }
+                if (bransje == null) {
+                    logger.error("Bransje $bransjenavn i db ikke funnet i domene, kjører ikke eksport")
+                    return
+                }
+
                 eksporterSykefraværsstatistikkBransje(
                     eksportkvartal = eksportkvartal,
+                    bransje = bransje,
                 )
             }
             is NæringskodeSykefraværsstatistikkDto -> {
@@ -134,8 +143,24 @@ class SykefraværsstatistikkEksportService(
         )
     }
 
-    private fun eksporterSykefraværsstatistikkBransje(eksportkvartal: ÅrstallOgKvartal) {
-        logger.warn("Eksport av sykefraværsstatistikk for bransje ikke implementert")
+    private fun eksporterSykefraværsstatistikkBransje(
+        eksportkvartal: ÅrstallOgKvartal,
+        bransje: Bransje,
+    ) {
+        val statistikkategori = Statistikkategori.BRANSJE
+        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkBransje(bransje = bransje)
+        val kode = sykefraværsstatistikk.first().bransje.navn
+        // TODO: Sjekk om dette er rett kode
+        val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
+
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = eksportkvartal,
+            kode = kode,
+            statistikkategori = statistikkategori,
+            statistikk = statistikk,
+            produsent = statistikkBransjeProdusent,
+        )
     }
 
     private fun eksporterSykefraværsstatistikkNæringskode(eksportkvartal: ÅrstallOgKvartal) {

@@ -1,5 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
@@ -10,6 +11,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.app
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import kotlin.test.Test
@@ -96,6 +98,49 @@ class EksportTest {
             muligeDagsverk = 186.3.toBigDecimal(),
             antallPersoner = 5,
             tapteDagsverGradert = 87.87601.toBigDecimal(),
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 12.3.toBigDecimal(),
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 5.2.toBigDecimal(),
+                ),
+            ),
+        )
+
+        kafkaContainerHelper.sendOgVentTilKonsumert(
+            sykefraværsstatistikk.toJsonKey(),
+            sykefraværsstatistikk.toJsonValue(),
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+
+        applikasjon.shouldContainLog(
+            "Eksporterer sykefraværsstatistikk for $kategori - 1. kvartal 2025".toRegex(),
+        )
+        applikasjon.shouldContainLog(
+            "Melding eksportert på Kafka for statistikkategori $kategori, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
+        )
+    }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori BRANSJE blir eksportert til kafka`() {
+        val bransje: Bransje = underenhetIBransjeAnlegg.somNæringsdrivende().bransje()!!
+        val kategori = Statistikkategori.BRANSJE
+        kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
+
+        val kvartal20251 = ÅrstallOgKvartal(2025, 1)
+
+        val sykefraværsstatistikk = JsonMelding(
+            kategori = Statistikkategori.BRANSJE,
+            kode = bransje.navn,
+            årstallOgKvartal = kvartal20251,
+            prosent = 2.7.toBigDecimal(),
+            tapteDagsverk = 5039.8.toBigDecimal(),
+            muligeDagsverk = 186.3.toBigDecimal(),
+            antallPersoner = 3,
+            tapteDagsverGradert = 21.2345.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
