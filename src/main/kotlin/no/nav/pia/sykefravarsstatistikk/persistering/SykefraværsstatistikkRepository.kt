@@ -7,10 +7,13 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
@@ -140,7 +143,6 @@ class SykefraværsstatistikkRepository(
         }
 
     fun hentSykefraværsstatistikkVirksomhet(virksomhet: Virksomhet): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
-
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
@@ -149,6 +151,18 @@ class SykefraværsstatistikkRepository(
             }
         } catch (e: Exception) {
             logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet ${virksomhet.orgnr}", e)
+            throw e
+        }
+
+    fun hentSykefraværsstatistikkNæringskode(næringskode: Næringskode): List<UmaskertSykefraværsstatistikkForEttKvartalNæringskode> =
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentUmaskertNæringskodestatistikk(næringskode)
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for næring ${næringskode.femsifferIdentifikator}", e)
             throw e
         }
 
@@ -238,6 +252,18 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
+    private fun Row.tilUmaskertNæringskodestatistikk(): UmaskertSykefraværsstatistikkForEttKvartalNæringskode =
+        UmaskertSykefraværsstatistikkForEttKvartalNæringskode(
+            næringskode = string("naringskode").tilNæringskode(),
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
+            opprettet = localDateTime("opprettet"),
+        )
+
     private fun Row.tilUmaskertSektorstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalSektor =
         UmaskertSykefraværsstatistikkForEttKvartalSektor(
             sektor = string("sektor"),
@@ -295,6 +321,25 @@ class SykefraværsstatistikkRepository(
                     "naring" to næring.tosifferIdentifikator,
                 ),
             ).map { row -> row.tilUmaskertNæringstatistikk() }.asList,
+        )
+    }
+
+    private fun TransactionalSession.hentUmaskertNæringskodestatistikk(
+        næringskode: Næringskode,
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalNæringskode> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_naringskode
+            WHERE naringskode = :naringskode
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "naringskode" to næringskode.femsifferIdentifikator,
+                ),
+            ).map { row -> row.tilUmaskertNæringskodestatistikk() }.asList,
         )
     }
 

@@ -37,6 +37,17 @@ data class UmaskertSykefraværsstatistikkForEttKvartalNæring(
     val opprettet: LocalDateTime,
 ) : Sykefraværsstatistikk
 
+data class UmaskertSykefraværsstatistikkForEttKvartalNæringskode(
+    val næringskode: Næringskode,
+    override val årstall: Int,
+    override val kvartal: Int,
+    override val antallPersoner: Int,
+    override val tapteDagsverk: BigDecimal,
+    override val muligeDagsverk: BigDecimal,
+    override val prosent: BigDecimal,
+    val opprettet: LocalDateTime,
+) : Sykefraværsstatistikk
+
 data class UmaskertSykefraværsstatistikkForEttKvartalBransje(
     val bransje: Bransje,
     override val årstall: Int,

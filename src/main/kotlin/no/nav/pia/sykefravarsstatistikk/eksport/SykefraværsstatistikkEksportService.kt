@@ -3,12 +3,15 @@ package no.nav.pia.sykefravarsstatistikk.eksport
 import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.pia.sykefravarsstatistikk.api.maskering.UmaskertSykefraværUtenProsentForEttKvartal
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.tilSektor
@@ -30,10 +33,10 @@ class SykefraværsstatistikkEksportService(
     private val statistikkSektorProdusent: SykefraværsstatistikkProducer,
     private val statistikkNæringProdusent: SykefraværsstatistikkProducer,
     private val statistikkBransjeProdusent: SykefraværsstatistikkProducer,
-//    private val statistikkNæringskodeProdusent: SykefraværsstatistikkProducer,
-//    private val statistikkVirksomhetProdusent: SykefraværsstatistikkProducer,
-//    private val statistikkVirksomhetGradertProdusent: SykefraværsstatistikkProducer,
-//    private val statistikkMetadataVirksomhetProdusent: SykefraværsstatistikkProducer,
+    private val statistikkNæringskodeProdusent: SykefraværsstatistikkProducer,
+    private val statistikkVirksomhetProdusent: SykefraværsstatistikkProducer,
+    private val statistikkVirksomhetGradertProdusent: SykefraværsstatistikkProducer,
+    private val statistikkMetadataVirksomhetProdusent: SykefraværsstatistikkProducer,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -75,8 +78,11 @@ class SykefraværsstatistikkEksportService(
                 )
             }
             is NæringskodeSykefraværsstatistikkDto -> {
+                val bransjenavn = sykefraværstatistikkDto.næringskode
+                val næringskode = bransjenavn.tilNæringskode()
                 eksporterSykefraværsstatistikkNæringskode(
                     eksportkvartal = eksportkvartal,
+                    næringskode = næringskode,
                 )
             }
             is VirksomhetSykefraværsstatistikkDto -> {
@@ -163,11 +169,29 @@ class SykefraværsstatistikkEksportService(
         )
     }
 
-    private fun eksporterSykefraværsstatistikkNæringskode(eksportkvartal: ÅrstallOgKvartal) {
-        logger.warn("Eksport av sykefraværsstatistikk for næringskode ikke implementert")
+    private fun eksporterSykefraværsstatistikkNæringskode(
+        eksportkvartal: ÅrstallOgKvartal,
+        næringskode: Næringskode,
+    ) {
+        val statistikkategori = Statistikkategori.NÆRINGSKODE
+        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        val sykefraværsstatistikk: List<UmaskertSykefraværsstatistikkForEttKvartalNæringskode> = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæringskode(
+            næringskode = næringskode,
+        )
+        val kode = sykefraværsstatistikk.first().næringskode
+        val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
+
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = eksportkvartal,
+            kode = kode.femsifferIdentifikator,
+            statistikkategori = statistikkategori,
+            statistikk = statistikk,
+            produsent = statistikkNæringskodeProdusent,
+        )
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhet(eksportkvartal: ÅrstallOgKvartal) {
+        // TODO: Implementer eksport av sykefraværsstatistikk for virksomhet og virksomhet gradert
         logger.warn("Eksport av sykefraværsstatistikk for virksomhet ikke implementert")
     }
 
@@ -183,6 +207,7 @@ class SykefraværsstatistikkEksportService(
             .tilSykefraværMedKategori(statistikkategori, kode)
 
         if (sykefraværMedKategoriSisteKvartal.årstallOgKvartal != eksportkvartal) {
+            // TODO: Test at vi får denne feilen
             logger.warn("Siste kvartal i uthentet statistikk er ikke samme som inneværende kvartal")
             return
         }
@@ -199,6 +224,7 @@ class SykefraværsstatistikkEksportService(
                 sisteKvartal = sykefraværMedKategoriSisteKvartal,
                 siste4Kvartal = SykefraværFlereKvartalerForEksport(umaskertSykefravær = umaskertSykefraværsstatistikk),
             )
+            Statistikkategori.VIRKSOMHET_GRADERT -> TODO("Implement virksomhet gradert")
         }
         produsent.sendPåKafka(statistikkategoriKafkamelding)
         logger.info(
@@ -225,11 +251,11 @@ fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværUtenProsentForEttKvartal(
             is UmaskertSykefraværsstatistikkForEttKvartalLand,
             is UmaskertSykefraværsstatistikkForEttKvartalSektor,
             is UmaskertSykefraværsstatistikkForEttKvartalNæring,
-//                is SykefraværsstatistikkNæringMedVarighet, //TODO: mangler i ny app ?
+
             is UmaskertSykefraværsstatistikkForEttKvartalBransje,
-//                is SykefraværsstatistikkForNæringskode, //TODO: mangler i ny app ?
+            is UmaskertSykefraværsstatistikkForEttKvartalNæringskode,
             is UmaskertSykefraværsstatistikkForEttKvartalVirksomhet,
-//                is SykefraværsstatistikkVirksomhetUtenVarighet, //TODO: mangler i ny app ?
+
             -> UmaskertSykefraværUtenProsentForEttKvartal(
                 årstallOgKvartal = ÅrstallOgKvartal(it.årstall, it.kvartal),
                 dagsverkTeller = it.tapteDagsverk,

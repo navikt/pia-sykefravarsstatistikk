@@ -7,5 +7,5 @@ class SykefraværsstatistikkImportService(
     private val sykefraværsstatistikkRepository: SykefraværsstatistikkRepository,
 ) {
     fun lagreSykefraværsstatistikk(sykefraværstatistikkDto: SykefraværsstatistikkDto) =
-        sykefraværsstatistikkRepository.insertSykefraværsstatistikk(sykefraværstatistikkDto)
+        sykefraværsstatistikkRepository.insertSykefraværsstatistikk(sykefraværsstatistikk = sykefraværstatistikkDto)
 }

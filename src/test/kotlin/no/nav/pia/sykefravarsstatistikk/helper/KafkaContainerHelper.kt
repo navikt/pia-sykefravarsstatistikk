@@ -9,6 +9,7 @@ import kotlinx.coroutines.time.withTimeout
 import kotlinx.coroutines.time.withTimeoutOrNull
 import no.nav.pia.sykefravarsstatistikk.domene.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
@@ -16,8 +17,10 @@ import no.nav.pia.sykefravarsstatistikk.domene.Underenhet
 import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.PubliseringsdatoImportTestUtils.Companion.toJson
+import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.toJson
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoDto
@@ -117,6 +120,19 @@ class KafkaContainerHelper(
             StringSerializer(),
             StringSerializer(),
         )
+
+    suspend fun sendOgKonsumerFraAnnetTopic(
+        importMelding: JsonMelding,
+        importTopic: Topic,
+        eksportNøkkel: String,
+        eksportKonsument: KafkaConsumer<String, String>,
+        block: (meldinger: List<String>) -> Unit,
+    ) {
+        kafkaProducer.send(
+            ProducerRecord(importTopic.navn, importMelding.key.toJson(), importMelding.value.toJson()),
+        )
+        kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(key = eksportNøkkel, konsument = eksportKonsument, block = block)
+    }
 
     fun sendOgVentTilKonsumert(
         nøkkel: String,
@@ -283,6 +299,34 @@ class KafkaContainerHelper(
         }
     }
 
+    fun sendNæringskodestatistikk(
+        næringskode: Næringskode,
+        startÅr: Int = 2010,
+        sluttÅr: Int = 2024,
+        harForFåAnsatte: Boolean = false,
+    ) {
+        val statistikkategori = Statistikkategori.NÆRINGSKODE
+        for (årstall in startÅr..sluttÅr) {
+            for (kvartal in 1..4) {
+                val næringMelding = if (harForFåAnsatte) {
+                    enMeldingMedFåAnsatte(
+                        årstall = årstall,
+                        kvartal = kvartal,
+                        statistikkategori = statistikkategori,
+                        kode = næringskode.femsifferIdentifikator,
+                    )
+                } else {
+                    enStandardNæringskodeMelding(årstall = årstall, kvartal = kvartal, næringskode = næringskode)
+                }
+                sendOgVentTilKonsumert(
+                    nøkkel = næringMelding.toJsonKey(),
+                    melding = næringMelding.toJsonValue(),
+                    topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+                )
+            }
+        }
+    }
+
     private fun enMeldingMedFåAnsatte(
         årstall: Int,
         kvartal: Int,
@@ -424,6 +468,48 @@ class KafkaContainerHelper(
                 TapteDagsverkPerVarighet(
                     varighet = "F",
                     tapteDagsverk = 13876.47.toBigDecimal(),
+                ),
+            ),
+        )
+
+    private fun enStandardNæringskodeMelding(
+        årstall: Int,
+        kvartal: Int,
+        næringskode: Næringskode,
+    ): JsonMelding =
+        JsonMelding(
+            kategori = Statistikkategori.NÆRINGSKODE,
+            kode = næringskode.femsifferIdentifikator,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            prosent = 5.8.toBigDecimal(),
+            tapteDagsverk = 893.631879.toBigDecimal(),
+            muligeDagsverk = 15407.446182.toBigDecimal(),
+            antallPersoner = 299,
+            tapteDagsverGradert = 365.466504.toBigDecimal(),
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 278.26.toBigDecimal(),
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "B",
+                    tapteDagsverk = 274.31.toBigDecimal(),
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "C",
+                    tapteDagsverk = 87.62.toBigDecimal(),
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "D",
+                    tapteDagsverk = 31.21.toBigDecimal(),
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "E",
+                    tapteDagsverk = 113.4.toBigDecimal(),
+                ),
+                TapteDagsverkPerVarighet(
+                    varighet = "F",
+                    tapteDagsverk = 108.83.toBigDecimal(),
                 ),
             ),
         )

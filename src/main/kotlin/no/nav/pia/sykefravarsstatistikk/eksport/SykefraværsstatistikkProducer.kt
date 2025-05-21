@@ -19,7 +19,7 @@ class SykefraværsstatistikkProducer(
                 "kategori" to input.sisteKvartal.kategori,
                 "kode" to input.sisteKvartal.kode,
                 "kvartal" to input.sisteKvartal.kvartal.toString(),
-                "årstall" to input.sisteKvartal.Årstall.toString(),
+                "årstall" to input.sisteKvartal.årstall.toString(),
             ),
         )
 
@@ -27,7 +27,7 @@ class SykefraværsstatistikkProducer(
             kategori = input.sisteKvartal.kategori,
             kode = input.sisteKvartal.kode,
             sistePubliserteKvartal = SistePubliserteKvartal(
-                årstall = input.sisteKvartal.Årstall,
+                årstall = input.sisteKvartal.årstall,
                 kvartal = input.sisteKvartal.kvartal,
                 prosent = input.sisteKvartal.prosent?.toDouble(),
                 tapteDagsverk = input.sisteKvartal.tapteDagsverk?.toDouble(),

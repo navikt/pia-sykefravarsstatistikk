@@ -124,6 +124,7 @@ class SykefraværsstatistikkImportTestUtils {
             when (this) {
                 Statistikkategori.LAND -> "land"
                 Statistikkategori.VIRKSOMHET -> "orgnr"
+                Statistikkategori.VIRKSOMHET_GRADERT -> "orgnr"
                 Statistikkategori.NÆRING -> "næring"
                 Statistikkategori.NÆRINGSKODE -> "næringskode"
                 Statistikkategori.BRANSJE -> "bransje"
