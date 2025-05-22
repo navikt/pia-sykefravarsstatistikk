@@ -9,7 +9,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
 import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
-import no.nav.pia.sykefravarsstatistikk.eksport.SykefraværsstatistikkProducer.SykefraværsstatistikkPerKategoriEksportDto
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon

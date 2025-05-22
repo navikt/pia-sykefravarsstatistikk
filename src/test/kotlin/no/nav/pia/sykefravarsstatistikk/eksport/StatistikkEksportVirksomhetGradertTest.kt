@@ -5,8 +5,8 @@ import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import no.nav.pia.sykefravarsstatistikk.domene.Næring
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
+import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
@@ -14,51 +14,54 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.app
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import kotlin.test.Test
 
-class StatistikkEksportNæringTest {
+class StatistikkEksportVirksomhetGradertTest {
     companion object {
-        private val kategori = Statistikkategori.NÆRING
-        private val eksportTopic = Topic.STATISTIKK_EKSPORT_NÆRING
+        private val importKategori = Statistikkategori.VIRKSOMHET
         private val importTopic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER
-        private val konsument = kafkaContainerHelper.nyKonsument(topic = eksportTopic)
 
-        private val kvartal20251 = ÅrstallOgKvartal(2025, 1)
+        private val eksportKategori = Statistikkategori.VIRKSOMHET_GRADERT
+        private val eksportTopic = Topic.STATISTIKK_EKSPORT_VIRKSOMHET_GRADERT
+        private val eksportKonsument = kafkaContainerHelper.nyKonsument(topic = eksportTopic)
+
+        private val KVARTAL_2025_1 = ÅrstallOgKvartal(2025, 1)
 
         @BeforeClass
         @JvmStatic
-        fun setUp() = konsument.subscribe(mutableListOf(eksportTopic.navn))
+        fun setUp() {
+            eksportKonsument.subscribe(mutableListOf(eksportTopic.navn))
+        }
 
         @AfterClass
         @JvmStatic
         fun tearDown() {
-            konsument.unsubscribe()
-            konsument.close()
+            eksportKonsument.unsubscribe()
+            eksportKonsument.close()
         }
     }
 
     @Test
-    fun `sykefraværsstatistikk for kategori NÆRING blir eksportert til kafka`() {
-        val næring: Næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring
+    fun `sykefraværsstatistikk for kategori VIRKSOMHET_GRADERT blir eksportert til kafka`() {
+        val virksomhet: Virksomhet = underenhetIBransjeAnlegg.somNæringsdrivende()
+        kafkaContainerHelper.sendVirksomhetsstatistikk(virksomhet = virksomhet)
 
-        kafkaContainerHelper.sendNæringsstatistikk(næring = næring)
-
-        val importKode = næring.tosifferIdentifikator
-        val eksportKode = næring.tosifferIdentifikator
+        val importKode = virksomhet.orgnr
+        val eksportKode = virksomhet.orgnr
 
         val sykefraværsstatistikk = JsonMelding(
-            kategori = kategori,
+            kategori = importKategori,
             kode = importKode,
-            årstallOgKvartal = kvartal20251,
-            prosent = 2.7.toBigDecimal(),
-            tapteDagsverk = 5039.8.toBigDecimal(),
-            muligeDagsverk = 186.3.toBigDecimal(),
-            antallPersoner = 5,
-            tapteDagsverGradert = 87.87601.toBigDecimal(),
+            årstallOgKvartal = KVARTAL_2025_1,
+            prosent = 28.3.toBigDecimal(),
+            tapteDagsverk = 154.5439.toBigDecimal(),
+            muligeDagsverk = 761.3.toBigDecimal(),
+            antallPersoner = 4,
+            tapteDagsverGradert = 33.2.toBigDecimal(),
             tapteDagsverkMedVarighet = listOf(
                 TapteDagsverkPerVarighet(
                     varighet = "A",
@@ -73,10 +76,10 @@ class StatistikkEksportNæringTest {
 
         val nøkkel: String = ObjectMapper().writeValueAsString(
             mapOf(
-                "kategori" to kategori,
+                "kategori" to eksportKategori,
                 "kode" to eksportKode,
-                "kvartal" to kvartal20251.kvartal.toString(),
-                "årstall" to kvartal20251.årstall.toString(),
+                "kvartal" to KVARTAL_2025_1.kvartal.toString(),
+                "årstall" to KVARTAL_2025_1.årstall.toString(),
             ),
         )
 
@@ -85,22 +88,23 @@ class StatistikkEksportNæringTest {
                 importMelding = sykefraværsstatistikk,
                 importTopic = importTopic,
                 eksportNøkkel = nøkkel,
-                eksportKonsument = konsument,
+                eksportKonsument = eksportKonsument,
             ) { meldinger ->
-                val objektene = meldinger.map { Json.decodeFromString<SykefraværsstatistikkPerKategoriEksportDto>(it) }
+                val objektene = meldinger.map { Json.decodeFromString<GradertSykemeldingEksportDto>(it) }
                 objektene shouldHaveAtLeastSize 1
                 objektene.forEach {
-                    it.kategori shouldBe kategori
+                    it.kategori shouldBe eksportKategori
                     it.kode shouldBe eksportKode
                 }
             }
         }
 
         applikasjon.shouldContainLog(
-            "Eksporterer sykefraværsstatistikk for $kategori - 1. kvartal 2025".toRegex(),
+            "Eksporterer sykefraværsstatistikk for $eksportKategori - 1. kvartal 2025".toRegex(),
         )
+
         applikasjon.shouldContainLog(
-            "Melding eksportert på Kafka for statistikkategori $kategori, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
+            "Melding eksportert på Kafka for statistikkategori $eksportKategori, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
         )
     }
 }

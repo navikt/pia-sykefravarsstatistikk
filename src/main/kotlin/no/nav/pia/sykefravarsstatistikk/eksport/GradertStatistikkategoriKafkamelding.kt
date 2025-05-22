@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.maskering.SykefraværMedKategori
 
-data class StatistikkategoriKafkamelding(
+data class GradertStatistikkategoriKafkamelding(
     val sisteKvartal: SykefraværMedKategori,
     val siste4Kvartal: SykefraværFlereKvartalerForEksport,
 ) : Kafkamelding {
@@ -21,5 +21,5 @@ data class StatistikkategoriKafkamelding(
         )
 
     override val innhold: String
-        get() = Json.encodeToString(this.tilDto())
+        get() = Json.encodeToString(this.tilGradertDto())
 }

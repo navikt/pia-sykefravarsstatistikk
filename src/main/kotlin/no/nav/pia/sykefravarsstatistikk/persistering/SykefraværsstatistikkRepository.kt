@@ -16,7 +16,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkFor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
-import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -142,15 +141,15 @@ class SykefraværsstatistikkRepository(
             }
         }
 
-    fun hentSykefraværsstatistikkVirksomhet(virksomhet: Virksomhet): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
+    fun hentSykefraværsstatistikkVirksomhet(orgnr: String): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentSykefraværsstatistikk(virksomhet)
+                    tx.hentSykefraværsstatistikk(orgnr)
                 }
             }
         } catch (e: Exception) {
-            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet ${virksomhet.orgnr}", e)
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet $orgnr", e)
             throw e
         }
 
@@ -377,9 +376,7 @@ class SykefraværsstatistikkRepository(
         )
     }
 
-    private fun TransactionalSession.hentSykefraværsstatistikk(
-        virksomhet: Virksomhet,
-    ): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
+    private fun TransactionalSession.hentSykefraværsstatistikk(orgnr: String): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
         val query =
             """
             SELECT *
@@ -390,7 +387,7 @@ class SykefraværsstatistikkRepository(
             queryOf(
                 query,
                 mapOf(
-                    "orgnr" to virksomhet.orgnr,
+                    "orgnr" to orgnr,
                 ),
             ).map { row -> row.tilUmaskertStatistikkVirksomhet() }.asList,
         )

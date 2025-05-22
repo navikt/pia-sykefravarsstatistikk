@@ -86,8 +86,10 @@ class SykefraværsstatistikkEksportService(
                 )
             }
             is VirksomhetSykefraværsstatistikkDto -> {
+                val orgnummer = sykefraværstatistikkDto.orgnr
                 eksporterSykefraværsstatistikkVirksomhet(
                     eksportkvartal = eksportkvartal,
+                    orgnummer = orgnummer,
                 )
             }
         }
@@ -190,9 +192,35 @@ class SykefraværsstatistikkEksportService(
         )
     }
 
-    private fun eksporterSykefraværsstatistikkVirksomhet(eksportkvartal: ÅrstallOgKvartal) {
-        // TODO: Implementer eksport av sykefraværsstatistikk for virksomhet og virksomhet gradert
-        logger.warn("Eksport av sykefraværsstatistikk for virksomhet ikke implementert")
+    private fun eksporterSykefraværsstatistikkVirksomhet(
+        eksportkvartal: ÅrstallOgKvartal,
+        orgnummer: String,
+    ) {
+        val sykefraværsstatistikk: List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
+            sykefraværsstatistikkRepository.hentSykefraværsstatistikkVirksomhet(
+                orgnr = orgnummer,
+            )
+
+        val kode = sykefraværsstatistikk.first().orgnr
+        val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
+
+        logger.info("Eksporterer sykefraværsstatistikk for ${Statistikkategori.VIRKSOMHET} - $eksportkvartal")
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = eksportkvartal,
+            kode = kode,
+            statistikkategori = Statistikkategori.VIRKSOMHET,
+            statistikk = statistikk,
+            produsent = statistikkVirksomhetProdusent,
+        )
+
+        logger.info("Eksporterer sykefraværsstatistikk for ${Statistikkategori.VIRKSOMHET_GRADERT} - $eksportkvartal")
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = eksportkvartal,
+            kode = kode,
+            statistikkategori = Statistikkategori.VIRKSOMHET_GRADERT,
+            statistikk = statistikk,
+            produsent = statistikkVirksomhetGradertProdusent,
+        )
     }
 
     private fun eksporterSykefraværsstatistikkPerKategori(
@@ -224,7 +252,10 @@ class SykefraværsstatistikkEksportService(
                 sisteKvartal = sykefraværMedKategoriSisteKvartal,
                 siste4Kvartal = SykefraværFlereKvartalerForEksport(umaskertSykefravær = umaskertSykefraværsstatistikk),
             )
-            Statistikkategori.VIRKSOMHET_GRADERT -> TODO("Implement virksomhet gradert")
+            Statistikkategori.VIRKSOMHET_GRADERT -> GradertStatistikkategoriKafkamelding(
+                sisteKvartal = sykefraværMedKategoriSisteKvartal,
+                siste4Kvartal = SykefraværFlereKvartalerForEksport(umaskertSykefravær = umaskertSykefraværsstatistikk),
+            )
         }
         produsent.sendPåKafka(statistikkategoriKafkamelding)
         logger.info(

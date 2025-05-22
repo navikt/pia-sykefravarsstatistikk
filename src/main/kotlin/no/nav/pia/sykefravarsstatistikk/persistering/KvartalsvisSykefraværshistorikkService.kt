@@ -46,7 +46,7 @@ class KvartalsvisSykefraværshistorikkService(
             "Henter statistikk for virksomhet fra: ${førsteÅrstalOgKvartal.årstall}K${førsteÅrstalOgKvartal.kvartal}",
         )
         val sykefraværsstatistikkTilVirksomhet = sykefraværsstatistikkRepository.hentSykefraværsstatistikkVirksomhet(
-            virksomhet = virksomhet,
+            orgnr = virksomhet.orgnr,
         )
         return sykefraværsstatistikkTilVirksomhet.filter {
             ÅrstallOgKvartal(it.årstall, it.kvartal) >= førsteÅrstalOgKvartal
@@ -159,7 +159,6 @@ class KvartalsvisSykefraværshistorikkService(
                 ),
             )
         }
-
 
         val bransje = underenhet.bransje()
         if (bransje != null) {
