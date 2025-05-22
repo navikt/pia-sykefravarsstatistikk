@@ -80,7 +80,77 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
         metadataQ32024.primærnæringskode shouldBe "88911"
     }
 
-    // TODO: test: skal takle nullverdier for primærnæring og primærnæringskode
+    @Test
+    fun `Kafkamelding om metadata for VIRKSOMHET_METADATA eksporteres uten Bransje dersom virksomhet ikke hører til noen bransjer`() {
+        val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
+            orgnr = "998877665",
+            årstallOgKvartal = KVARTAL_2024_3,
+            sektor = "2",
+            primærnæring = "88",
+            primærnæringskode = "88001",
+        )
+        kafkaContainerHelper.sendKafkaMelding(
+            virksomhetMetadataStatistikk.toJsonKey(),
+            virksomhetMetadataStatistikk.toJsonValue(),
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
+        )
+
+        runBlocking {
+            kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
+                key = Json.encodeToString(VirksomhetMetadataNøkkel(orgnr = "998877665", årstall = 2024, kvartal = 3)),
+                konsument = eksportKonsument,
+                block = { meldinger ->
+                    val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
+                    objektene shouldHaveAtLeastSize 1
+                    objektene.forEach {
+                        it.orgnr shouldBe "998877665"
+                        it.årstall shouldBe 2024
+                        it.kvartal shouldBe 3
+                        it.næring shouldBe "88"
+                        it.næringskode shouldBe "88001"
+                        it.bransje shouldBe null
+                        it.sektor shouldBe "2"
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `Kafkamelding om metadata for VIRKSOMHET_METADATA kan eksporteres uten næring eller næringskode`() {
+        val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
+            orgnr = "998877665",
+            årstallOgKvartal = KVARTAL_2024_3,
+            sektor = "2",
+            primærnæring = null,
+            primærnæringskode = null,
+        )
+        kafkaContainerHelper.sendKafkaMelding(
+            virksomhetMetadataStatistikk.toJsonKey(),
+            virksomhetMetadataStatistikk.toJsonValue(),
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
+        )
+
+        runBlocking {
+            kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
+                key = Json.encodeToString(VirksomhetMetadataNøkkel(orgnr = "998877665", årstall = 2024, kvartal = 3)),
+                konsument = eksportKonsument,
+                block = { meldinger ->
+                    val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
+                    objektene shouldHaveAtLeastSize 1
+                    objektene.forEach {
+                        it.orgnr shouldBe "998877665"
+                        it.årstall shouldBe 2024
+                        it.kvartal shouldBe 3
+                        it.næring shouldBe ""
+                        it.næringskode shouldBe ""
+                        it.bransje shouldBe null
+                        it.sektor shouldBe "2"
+                    }
+                },
+            )
+        }
+    }
 
     @Test
     fun `metadata for VIRKSOMHET_METADATA kan inneholde null-verdier for primærnæring og -primærnæringskode`() {
