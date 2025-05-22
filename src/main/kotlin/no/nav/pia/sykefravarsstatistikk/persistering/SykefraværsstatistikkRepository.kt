@@ -277,7 +277,7 @@ class SykefraværsstatistikkRepository(
 
     private fun Row.tilUmaskertLandstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalLand =
         UmaskertSykefraværsstatistikkForEttKvartalLand(
-            land = if (string("land") == "NO") "Norge" else "Ukjent",
+            land = string("land"),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
