@@ -131,7 +131,21 @@ class KafkaContainerHelper(
         kafkaProducer.send(
             ProducerRecord(importTopic.navn, importMelding.key.toJson(), importMelding.value.toJson()),
         )
-        kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(key = eksportNøkkel, konsument = eksportKonsument, block = block)
+        kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
+            key = eksportNøkkel,
+            konsument = eksportKonsument,
+            block = block,
+        )
+    }
+
+    fun sendKafkaMelding(
+        nøkkel: String,
+        melding: String,
+        topic: Topic,
+    ) {
+        runBlocking {
+            kafkaProducer.send(ProducerRecord(topic.navn, nøkkel, melding)).get()
+        }
     }
 
     fun sendOgVentTilKonsumert(

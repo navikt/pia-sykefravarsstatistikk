@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataKafkamelding
+import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataNøkkel
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.VirksomhetMetadataImportTestUtils.Companion.hentVirksomhetMetadataStatistikk
@@ -17,12 +18,12 @@ import kotlin.test.Test
 
 class KvartalsvisVirksomhetMetadataConsumerTest {
     companion object {
-        private val eksportTopic = Topic.STATISTIKK_EKSPORT_METADATA_VIRKSOMHET
-        private val eksportKonsument = kafkaContainerHelper.nyKonsument(topic = eksportTopic)
+        private val eksportMetadataVirksomhetTopic = Topic.STATISTIKK_EKSPORT_METADATA_VIRKSOMHET
+        private val eksportKonsument = kafkaContainerHelper.nyKonsument(topic = eksportMetadataVirksomhetTopic)
 
         @BeforeClass
         @JvmStatic
-        fun setUp() = eksportKonsument.subscribe(mutableListOf(eksportTopic.navn))
+        fun setUp() = eksportKonsument.subscribe(mutableListOf(eksportMetadataVirksomhetTopic.navn))
 
         @AfterClass
         @JvmStatic
@@ -41,32 +42,15 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
             primærnæring = "88",
             primærnæringskode = "88911",
         )
-
-        kafkaContainerHelper.sendOgVentTilKonsumert(
+        kafkaContainerHelper.sendKafkaMelding(
             virksomhetMetadataStatistikk.toJsonKey(),
             virksomhetMetadataStatistikk.toJsonValue(),
             Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
         )
 
-        val metadataQ32024 = hentVirksomhetMetadataStatistikk(
-            orgnr = "998877665",
-            kvartal = KVARTAL_2024_3,
-        )
-        metadataQ32024.orgnr shouldBe "998877665"
-        metadataQ32024.årstall shouldBe 2024
-        metadataQ32024.kvartal shouldBe 3
-        metadataQ32024.sektor shouldBe "2"
-        metadataQ32024.primærnæring shouldBe "88"
-        metadataQ32024.primærnæringskode shouldBe "88911"
-
         runBlocking {
             kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
-                key =
-                    """
-                    "orgnr": "998877665",
-                    "arstall": 2024,
-                    "kvartal": 3,
-                    """.trimIndent(),
+                key = Json.encodeToString(VirksomhetMetadataNøkkel(orgnr = "998877665", årstall = 2024, kvartal = 3)),
                 konsument = eksportKonsument,
                 block = { meldinger ->
                     val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
@@ -83,6 +67,17 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
                 },
             )
         }
+
+        val metadataQ32024 = hentVirksomhetMetadataStatistikk(
+            orgnr = "998877665",
+            kvartal = KVARTAL_2024_3,
+        )
+        metadataQ32024.orgnr shouldBe "998877665"
+        metadataQ32024.årstall shouldBe 2024
+        metadataQ32024.kvartal shouldBe 3
+        metadataQ32024.sektor shouldBe "2"
+        metadataQ32024.primærnæring shouldBe "88"
+        metadataQ32024.primærnæringskode shouldBe "88911"
     }
 
     // TODO: test: skal takle nullverdier for primærnæring og primærnæringskode

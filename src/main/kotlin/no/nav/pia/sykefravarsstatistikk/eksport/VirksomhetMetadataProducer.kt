@@ -1,8 +1,8 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 
@@ -10,13 +10,12 @@ class VirksomhetMetadataProducer(
     kafka: Kafka,
     topic: Topic,
 ) : KafkaProdusent<VirksomhetMetadataKafkamelding>(kafka = kafka, topic = topic) {
-    private val jsonMapper = ObjectMapper()
-
     override fun tilKafkaMelding(input: VirksomhetMetadataKafkamelding): Pair<String, String> {
-        val nøkkel = jsonMapper.writeValueAsString(
-            VirksomhetMetadataNøkkel(orgnr = input.orgnr, årstall = input.årstall, kvartal = input.kvartal),
+        val nøkkel = Json.encodeToString(
+            value =
+                VirksomhetMetadataNøkkel(orgnr = input.orgnr, årstall = input.årstall, kvartal = input.kvartal),
         )
-        val verdi = jsonMapper.writeValueAsString(input)
+        val verdi = Json.encodeToString(value = input)
         return nøkkel to verdi
     }
 }
@@ -24,7 +23,7 @@ class VirksomhetMetadataProducer(
 @Serializable
 data class VirksomhetMetadataNøkkel(
     val orgnr: String,
-    @SerializedName("arstall")
+    @SerialName("arstall")
     val årstall: Int,
     val kvartal: Int,
 )
@@ -32,12 +31,12 @@ data class VirksomhetMetadataNøkkel(
 @Serializable
 data class VirksomhetMetadataKafkamelding(
     val orgnr: String,
-    @SerializedName("arstall")
+    @SerialName("arstall")
     val årstall: Int,
     val kvartal: Int,
-    @SerializedName("naring")
+    @SerialName("naring")
     val næring: String,
-    @SerializedName("naringskode")
+    @SerialName("naringskode")
     val næringskode: String,
     val bransje: String?,
     val sektor: String,
