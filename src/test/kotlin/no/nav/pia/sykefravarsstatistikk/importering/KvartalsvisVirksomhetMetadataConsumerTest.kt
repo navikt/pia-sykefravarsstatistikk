@@ -1,14 +1,37 @@
 package no.nav.pia.sykefravarsstatistikk.importering
 
+import ia.felles.definisjoner.bransjer.Bransje.BARNEHAGER
+import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataKafkamelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.VirksomhetMetadataImportTestUtils.Companion.hentVirksomhetMetadataStatistikk
 import no.nav.pia.sykefravarsstatistikk.helper.VirksomhetMetadataImportTestUtils.VirksomhetMetadataJsonMelding
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import kotlin.test.Test
 
 class KvartalsvisVirksomhetMetadataConsumerTest {
+    companion object {
+        private val eksportTopic = Topic.STATISTIKK_EKSPORT_METADATA_VIRKSOMHET
+        private val eksportKonsument = kafkaContainerHelper.nyKonsument(topic = eksportTopic)
+
+        @BeforeClass
+        @JvmStatic
+        fun setUp() = eksportKonsument.subscribe(mutableListOf(eksportTopic.navn))
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            eksportKonsument.unsubscribe()
+            eksportKonsument.close()
+        }
+    }
+
     @Test
     fun `Kafkamelding om metadata for VIRKSOMHET_METADATA blir lagret i DB`() {
         val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
@@ -35,7 +58,34 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
         metadataQ32024.sektor shouldBe "2"
         metadataQ32024.primærnæring shouldBe "88"
         metadataQ32024.primærnæringskode shouldBe "88911"
+
+        runBlocking {
+            kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
+                key =
+                    """
+                    "orgnr": "998877665",
+                    "arstall": 2024,
+                    "kvartal": 3,
+                    """.trimIndent(),
+                konsument = eksportKonsument,
+                block = { meldinger ->
+                    val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
+                    objektene shouldHaveAtLeastSize 1
+                    objektene.forEach {
+                        it.orgnr shouldBe "998877665"
+                        it.årstall shouldBe 2024
+                        it.kvartal shouldBe 3
+                        it.næring shouldBe "88"
+                        it.næringskode shouldBe "88911"
+                        it.bransje shouldBe BARNEHAGER.name
+                        it.sektor shouldBe "2"
+                    }
+                },
+            )
+        }
     }
+
+    // TODO: test: skal takle nullverdier for primærnæring og primærnæringskode
 
     @Test
     fun `metadata for VIRKSOMHET_METADATA kan inneholde null-verdier for primærnæring og -primærnæringskode`() {

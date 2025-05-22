@@ -36,7 +36,6 @@ class SykefraværsstatistikkEksportService(
     private val statistikkNæringskodeProdusent: SykefraværsstatistikkProducer,
     private val statistikkVirksomhetProdusent: SykefraværsstatistikkProducer,
     private val statistikkVirksomhetGradertProdusent: SykefraværsstatistikkProducer,
-    private val statistikkMetadataVirksomhetProdusent: SykefraværsstatistikkProducer,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 

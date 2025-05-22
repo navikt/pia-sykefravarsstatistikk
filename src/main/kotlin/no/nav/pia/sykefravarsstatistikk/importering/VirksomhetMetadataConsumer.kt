@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataEksportService
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
@@ -23,6 +24,7 @@ import kotlin.coroutines.CoroutineContext
 class VirksomhetMetadataConsumer(
     val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
     val metadataService: MetadataService,
+    val virksomhetMetadataEksportService: VirksomhetMetadataEksportService,
     val applikasjonsHelse: ApplikasjonsHelse,
 ) : CoroutineScope {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -52,9 +54,9 @@ class VirksomhetMetadataConsumer(
                         try {
                             val records = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                records.map { it.value().tilVirksomhetMetadataDto() }.let {
-                                    metadataService.lagreVirksomhetMetadata(it)
-                                    // TODO: Videresend til eksportservice og send på kafka
+                                records.map { it.value().tilVirksomhetMetadataDto() }.forEach {
+                                    metadataService.lagreVirksomhetMetadata(metadata = it)
+                                    virksomhetMetadataEksportService.eksporterVirksomhetMetadata(metadata = it)
                                 }
                                 logger.info("Lagret ${records.count()} meldinger i VirksomhetMetadataConsumer (topic '$topic') ")
                                 consumer.commitSync()

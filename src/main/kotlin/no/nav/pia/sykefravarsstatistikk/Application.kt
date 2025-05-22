@@ -9,6 +9,8 @@ import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService
 import no.nav.pia.sykefravarsstatistikk.api.auth.EnhetsregisteretService
 import no.nav.pia.sykefravarsstatistikk.eksport.SykefraværsstatistikkEksportService
 import no.nav.pia.sykefravarsstatistikk.eksport.SykefraværsstatistikkProducer
+import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataEksportService
+import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataProducer
 import no.nav.pia.sykefravarsstatistikk.importering.PubliseringsdatoConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkConsumer
 import no.nav.pia.sykefravarsstatistikk.importering.SykefraværsstatistikkImportService
@@ -75,7 +77,7 @@ fun main() {
         kafka = naisEnvironment.kafka,
         topic = Topic.STATISTIKK_EKSPORT_VIRKSOMHET_GRADERT,
     )
-    val statistikkMetadataVirksomhetProdusent = SykefraværsstatistikkProducer(
+    val statistikkMetadataVirksomhetProdusent = VirksomhetMetadataProducer(
         kafka = naisEnvironment.kafka,
         topic = Topic.STATISTIKK_EKSPORT_METADATA_VIRKSOMHET,
     )
@@ -88,7 +90,6 @@ fun main() {
         statistikkNæringskodeProdusent = statistikkNæringskodeProdusent,
         statistikkVirksomhetProdusent = statistikkVirksomhetProdusent,
         statistikkVirksomhetGradertProdusent = statistikkVirksomhetGradertProdusent,
-        statistikkMetadataVirksomhetProdusent = statistikkMetadataVirksomhetProdusent,
     )
     val kvartalsvisSykefraværshistorikkService = KvartalsvisSykefraværshistorikkService(
         importtidspunktRepository = importtidspunktRepository,
@@ -103,6 +104,9 @@ fun main() {
 
     VirksomhetMetadataConsumer(
         metadataService = MetadataService(MetadataRepository(dataSource = dataSource)),
+        virksomhetMetadataEksportService = VirksomhetMetadataEksportService(
+            statistikkMetadataVirksomhetProdusent = statistikkMetadataVirksomhetProdusent,
+        ),
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
