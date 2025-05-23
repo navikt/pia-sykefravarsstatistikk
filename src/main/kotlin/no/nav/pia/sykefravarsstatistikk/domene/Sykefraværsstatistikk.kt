@@ -9,4 +9,6 @@ sealed interface Sykefraværsstatistikk {
     val tapteDagsverk: BigDecimal
     val muligeDagsverk: BigDecimal
     val prosent: BigDecimal
+
+    fun årstallOgKvartal(): ÅrstallOgKvartal = ÅrstallOgKvartal(årstall, kvartal)
 }

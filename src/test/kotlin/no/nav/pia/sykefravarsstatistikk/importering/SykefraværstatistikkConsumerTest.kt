@@ -9,7 +9,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import kotlin.test.Test
 
 class SykefraværstatistikkConsumerTest {
@@ -38,7 +38,7 @@ class SykefraværstatistikkConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
         )
 
         val statistikkQ12023 = hentVirksomhetStatistikk(
@@ -90,7 +90,7 @@ class SykefraværstatistikkConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
         )
 
         val statistikkQ32024 = hentVirksomhetStatistikk(
@@ -140,7 +140,7 @@ class SykefraværstatistikkConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             sykefraværsstatistikk.toJsonKey(),
             sykefraværsstatistikk.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
         )
 
         val nyStatistikkQ32024 = hentVirksomhetStatistikk(

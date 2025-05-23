@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDateTime
 import no.nav.pia.sykefravarsstatistikk.helper.PubliseringsdatoImportTestUtils.Companion.hentPubliseringsdato
 import no.nav.pia.sykefravarsstatistikk.helper.PubliseringsdatoImportTestUtils.PubliseringsdatoJsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import kotlin.test.Test
 
 class KvartalsvisPublieringsdatoConsumerTest {
@@ -20,7 +20,7 @@ class KvartalsvisPublieringsdatoConsumerTest {
         kafkaContainerHelper.sendOgVentTilKonsumert(
             publiseringsdato.toJsonKey(),
             publiseringsdato.toJsonValue(),
-            KafkaTopics.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_PUBLISERINGSDATO,
+            Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_PUBLISERINGSDATO,
         )
 
         val publiseringsdatoQ42024 = hentPubliseringsdato(

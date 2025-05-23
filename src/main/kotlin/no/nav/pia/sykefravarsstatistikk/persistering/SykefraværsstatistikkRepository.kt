@@ -7,13 +7,15 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.pia.sykefravarsstatistikk.domene.Næring
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode
+import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
+import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
-import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -23,16 +25,13 @@ class SykefraværsstatistikkRepository(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun insertSykefraværsstatistikk(sykefraværsstatistikk: List<SykefraværsstatistikkDto>) {
-        logger.info("Lagrer '${sykefraværsstatistikk.size}' statistikk")
+    fun insertSykefraværsstatistikk(sykefraværsstatistikk: SykefraværsstatistikkDto) {
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    sykefraværsstatistikk.forEach {
-                        tx.insertStatistikk(
-                            sykefraværsstatistikkDto = it,
-                        )
-                    }
+                    tx.insertStatistikk(
+                        sykefraværsstatistikkDto = sykefraværsstatistikk,
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -142,16 +141,27 @@ class SykefraværsstatistikkRepository(
             }
         }
 
-    fun hentSykefraværsstatistikkVirksomhet(virksomhet: Virksomhet): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
-
+    fun hentSykefraværsstatistikkVirksomhet(orgnr: String): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> =
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    tx.hentSykefraværsstatistikk(virksomhet)
+                    tx.hentSykefraværsstatistikk(orgnr)
                 }
             }
         } catch (e: Exception) {
-            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet ${virksomhet.orgnr}", e)
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for virksomhet $orgnr", e)
+            throw e
+        }
+
+    fun hentSykefraværsstatistikkNæringskode(næringskode: Næringskode): List<UmaskertSykefraværsstatistikkForEttKvartalNæringskode> =
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    tx.hentUmaskertNæringskodestatistikk(næringskode)
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved uthenting av sykefraværsstatistikk for næring ${næringskode.femsifferIdentifikator}", e)
             throw e
         }
 
@@ -241,6 +251,18 @@ class SykefraværsstatistikkRepository(
             opprettet = localDateTime("opprettet"),
         )
 
+    private fun Row.tilUmaskertNæringskodestatistikk(): UmaskertSykefraværsstatistikkForEttKvartalNæringskode =
+        UmaskertSykefraværsstatistikkForEttKvartalNæringskode(
+            næringskode = string("naringskode").tilNæringskode(),
+            årstall = int("arstall"),
+            kvartal = int("kvartal"),
+            antallPersoner = int("antall_personer"),
+            tapteDagsverk = bigDecimal("tapte_dagsverk"),
+            muligeDagsverk = bigDecimal("mulige_dagsverk"),
+            prosent = bigDecimal("prosent"),
+            opprettet = localDateTime("opprettet"),
+        )
+
     private fun Row.tilUmaskertSektorstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalSektor =
         UmaskertSykefraværsstatistikkForEttKvartalSektor(
             sektor = string("sektor"),
@@ -255,7 +277,7 @@ class SykefraværsstatistikkRepository(
 
     private fun Row.tilUmaskertLandstatistikk(): UmaskertSykefraværsstatistikkForEttKvartalLand =
         UmaskertSykefraværsstatistikkForEttKvartalLand(
-            land = if (string("land") == "NO") "Norge" else "Ukjent",
+            land = string("land"),
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
@@ -301,6 +323,25 @@ class SykefraværsstatistikkRepository(
         )
     }
 
+    private fun TransactionalSession.hentUmaskertNæringskodestatistikk(
+        næringskode: Næringskode,
+    ): List<UmaskertSykefraværsstatistikkForEttKvartalNæringskode> {
+        val query =
+            """
+            SELECT *
+            FROM sykefravarsstatistikk_naringskode
+            WHERE naringskode = :naringskode
+            """.trimIndent()
+        return run(
+            queryOf(
+                query,
+                mapOf(
+                    "naringskode" to næringskode.femsifferIdentifikator,
+                ),
+            ).map { row -> row.tilUmaskertNæringskodestatistikk() }.asList,
+        )
+    }
+
     private fun TransactionalSession.hentUmaskertSektorstatistikk(sektor: Sektor): List<UmaskertSykefraværsstatistikkForEttKvartalSektor> {
         val query =
             """
@@ -335,9 +376,7 @@ class SykefraværsstatistikkRepository(
         )
     }
 
-    private fun TransactionalSession.hentSykefraværsstatistikk(
-        virksomhet: Virksomhet,
-    ): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
+    private fun TransactionalSession.hentSykefraværsstatistikk(orgnr: String): List<UmaskertSykefraværsstatistikkForEttKvartalVirksomhet> {
         val query =
             """
             SELECT *
@@ -348,7 +387,7 @@ class SykefraværsstatistikkRepository(
             queryOf(
                 query,
                 mapOf(
-                    "orgnr" to virksomhet.orgnr,
+                    "orgnr" to orgnr,
                 ),
             ).map { row -> row.tilUmaskertStatistikkVirksomhet() }.asList,
         )

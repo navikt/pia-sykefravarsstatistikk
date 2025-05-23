@@ -7,6 +7,8 @@ class Næringskode private constructor(
         private fun tilFemsiffer(kode: String): Næringskode = Næringskode(kode.replace(".", ""))
 
         fun BrregNæringskodeDto.tilDomene(): Næringskode = tilFemsiffer(this.kode)
+
+        fun String.tilNæringskode(): Næringskode = tilFemsiffer(this)
     }
 
     init {

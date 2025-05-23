@@ -7,8 +7,7 @@ class MetadataService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun lagreVirksomhetMetadata(metadata: List<VirksomhetMetadataDto>) {
-        logger.info("Starter lagring av metadata for virksomhet, antall metadata som skal lagres: '${metadata.size}'\")")
+    fun lagreVirksomhetMetadata(metadata: VirksomhetMetadataDto) {
         metadataRepository.insertVirksomhetMetadata(metadata)
     }
 

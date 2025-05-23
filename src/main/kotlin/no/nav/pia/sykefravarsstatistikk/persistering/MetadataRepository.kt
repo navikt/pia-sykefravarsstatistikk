@@ -14,51 +14,48 @@ class MetadataRepository(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun insertVirksomhetMetadata(virksomhetMetadataDto: List<VirksomhetMetadataDto>) {
-        logger.debug("Lagrer '${virksomhetMetadataDto.size}' metadata for virksomheter")
+    fun insertVirksomhetMetadata(virksomhetMetadataDto: VirksomhetMetadataDto) {
         using(sessionOf(dataSource)) { session ->
             session.transaction { tx ->
-                virksomhetMetadataDto.forEach {
-                    tx.run(
-                        queryOf(
-                            """
-                            INSERT INTO virksomhet_metadata(
-                                orgnr,
-                                arstall,
-                                kvartal,
-                                sektor,
-                                primarnaring,
-                                primarnaringskode,
-                                rectype
-                            )
-                            VALUES(
-                                :orgnr,
-                                :arstall,
-                                :kvartal,
-                                :sektor,
-                                :primarnaring,
-                                :primarnaringskode,
-                                :rectype
-                            )
-                            ON CONFLICT (orgnr, arstall, kvartal) DO UPDATE SET
-                                sektor = :sektor,
-                                primarnaring = :primarnaring,
-                                primarnaringskode = :primarnaringskode,
-                                rectype = :rectype,
-                                sist_endret = now()
-                            """.trimIndent(),
-                            mapOf(
-                                "orgnr" to it.orgnr,
-                                "arstall" to it.årstall,
-                                "kvartal" to it.kvartal,
-                                "sektor" to it.sektor,
-                                "primarnaring" to it.primærnæring,
-                                "primarnaringskode" to it.primærnæringskode,
-                                "rectype" to it.rectype,
-                            ),
-                        ).asUpdate,
-                    )
-                }
+                tx.run(
+                    queryOf(
+                        """
+                        INSERT INTO virksomhet_metadata(
+                            orgnr,
+                            arstall,
+                            kvartal,
+                            sektor,
+                            primarnaring,
+                            primarnaringskode,
+                            rectype
+                        )
+                        VALUES(
+                            :orgnr,
+                            :arstall,
+                            :kvartal,
+                            :sektor,
+                            :primarnaring,
+                            :primarnaringskode,
+                            :rectype
+                        )
+                        ON CONFLICT (orgnr, arstall, kvartal) DO UPDATE SET
+                            sektor = :sektor,
+                            primarnaring = :primarnaring,
+                            primarnaringskode = :primarnaringskode,
+                            rectype = :rectype,
+                            sist_endret = now()
+                        """.trimIndent(),
+                        mapOf(
+                            "orgnr" to virksomhetMetadataDto.orgnr,
+                            "arstall" to virksomhetMetadataDto.årstall,
+                            "kvartal" to virksomhetMetadataDto.kvartal,
+                            "sektor" to virksomhetMetadataDto.sektor,
+                            "primarnaring" to virksomhetMetadataDto.primærnæring,
+                            "primarnaringskode" to virksomhetMetadataDto.primærnæringskode,
+                            "rectype" to virksomhetMetadataDto.rectype,
+                        ),
+                    ).asUpdate,
+                )
             }
         }
     }

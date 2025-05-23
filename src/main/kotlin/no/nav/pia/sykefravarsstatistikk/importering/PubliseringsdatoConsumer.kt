@@ -7,8 +7,8 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.ApplikasjonsHelse
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaConfig
-import no.nav.pia.sykefravarsstatistikk.konfigurasjon.KafkaTopics
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
+import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import no.nav.pia.sykefravarsstatistikk.persistering.MetadataService
 import no.nav.pia.sykefravarsstatistikk.persistering.tilPubliseringsdatoDto
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -21,14 +21,14 @@ import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
 class PubliseringsdatoConsumer(
-    val topic: KafkaTopics,
+    val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_PUBLISERINGSDATO,
     val metadataService: MetadataService,
     val applikasjonsHelse: ApplikasjonsHelse,
 ) : CoroutineScope {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val job: Job = Job()
     private val kafkaConsumer = KafkaConsumer(
-        KafkaConfig().consumerProperties(konsumentGruppe = topic.konsumentGruppe),
+        Kafka().consumerProperties(konsumentGruppe = topic.konsumentGruppe),
         StringDeserializer(),
         StringDeserializer(),
     )
@@ -44,9 +44,9 @@ class PubliseringsdatoConsumer(
         launch {
             kafkaConsumer.use { consumer ->
                 try {
-                    consumer.subscribe(listOf(topic.navnMedNamespace))
+                    consumer.subscribe(listOf(topic.navn))
                     logger.info(
-                        "Kafka consumer subscribed to topic '${topic.navnMedNamespace}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
+                        "Kafka consumer subscribed to topic '${topic.navn}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
                     )
                     while (applikasjonsHelse.alive) {
                         try {
@@ -59,7 +59,7 @@ class PubliseringsdatoConsumer(
                                 }
                                 logger.info("Lagret ${records.count()} meldinger i PubliseringsdatoConsumer (topic '$topic') ")
                                 consumer.commitSync()
-                                logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navnMedNamespace}")
+                                logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navn}")
                             }
                         } catch (e: RetriableException) {
                             logger.warn(
@@ -69,7 +69,7 @@ class PubliseringsdatoConsumer(
                         }
                     }
                 } catch (e: WakeupException) {
-                    logger.info("PubliseringsdatoConsumer (topic '$topic')  is shutting down...")
+                    logger.info("PubliseringsdatoConsumer (topic '$topic')  is shutting down...", e)
                 } catch (e: Exception) {
                     logger.error(
                         "Exception is shutting down kafka listner i PubliseringsdatoConsumer (topic '$topic')",

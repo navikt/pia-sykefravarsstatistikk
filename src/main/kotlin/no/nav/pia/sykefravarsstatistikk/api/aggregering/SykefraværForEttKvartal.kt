@@ -21,7 +21,7 @@ open class SykefraværForEttKvartal(
     Comparable<SykefraværForEttKvartal> {
     val kvartal: Int
         get() = årstallOgKvartal?.kvartal ?: 0
-    val Årstall: Int
+    val årstall: Int
         get() = årstallOgKvartal?.årstall ?: 0
 
     override fun compareTo(other: SykefraværForEttKvartal) = compareValuesBy(this, other) { it.årstallOgKvartal }

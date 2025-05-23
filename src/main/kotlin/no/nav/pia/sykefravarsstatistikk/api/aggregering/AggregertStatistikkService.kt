@@ -158,7 +158,7 @@ class AggregertStatistikkService(
                     ).toUmaskertSykefraværUtenProsentForEttKvartal().filterPåKvartaler(kvartaler)
 
                     is Aggregeringskategorier.Virksomhet -> sykefraværsstatistikkRepository.hentSykefraværsstatistikkVirksomhet(
-                        virksomhet = it.virksomhet,
+                        orgnr = it.virksomhet.orgnr,
                     ).toUmaskertSykefraværUtenProsentForEttKvartal().filterPåKvartaler(kvartaler)
 
                     is Aggregeringskategorier.Bransje -> sykefraværsstatistikkRepository.hentSykefraværsstatistikkBransje(
