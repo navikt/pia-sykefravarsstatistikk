@@ -8,7 +8,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilNæring
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
-import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæringskode
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.tilSektor
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -171,9 +170,7 @@ class SykefraværsstatistikkEksportService(
     ) {
         val statistikkategori = Statistikkategori.NÆRINGSKODE
         logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
-        val sykefraværsstatistikk: List<UmaskertSykefraværsstatistikkForEttKvartalNæringskode> = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæringskode(
-            næringskode = næringskode,
-        )
+        val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæringskode(næringskode = næringskode)
         val kode = sykefraværsstatistikk.first().næringskode
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
 

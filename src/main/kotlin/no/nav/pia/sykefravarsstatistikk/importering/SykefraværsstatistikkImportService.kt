@@ -8,4 +8,7 @@ class SykefraværsstatistikkImportService(
 ) {
     fun lagreSykefraværsstatistikk(sykefraværstatistikkDto: SykefraværsstatistikkDto) =
         sykefraværsstatistikkRepository.insertSykefraværsstatistikk(sykefraværsstatistikk = sykefraværstatistikkDto)
+
+    fun lagreSykefraværsstatistikk(sequence: Sequence<SykefraværsstatistikkDto>) =
+        sykefraværsstatistikkRepository.insertSykefraværsstatistikk(sequence = sequence)
 }

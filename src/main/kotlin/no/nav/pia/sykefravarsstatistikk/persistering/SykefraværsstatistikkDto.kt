@@ -18,6 +18,8 @@ import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonUnquotedLiteral
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
+import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import java.math.BigDecimal
 
 sealed interface KvartalsvisSykefraværsstatistikk {
@@ -41,6 +43,18 @@ sealed class SykefraværsstatistikkDto : KvartalsvisSykefraværsstatistikk {
     abstract override val tapteDagsverk: BigDecimal
     abstract override val muligeDagsverk: BigDecimal
     abstract override val antallPersoner: Int
+
+    fun årstallOgKvartal(): ÅrstallOgKvartal = ÅrstallOgKvartal(årstall, kvartal)
+
+    fun statistikkategori(): Statistikkategori =
+        when (this) {
+            is LandSykefraværsstatistikkDto -> Statistikkategori.LAND
+            is SektorSykefraværsstatistikkDto -> Statistikkategori.SEKTOR
+            is NæringSykefraværsstatistikkDto -> Statistikkategori.NÆRING
+            is NæringskodeSykefraværsstatistikkDto -> Statistikkategori.NÆRINGSKODE
+            is BransjeSykefraværsstatistikkDto -> Statistikkategori.BRANSJE
+            is VirksomhetSykefraværsstatistikkDto -> Statistikkategori.VIRKSOMHET
+        }
 }
 
 @Serializable

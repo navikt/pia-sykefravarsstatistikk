@@ -56,24 +56,13 @@ class SykefraværsstatistikkConsumer(
                         try {
                             val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                records.filter { erNøkkelGyldig(it) }.forEach { consumerRecord ->
-                                    // Les melding
-                                    val melding = consumerRecord.toSykefraværsstatistikkImportKafkaMelding()
-                                    val sykefraværstatistikkDto = melding.verdi.toSykefraværsstatistikkDto()
+                                records.asSequence()
+                                    .filter { erNøkkelGyldig(it) }
+                                    .map { it.toSykefraværsstatistikkImportKafkaMelding().verdi.toSykefraværsstatistikkDto() }
+                                    .also { sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(it) }
+                                    .forEach { sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(it) }
 
-                                    // Lagre melding
-                                    sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(
-                                        sykefraværstatistikkDto = sykefraværstatistikkDto,
-                                    )
-
-                                    // Eksporter til kafka
-                                    sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(
-                                        sykefraværstatistikkDto = sykefraværstatistikkDto,
-                                    )
-                                }
-                                logger.info(
-                                    "Lagret ${records.count()} meldinger i SykefraværsstatistikkConsumer (topic '$topic') ",
-                                )
+                                logger.info("Lagret ${records.count()} meldinger i SykefraværsstatistikkConsumer (topic '$topic') ")
                                 consumer.commitSync()
                                 logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navn}")
                             }
