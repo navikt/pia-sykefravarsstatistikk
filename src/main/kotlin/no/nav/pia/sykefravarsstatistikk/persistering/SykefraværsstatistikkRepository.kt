@@ -40,6 +40,23 @@ class SykefraværsstatistikkRepository(
         }
     }
 
+    fun insertSykefraværsstatistikk(sequence: Sequence<SykefraværsstatistikkDto>) {
+        try {
+            using(sessionOf(dataSource)) { session ->
+                session.transaction { tx ->
+                    sequence.forEach {
+                        tx.insertStatistikk(
+                            sykefraværsstatistikkDto = it,
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Feil ved lagring av sykefraværsstatistikk", e)
+            throw e
+        }
+    }
+
     private fun SykefraværsstatistikkDto.tilStatistikkSpesifikkVerdi() =
         when (this) {
             is LandSykefraværsstatistikkDto -> this.land
