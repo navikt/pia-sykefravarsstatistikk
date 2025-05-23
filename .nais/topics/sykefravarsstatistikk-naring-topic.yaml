@@ -13,7 +13,7 @@ spec:
     partitions: 1
     replication: 3  # see min/max requirements
     retentionBytes: -1  # -1 means unlimited
-    retentionHours: 1  # TODO: Change to 168 (7 days) when ready for production
+    retentionHours: 720  # 30 dager
   acl:
     - team: pia
       application: pia-sykefravarsstatistikk
