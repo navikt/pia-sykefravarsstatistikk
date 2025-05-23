@@ -8,11 +8,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Næringskode.Companion.tilNæring
 import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.Sykefraværsstatistikk
-import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalBransje
-import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalLand
-import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæring
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalNæringskode
-import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalSektor
 import no.nav.pia.sykefravarsstatistikk.domene.UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.tilSektor
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
@@ -228,12 +224,11 @@ class SykefraværsstatistikkEksportService(
         statistikk: List<Sykefraværsstatistikk>,
         produsent: SykefraværsstatistikkProducer,
     ) {
-        val umaskertSykefraværsstatistikk = statistikk.tilUmaskertSykefraværUtenProsentForEttKvartal()
+        val umaskertSykefraværsstatistikk = statistikk.tilUmaskertSykefraværUtenProsentForEttKvartal(statistikkategori)
         val sykefraværMedKategoriSisteKvartal = umaskertSykefraværsstatistikk.max()
             .tilSykefraværMedKategori(statistikkategori, kode)
 
         if (sykefraværMedKategoriSisteKvartal.årstallOgKvartal != eksportkvartal) {
-            // TODO: Test at vi får denne feilen
             logger.warn("Siste kvartal i uthentet statistikk er ikke samme som inneværende kvartal")
             return
         }
@@ -267,29 +262,48 @@ class SykefraværsstatistikkEksportService(
             it.årstallOgKvartal() >= førsteKvartal && it.årstallOgKvartal() <= eksportkvartal
         }
     }
-}
 
-// TODO: Se gjennom om dette blir rett, vi må kanskje endre på denne litt
 // TODO: rename 'UmaskertSykefraværForEttKvartal' da graderingsprosent og sykefraværsprosent er to forskjellige ting
 //  og kalkuleres på to forskjellige måter
 //  -> sykefraværsprosent = (antall tapte dagsverk / antall mulige dagsverk) * 100 -- lav prosent er bra
 //  -> graderingsprosent = (antall tapte graderte dagsverk / antall tapte dagsverk) * 100 -- høy prosent er bra
-fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværUtenProsentForEttKvartal(): List<UmaskertSykefraværUtenProsentForEttKvartal> =
-    this.map {
-        when (it) {
-            is UmaskertSykefraværsstatistikkForEttKvartalLand,
-            is UmaskertSykefraværsstatistikkForEttKvartalSektor,
-            is UmaskertSykefraværsstatistikkForEttKvartalNæring,
+    fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværUtenProsentForEttKvartal(
+        statistikkategori: Statistikkategori,
+    ): List<UmaskertSykefraværUtenProsentForEttKvartal> =
+        this.map {
+            when (statistikkategori) {
+                Statistikkategori.LAND,
+                Statistikkategori.SEKTOR,
+                Statistikkategori.NÆRING,
 
-            is UmaskertSykefraværsstatistikkForEttKvartalBransje,
-            is UmaskertSykefraværsstatistikkForEttKvartalNæringskode,
-            is UmaskertSykefraværsstatistikkForEttKvartalVirksomhet,
+                Statistikkategori.BRANSJE,
+                Statistikkategori.NÆRINGSKODE,
+                Statistikkategori.VIRKSOMHET,
 
-            -> UmaskertSykefraværUtenProsentForEttKvartal(
-                årstallOgKvartal = ÅrstallOgKvartal(it.årstall, it.kvartal),
-                dagsverkTeller = it.tapteDagsverk,
-                dagsverkNevner = it.muligeDagsverk,
-                antallPersoner = it.antallPersoner,
-            )
+                -> {
+                    UmaskertSykefraværUtenProsentForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it.årstall, it.kvartal),
+                        dagsverkTeller = it.tapteDagsverk,
+                        dagsverkNevner = it.muligeDagsverk,
+                        antallPersoner = it.antallPersoner,
+                    )
+                }
+
+                Statistikkategori.VIRKSOMHET_GRADERT -> {
+                    it as UmaskertSykefraværsstatistikkForEttKvartalVirksomhet
+
+                    UmaskertSykefraværUtenProsentForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it.årstall, it.kvartal),
+                        dagsverkTeller = it.tapteDagsverkGradert,
+                        dagsverkNevner = it.tapteDagsverk,
+                        antallPersoner = it.antallPersoner,
+                    )
+                }
+
+                Statistikkategori.OVERORDNET_ENHET -> {
+                    logger.warn("Statistikkategori OVERORDNET_ENHET er ikke implementert i eksport")
+                    TODO("Denne kategorien er ikke implementert i eksport")
+                }
+            }
         }
-    }
+}
