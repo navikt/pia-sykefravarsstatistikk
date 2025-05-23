@@ -118,7 +118,6 @@ class SykefraværsstatistikkEksportService(
         logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkSektor(sektor = sektor)
         val kode = sykefraværsstatistikk.first().sektor
-        // TODO: er dette det samme som sektor.kode? Hva er bedre, kode fra db eller kode fra input?
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
 
         eksporterSykefraværsstatistikkPerKategori(
