@@ -88,7 +88,7 @@ class SykefraværsstatistikkEksportService(
 
     private fun eksporterSykefraværsstatistikkLand(eksportkvartal: ÅrstallOgKvartal) {
         val statistikkategori = Statistikkategori.LAND
-        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", statistikkategori, eksportkvartal)
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkLand()
         val kode = sykefraværsstatistikk.first().land
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
@@ -107,7 +107,7 @@ class SykefraværsstatistikkEksportService(
         sektor: Sektor,
     ) {
         val statistikkategori = Statistikkategori.SEKTOR
-        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", statistikkategori, eksportkvartal)
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkSektor(sektor = sektor)
         val kode = sykefraværsstatistikk.first().sektor
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
@@ -126,7 +126,7 @@ class SykefraværsstatistikkEksportService(
         næring: Næring,
     ) {
         val statistikkategori = Statistikkategori.NÆRING
-        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", statistikkategori, eksportkvartal)
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæring(næring = næring)
         val kode = sykefraværsstatistikk.first().næring.tosifferIdentifikator
         // TODO: Sjekk om dette er rett kode
@@ -146,7 +146,7 @@ class SykefraværsstatistikkEksportService(
         bransje: Bransje,
     ) {
         val statistikkategori = Statistikkategori.BRANSJE
-        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", statistikkategori, eksportkvartal)
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkBransje(bransje = bransje)
         val kode = sykefraværsstatistikk.first().bransje.navn
         // TODO: Sjekk om dette er rett kode
@@ -166,7 +166,7 @@ class SykefraværsstatistikkEksportService(
         næringskode: Næringskode,
     ) {
         val statistikkategori = Statistikkategori.NÆRINGSKODE
-        logger.info("Eksporterer sykefraværsstatistikk for $statistikkategori - $eksportkvartal")
+        logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", statistikkategori, eksportkvartal)
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkNæringskode(næringskode = næringskode)
         val kode = sykefraværsstatistikk.first().næringskode
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
@@ -192,7 +192,7 @@ class SykefraværsstatistikkEksportService(
         val kode = sykefraværsstatistikk.first().orgnr
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
 
-        logger.info("Eksporterer sykefraværsstatistikk for ${Statistikkategori.VIRKSOMHET} - $eksportkvartal")
+        logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", Statistikkategori.VIRKSOMHET, eksportkvartal)
         eksporterSykefraværsstatistikkPerKategori(
             eksportkvartal = eksportkvartal,
             kode = kode,
@@ -201,7 +201,11 @@ class SykefraværsstatistikkEksportService(
             produsent = statistikkVirksomhetProdusent,
         )
 
-        logger.info("Eksporterer sykefraværsstatistikk for ${Statistikkategori.VIRKSOMHET_GRADERT} - $eksportkvartal")
+        logger.debug(
+            "Eksporterer sykefraværsstatistikk for {} - {}",
+            Statistikkategori.VIRKSOMHET_GRADERT,
+            eksportkvartal,
+        )
         eksporterSykefraværsstatistikkPerKategori(
             eksportkvartal = eksportkvartal,
             kode = kode,
@@ -245,8 +249,11 @@ class SykefraværsstatistikkEksportService(
             )
         }
         produsent.sendPåKafka(statistikkategoriKafkamelding)
-        logger.info(
-            "Melding eksportert på Kafka for statistikkategori ${statistikkategori.name}, ${umaskertSykefraværsstatistikk.size} kvartaler fram til $eksportkvartal.",
+        logger.debug(
+            "Melding eksportert på Kafka for statistikkategori {}, {} kvartaler fram til {}.",
+            statistikkategori.name,
+            umaskertSykefraværsstatistikk.size,
+            eksportkvartal,
         )
     }
 
