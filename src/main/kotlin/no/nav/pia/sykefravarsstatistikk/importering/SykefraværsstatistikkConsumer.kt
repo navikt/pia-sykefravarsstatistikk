@@ -22,6 +22,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 class SykefraværsstatistikkConsumer(
     val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
@@ -50,7 +51,7 @@ class SykefraværsstatistikkConsumer(
                 try {
                     consumer.subscribe(listOf(topic.navn))
                     logger.info(
-                        "Kafka consumer subscribed to topic '${topic.navn}' of groupId '${topic.konsumentGruppe}' )' in SykefraværsstatistikkØvrigeKategorierConsumer",
+                        "Kafka consumer subscribed to topic '${topic.navn}' of groupId '${topic.konsumentGruppe}' )' in $consumer",
                     )
                     while (applikasjonsHelse.alive) {
                         try {
@@ -62,24 +63,22 @@ class SykefraværsstatistikkConsumer(
                                     .also { sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(it) }
                                     .forEach { sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(it) }
 
-                                logger.info("Lagret ${records.count()} meldinger i SykefraværsstatistikkConsumer (topic '$topic') ")
                                 consumer.commitSync()
                                 logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navn}")
                             }
                         } catch (e: RetriableException) {
                             logger.warn(
-                                "Had a retriable exception in SykefraværsstatistikkConsumer (topic '$topic'), retrying",
+                                "Had a retriable exception in $consumer (topic '${topic.navn}'), retrying",
                                 e,
                             )
                         }
                     }
                 } catch (e: WakeupException) {
-                    logger.info("SykefraværsstatistikkConsumer (topic '$topic')  is shutting down...", e)
+                    logger.info("$consumer (topic '${topic.navn}')  is waking up", e)
+                } catch (e: CancellationException) {
+                    logger.info("$consumer (topic '${topic.navn}')  is shutting down...", e)
                 } catch (e: Exception) {
-                    logger.error(
-                        "Exception is shutting down kafka listner i SykefraværsstatistikkConsumer (topic '$topic')",
-                        e,
-                    )
+                    logger.error("Exception is shutting down kafka listener $consumer (topic '${topic.navn}')", e)
                     applikasjonsHelse.ready = false
                     applikasjonsHelse.alive = false
                 }
@@ -89,9 +88,9 @@ class SykefraværsstatistikkConsumer(
 
     private fun cancel() =
         runBlocking {
-            logger.info("Stopping kafka consumer job i SykefraværsstatistikkConsumer (topic '$topic')")
+            logger.info("Stopping kafka consumer job i SykefraværsstatistikkConsumer (topic '${topic.navn}')")
             kafkaConsumer.wakeup()
             job.cancelAndJoin()
-            logger.info("Stopped kafka consumer job i SykefraværsstatistikkConsumer (topic '$topic')")
+            logger.info("Stopped kafka consumer job i SykefraværsstatistikkConsumer (topic '${topic.navn}')")
         }
 }
