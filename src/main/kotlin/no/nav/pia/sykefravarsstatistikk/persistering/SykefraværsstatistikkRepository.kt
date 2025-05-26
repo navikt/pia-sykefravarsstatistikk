@@ -40,11 +40,11 @@ class SykefraværsstatistikkRepository(
         }
     }
 
-    fun insertSykefraværsstatistikk(sequence: Sequence<SykefraværsstatistikkDto>) {
+    fun insertSykefraværsstatistikk(sykefraværsstatistikk: List<SykefraværsstatistikkDto>) {
         try {
             using(sessionOf(dataSource)) { session ->
                 session.transaction { tx ->
-                    sequence.forEach {
+                    sykefraværsstatistikk.forEach {
                         tx.insertStatistikk(
                             sykefraværsstatistikkDto = it,
                         )

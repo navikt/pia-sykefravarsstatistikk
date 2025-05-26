@@ -57,8 +57,7 @@ class SykefraværsstatistikkConsumer(
                         try {
                             val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(1))
                             if (!records.isEmpty) {
-                                records.asSequence()
-                                    .filter { erNøkkelGyldig(it) }
+                                records.filter { erNøkkelGyldig(it) }
                                     .map { it.toSykefraværsstatistikkImportKafkaMelding().verdi.toSykefraværsstatistikkDto() }
                                     .also { sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(it) }
                                     .forEach { sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(it) }
