@@ -35,10 +35,7 @@ class SykefraværsstatistikkEksportService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun eksporterSykefraværsstatistikk(sykefraværstatistikkDto: SykefraværsstatistikkDto) {
-        val eksportkvartal = ÅrstallOgKvartal(
-            årstall = sykefraværstatistikkDto.årstall,
-            kvartal = sykefraværstatistikkDto.kvartal,
-        )
+        val eksportkvartal = sykefraværstatistikkDto.årstallOgKvartal()
 
         when (sykefraværstatistikkDto) {
             is LandSykefraværsstatistikkDto -> {
