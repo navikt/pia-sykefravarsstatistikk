@@ -12,6 +12,7 @@ val nimbusJoseJwtVersion = "10.2"
 val prometeusVersion = "1.14.6"
 val testcontainersVersion = "1.21.0"
 val testcontainersFakeGCSVersion = "0.2.0"
+val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
 
 plugins {
     kotlin("jvm") version "2.1.20"
@@ -48,6 +49,7 @@ dependencies {
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$opentelemetryLogbackMdcVersion")
     // Kafka
     implementation("org.apache.kafka:kafka-clients:$kafkClientVersion")
 
