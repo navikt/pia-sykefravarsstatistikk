@@ -29,8 +29,9 @@ class SykefraværsstatistikkConsumer(
     val sykefraværsstatistikkImportService: SykefraværsstatistikkImportService,
     val sykefraværsstatistikkEksportService: SykefraværsstatistikkEksportService,
     val applikasjonsHelse: ApplikasjonsHelse,
+    val instansnummer: Int = 1,
 ) : CoroutineScope {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+    private val logger: Logger = LoggerFactory.getLogger("${this::class.java}-$instansnummer")
     private val job: Job = Job()
     private val kafkaConsumer = KafkaConsumer(
         Kafka().consumerProperties(konsumentGruppe = topic.konsumentGruppe),

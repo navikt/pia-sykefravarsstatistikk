@@ -115,15 +115,20 @@ fun main() {
         applikasjonsHelse = applikasjonsHelse,
     ).run()
 
-    listOf(
-        Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
-        Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
-    ).forEach { topic ->
+    SykefraværsstatistikkConsumer(
+        topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        sykefraværsstatistikkImportService = sykefraværsstatistikkImportService,
+        sykefraværsstatistikkEksportService = sykefraværsstatistikkEksportService,
+        applikasjonsHelse = applikasjonsHelse,
+    ).run()
+
+    for (i in 1..3) {
         SykefraværsstatistikkConsumer(
-            topic = topic,
+            topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
             sykefraværsstatistikkImportService = sykefraværsstatistikkImportService,
             sykefraværsstatistikkEksportService = sykefraværsstatistikkEksportService,
             applikasjonsHelse = applikasjonsHelse,
+            instansnummer = i,
         ).run()
     }
 
