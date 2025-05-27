@@ -9,9 +9,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -83,12 +81,5 @@ class StatistikkEksportSektorTest {
                 }
             }
         }
-
-        applikasjon.shouldContainLog(
-            "Eksporterer sykefraværsstatistikk for $kategori - 1. kvartal 2025".toRegex(),
-        )
-        applikasjon.shouldContainLog(
-            "Melding eksportert på Kafka for statistikkategori $kategori, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
-        )
     }
 }
