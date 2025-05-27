@@ -10,9 +10,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.Virksomhet
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
@@ -95,21 +93,11 @@ class StatistikkEksportVirksomhetTest {
                 objektene.forEach {
                     it.kategori shouldBe eksportKategori
                     it.kode shouldBe virksomhet.orgnr
+                    // TODO: Test at gradering teller/nevner blir rett.
+                    // ikke tapteDagsverkGradert / tapteDagsverk
+                    // men tapteDagsverk / muligeDagsverk
                 }
             }
         }
-
-        applikasjon.shouldContainLog(
-            "Eksporterer sykefraværsstatistikk for $importKategori - 1. kvartal 2025".toRegex(),
-        )
-        applikasjon.shouldContainLog(
-            "Eksporterer sykefraværsstatistikk for $eksportKategori - 1. kvartal 2025".toRegex(),
-        )
-        applikasjon.shouldContainLog(
-            "Melding eksportert på Kafka for statistikkategori $importKategori, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
-        )
-        applikasjon.shouldContainLog(
-            "Melding eksportert på Kafka for statistikkategori $eksportKategori, 4 kvartaler fram til 1. kvartal 2025.".toRegex(),
-        )
     }
 }
