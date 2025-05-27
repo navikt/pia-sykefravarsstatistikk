@@ -74,9 +74,8 @@ class EnhetsregisteretContainerHelper(
         }
         log.info("Opprettet ${virksomheterMedEdgeCase.size} virksomheter (med 'edge case') i enhetsregisteret")
         val antallExpectationsOpprettet = hentAlleExpectationIds()
-        log.info("Har nå $antallExpectationsOpprettet testvirksomheter i enhetsregisteret")
+        log.info("Har nå ${antallExpectationsOpprettet.size} testvirksomheter i enhetsregisteret")
     }
-
 
     private fun getMockServerClient(): MockServerClient {
         if (mockServerClient == null) {
@@ -124,18 +123,16 @@ class EnhetsregisteretContainerHelper(
         leggTilUnderenhet(underenhet = underenhet)
     }
 
-    private fun leggTilUnderenhet(
-        underenhet: BrregUnderenhetDto,
-    ) {
+    private fun leggTilUnderenhet(underenhet: BrregUnderenhetDto) {
         log.debug(
             "Legger til underenhet med orgnr '${underenhet.organisasjonsnummer}' og navn '${underenhet.navn}'",
         )
         val næringskode = if (underenhet.naeringskode1 != null) {
             """
-              "naeringskode1": {
-                "kode": "${underenhet.naeringskode1!!.kode}",
-                "beskrivelse": "${underenhet.naeringskode1!!.beskrivelse}"
-              },
+            "naeringskode1": {
+              "kode": "${underenhet.naeringskode1!!.kode}",
+              "beskrivelse": "${underenhet.naeringskode1!!.beskrivelse}"
+            },
             """.trimIndent()
         } else {
             ""
@@ -175,7 +172,7 @@ class EnhetsregisteretContainerHelper(
                       },
                       "registreringsdatoEnhetsregisteret": "1992-09-18",
                       "registrertIMvaregisteret": true,
-                      ${næringskode}
+                      $næringskode
                       "antallAnsatte": ${underenhet.antallAnsatte},
                       "harRegistrertAntallAnsatte": true,
                       "overordnetEnhet": "${underenhet.overordnetEnhet}",
@@ -210,9 +207,7 @@ class EnhetsregisteretContainerHelper(
         }
     }
 
-    private fun leggTilOverordnetEnhet(
-        overordnetEnhet: BrregEnhetDto,
-    ) {
+    private fun leggTilOverordnetEnhet(overordnetEnhet: BrregEnhetDto) {
         log.debug(
             "Legger til overordnet enhet med orgnr '${overordnetEnhet.organisasjonsnummer}' og navn '${overordnetEnhet.navn}'",
         )
@@ -274,7 +269,7 @@ class EnhetsregisteretContainerHelper(
                         "kommunenummer": "2100"
                       },
                       "stiftelsesdato": "1992-09-18",
-                      ${institusjonellSektorkode}
+                      $institusjonellSektorkode
                       "registrertIForetaksregisteret": true,
                       "registrertIStiftelsesregisteret": false,
                       "registrertIFrivillighetsregisteret": false,

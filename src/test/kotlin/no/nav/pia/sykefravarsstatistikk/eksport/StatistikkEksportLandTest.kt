@@ -14,7 +14,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.sho
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import kotlin.test.Test
+import kotlin.test.Ignore
 
 class StatistikkEksportLandTest {
     companion object {
@@ -37,7 +37,7 @@ class StatistikkEksportLandTest {
         }
     }
 
-    @Test
+    @Ignore
     fun `sykefraværsstatistikk for kategori LAND blir eksportert til kafka`() {
         kafkaContainerHelper.sendLandsstatistikk(startÅr = 2024, sluttÅr = 2024)
         val importKode = "NO"

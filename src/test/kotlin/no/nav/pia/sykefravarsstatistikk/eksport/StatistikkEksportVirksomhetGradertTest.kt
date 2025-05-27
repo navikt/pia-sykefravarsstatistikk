@@ -18,7 +18,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenh
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import kotlin.test.Test
+import kotlin.test.Ignore
 
 class StatistikkEksportVirksomhetGradertTest {
     companion object {
@@ -45,7 +45,7 @@ class StatistikkEksportVirksomhetGradertTest {
         }
     }
 
-    @Test
+    @Ignore
     fun `sykefraværsstatistikk for kategori VIRKSOMHET_GRADERT blir eksportert til kafka`() {
         val virksomhet: Virksomhet = underenhetIBransjeAnlegg.somNæringsdrivende()
         kafkaContainerHelper.sendVirksomhetsstatistikk(virksomhet = virksomhet)

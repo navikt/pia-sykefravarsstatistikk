@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.measureTimedValue
 
 class SykefraværsstatistikkConsumer(
     val topic: Topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET,
@@ -45,6 +46,8 @@ class SykefraværsstatistikkConsumer(
         Runtime.getRuntime().addShutdownHook(Thread(this::cancel))
     }
 
+    val listAvTidsbuktISnitt = emptyList<Long>()
+
     fun run() {
         launch {
             kafkaConsumer.use { consumer ->
@@ -59,9 +62,24 @@ class SykefraværsstatistikkConsumer(
                             if (!records.isEmpty) {
                                 records.filter { erNøkkelGyldig(it) }
                                     .map { it.toSykefraværsstatistikkImportKafkaMelding().verdi.toSykefraværsstatistikkDto() }
-                                    .also { sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(it) }
-                                    .forEach { sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(it) }
-
+                                    .also {
+                                        val snitt = sykefraværsstatistikkImportService.lagreSykefraværsstatistikk(it)
+                                        listAvTidsbuktISnitt.plus(snitt)
+                                        logger.info("Lagring av sykefraværsstatistikk tok i snitt $snitt mikrosekunder")
+                                    }.also {
+                                        launch {
+                                            val utsendingAvAlleMeldingerPåKafkaTimedValue = measureTimedValue {
+                                                it.forEach {
+                                                    sykefraværsstatistikkEksportService.eksporterSykefraværsstatistikk(
+                                                        it,
+                                                    )
+                                                }
+                                            }
+                                            logger.info(
+                                                "Eksport av ${it.size} meldinger om sykefraværsstatistikk tok ${utsendingAvAlleMeldingerPåKafkaTimedValue.duration.inWholeMicroseconds} mikrosekunder",
+                                            )
+                                        }
+                                    }
                                 consumer.commitSync()
                                 logger.info("Prosesserte ${records.count()} meldinger i topic: ${topic.navn}")
                             }

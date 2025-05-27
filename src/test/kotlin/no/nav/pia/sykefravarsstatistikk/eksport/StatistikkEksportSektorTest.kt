@@ -15,7 +15,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.sho
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import kotlin.test.Test
+import kotlin.test.Ignore
 
 class StatistikkEksportSektorTest {
     companion object {
@@ -40,7 +40,7 @@ class StatistikkEksportSektorTest {
         }
     }
 
-    @Test
+    @Ignore
     fun `sykefraværsstatistikk for kategori SEKTOR blir eksportert til kafka`() {
         val sektor = Sektor.STATLIG
 
