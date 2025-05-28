@@ -10,9 +10,12 @@ class ImporttidspunktRepository(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
+    companion object {
+        val NÅVÆRENDE_KVARTAL = ÅrstallOgKvartal(årstall = 2025, kvartal = 1)
+    }
+
     fun hentNyesteImporterteKvartal(): ÅrstallOgKvartal {
-        // TODO: Hent fra db?
-        logger.info("Henter nyeste importert kvartal, dette er hardkodet til 2024K4")
-        return ÅrstallOgKvartal(årstall = 2024, kvartal = 4)
+        logger.info("Henter nyeste importert kvartal, dette er hardkodet til ${NÅVÆRENDE_KVARTAL.årstall} Q${NÅVÆRENDE_KVARTAL.kvartal}.")
+        return NÅVÆRENDE_KVARTAL
     }
 }

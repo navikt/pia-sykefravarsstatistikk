@@ -27,6 +27,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæri
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehjem
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
+import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository.Companion.NÅVÆRENDE_KVARTAL
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.test.BeforeTest
@@ -215,7 +216,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
                 kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(3),
                 tapteDagsverk = 440.0.toBigDecimal(),
                 muligeDagsverk = 1254.0.toBigDecimal(),
                 antallPersoner = 22,
@@ -252,7 +253,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
                 kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(2),
                 tapteDagsverk = 85.0.toBigDecimal(),
                 muligeDagsverk = 1653.0.toBigDecimal(),
                 antallPersoner = 29,
@@ -285,7 +286,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
                 kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(1),
                 tapteDagsverk = 118.0.toBigDecimal(),
                 muligeDagsverk = 1197.0.toBigDecimal(),
                 antallPersoner = 21,
@@ -318,7 +319,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.VIRKSOMHET,
                 kode = underenhetIBransjeSykehjem.somNæringsdrivende().orgnr,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL,
                 tapteDagsverk = 41.0.toBigDecimal(),
                 muligeDagsverk = 1140.0.toBigDecimal(),
                 antallPersoner = 20,
@@ -356,7 +357,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
                 kode = Bransje.SYKEHJEM.navn,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2023, kvartal = 4),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusEttÅr(), // vi henter data fra samme kvartal i fjor for å utlede trend
                 tapteDagsverk = 312364.7.toBigDecimal(),
                 muligeDagsverk = 3123505.8.toBigDecimal(),
                 prosent = 9.8.toBigDecimal(),
@@ -382,7 +383,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
                 kode = Bransje.SYKEHJEM.navn,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(3),
                 tapteDagsverk = 330864.7.toBigDecimal(),
                 muligeDagsverk = 3331505.8.toBigDecimal(),
                 prosent = 9.9.toBigDecimal(),
@@ -408,7 +409,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
                 kode = Bransje.SYKEHJEM.navn,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(2),
                 tapteDagsverk = 312606.4.toBigDecimal(),
                 muligeDagsverk = 3245624.8.toBigDecimal(),
                 prosent = 9.6.toBigDecimal(),
@@ -434,7 +435,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
                 kode = Bransje.SYKEHJEM.navn,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(1),
                 tapteDagsverk = 311214.1.toBigDecimal(),
                 muligeDagsverk = 3782127.8.toBigDecimal(),
                 prosent = 8.2.toBigDecimal(),
@@ -460,7 +461,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.BRANSJE,
                 kode = Bransje.SYKEHJEM.navn,
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL,
                 tapteDagsverk = 327662.8.toBigDecimal(),
                 muligeDagsverk = 3511634.6.toBigDecimal(),
                 prosent = 9.3.toBigDecimal(),
@@ -487,7 +488,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.SEKTOR,
                 kode = "3",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(3),
                 tapteDagsverk = 5300255.308034.toBigDecimal(),
                 muligeDagsverk = 94813876.585998.toBigDecimal(),
                 antallPersoner = 2047614,
@@ -497,7 +498,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.SEKTOR,
                 kode = "3",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(2),
                 tapteDagsverk = 4814260.178576.toBigDecimal(),
                 muligeDagsverk = 92474907.299356.toBigDecimal(),
                 antallPersoner = 2092081,
@@ -507,7 +508,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.SEKTOR,
                 kode = "3",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(1),
                 tapteDagsverk = 4905415.411417.toBigDecimal(),
                 muligeDagsverk = 103456981.055736.toBigDecimal(),
                 antallPersoner = 2174010,
@@ -517,7 +518,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.SEKTOR,
                 kode = "3",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL,
                 tapteDagsverk = 5276690.149223.toBigDecimal(),
                 muligeDagsverk = 99698415.989531.toBigDecimal(),
                 antallPersoner = 2106935,
@@ -532,7 +533,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.LAND,
                 kode = "NO",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 1),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(3),
                 tapteDagsverk = 8894430.000000.toBigDecimal(),
                 muligeDagsverk = 142947000.000000.toBigDecimal(),
                 antallPersoner = 3124427,
@@ -542,7 +543,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.LAND,
                 kode = "NO",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 2),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(2),
                 tapteDagsverk = 8152210.000000.toBigDecimal(),
                 muligeDagsverk = 139269000.000000.toBigDecimal(),
                 antallPersoner = 3166683,
@@ -552,7 +553,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.LAND,
                 kode = "NO",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 3),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL.minusKvartaler(1),
                 tapteDagsverk = 7988370.000000.toBigDecimal(),
                 muligeDagsverk = 155487000.000000.toBigDecimal(),
                 antallPersoner = 3303089,
@@ -562,7 +563,7 @@ class SykefraværsstatistikkApiEndepunkterIntegrasjonsTest {
             sendSykefraværsstatistikk(
                 kategori = Statistikkategori.LAND,
                 kode = "NO",
-                årstallOgKvartal = ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
+                årstallOgKvartal = NÅVÆRENDE_KVARTAL,
                 tapteDagsverk = 8774880.000000.toBigDecimal(),
                 muligeDagsverk = 150138000.000000.toBigDecimal(),
                 antallPersoner = 3190634,

@@ -37,7 +37,7 @@ class StatistikkEksportLandTest {
 
     @Test
     fun `sykefraværsstatistikk for kategori LAND blir eksportert til kafka`() {
-        kafkaContainerHelper.sendLandsstatistikk(startÅr = 2024, sluttÅr = 2024)
+        kafkaContainerHelper.sendLandsstatistikk()
         val importKode = "NO"
         val eksportKode = "NO"
 

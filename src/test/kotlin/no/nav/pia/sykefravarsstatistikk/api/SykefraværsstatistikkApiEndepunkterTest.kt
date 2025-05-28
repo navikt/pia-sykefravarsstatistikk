@@ -1,7 +1,6 @@
 package no.nav.pia.sykefravarsstatistikk.api
 
 import io.kotest.assertions.shouldFail
-import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -18,7 +17,6 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.NÆRING
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.OVERORDNET_ENHET
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.SEKTOR
 import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori.VIRKSOMHET
-import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.KvartalsvisSykefraværshistorikkTestDto
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.bigDecimalShouldBe
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
@@ -41,6 +39,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenh
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringSkogskjøtsel
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
+import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository.Companion.NÅVÆRENDE_KVARTAL
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -82,10 +81,10 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk(
-                overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!
+                overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!,
             )
             kafkaContainerHelper.sendNæringsstatistikk(
-                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring
+                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring,
             )
             kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
                 virksomhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
@@ -121,15 +120,11 @@ class SykefraværsstatistikkApiEndepunkterTest {
     @Test
     fun `Aggregert statistikk skal også være maskert for Næring (eller Bransje) i response`() {
         runBlocking {
-            kafkaContainerHelper.sendLandsstatistikk(startÅr = 2023, sluttÅr = 2024)
+            kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk(
-                startÅr = 2023,
-                sluttÅr = 2024,
                 sektor = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!,
             )
             kafkaContainerHelper.sendNæringsstatistikk(
-                startÅr = 2023,
-                sluttÅr = 2024,
                 næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring,
                 harForFåAnsatte = true,
             )
@@ -150,8 +145,8 @@ class SykefraværsstatistikkApiEndepunkterTest {
             trendINæring shouldNotBe null
             trendINæring?.verdi shouldBe "0.0"
             trendINæring?.kvartalerIBeregningen shouldContainExactlyInAnyOrder listOf(
-                ÅrstallOgKvartal(årstall = 2024, kvartal = 4),
-                ÅrstallOgKvartal(årstall = 2023, kvartal = 4),
+                NÅVÆRENDE_KVARTAL,
+                NÅVÆRENDE_KVARTAL.minusEttÅr(),
             )
         }
     }
@@ -161,10 +156,10 @@ class SykefraværsstatistikkApiEndepunkterTest {
         runBlocking {
             kafkaContainerHelper.sendLandsstatistikk()
             kafkaContainerHelper.sendSektorstatistikk(
-                sektor = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!
+                sektor = overordnetEnhetINæringUtleieAvEiendom.somOverordnetEnhet().sektor!!,
             )
             kafkaContainerHelper.sendNæringsstatistikk(
-                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring
+                næring = underenhetINæringUtleieAvEiendom.somNæringsdrivende().næringskode.næring,
             )
             kafkaContainerHelper.sendEnkelVirksomhetsstatistikk(
                 virksomhet = underenhetINæringUtleieAvEiendom.somNæringsdrivende(),
@@ -217,7 +212,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
             } else {
                 kafkaContainerHelper.sendNæringsstatistikk(
-                    næring = underenhetIBransjeAnlegg.somNæringsdrivende().næringskode.næring
+                    næring = underenhetIBransjeAnlegg.somNæringsdrivende().næringskode.næring,
                 )
             }
 
@@ -235,7 +230,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
                     } else {
                         NÆRING.name
                     }
-                    )
+                )
             }!!.kvartalsvisSykefraværsprosent.size shouldBe 20
         }
     }
@@ -503,7 +498,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             landStatistikk.shouldNotBeNull()
             landStatistikk.label shouldBe "Norge"
             landStatistikk.kvartalerIBeregningen.size shouldBe 4 // skal være ett år
-            landStatistikk.kvartalerIBeregningen.forAll { it.årstall shouldBe 2024 }
+            landStatistikk.kvartalerIBeregningen.shouldContainExactlyInAnyOrder(NÅVÆRENDE_KVARTAL.sisteFireKvartaler())
             // TODO: finn en mer robust måte å teste hvilke kvartaler som er med i beregning, sjekk over flere år?
             landStatistikk.verdi shouldBe "6.4"
             landStatistikk.antallPersonerIBeregningen shouldBe 3365162
@@ -516,7 +511,7 @@ class SykefraværsstatistikkApiEndepunkterTest {
             bransjeStatistikk.shouldNotBeNull()
             bransjeStatistikk.label shouldBe bransje.navn
             bransjeStatistikk.kvartalerIBeregningen.size shouldBe 4 // skal være ett år
-            bransjeStatistikk.kvartalerIBeregningen.forAll { it.årstall shouldBe 2024 }
+            bransjeStatistikk.kvartalerIBeregningen.shouldContainExactlyInAnyOrder(NÅVÆRENDE_KVARTAL.sisteFireKvartaler())
             bransjeStatistikk.verdi shouldBe "5.8"
             bransjeStatistikk.antallPersonerIBeregningen shouldBe 88563
 

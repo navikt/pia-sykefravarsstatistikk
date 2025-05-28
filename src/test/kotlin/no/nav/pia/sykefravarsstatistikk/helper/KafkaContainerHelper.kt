@@ -23,6 +23,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestU
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Kafka
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
+import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository.Companion.NÅVÆRENDE_KVARTAL
 import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoDto
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.admin.AdminClient
@@ -232,119 +233,99 @@ class KafkaContainerHelper(
         }
     }
 
-    fun sendLandsstatistikk(
-        startÅr: Int = 2010,
-        sluttÅr: Int = 2024,
-    ) {
-        for (år in startÅr..sluttÅr) {
-            for (kvartal in 1..4) {
-                val landmelding = enStandardLandMelding(år, kvartal)
-                sendOgVentTilKonsumert(
-                    nøkkel = landmelding.toJsonKey(),
-                    melding = landmelding.toJsonValue(),
-                    topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
-                )
-            }
+    fun sendLandsstatistikk() {
+        val kvartaler = NÅVÆRENDE_KVARTAL.inkludertTidligere(25)
+        kvartaler.forEach {
+            val landmelding = enStandardLandMelding(it.årstall, it.kvartal)
+            sendOgVentTilKonsumert(
+                nøkkel = landmelding.toJsonKey(),
+                melding = landmelding.toJsonValue(),
+                topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            )
         }
     }
 
-    fun sendSektorstatistikk(
-        sektor: Sektor,
-        startÅr: Int = 2010,
-        sluttÅr: Int = 2024,
-    ) {
-        for (år in startÅr..sluttÅr) {
-            for (kvartal in 1..4) {
-                val sektormelding = enStandardSektorMelding(
-                    årstall = år,
-                    kvartal = kvartal,
-                    sektor = sektor,
-                )
-                sendOgVentTilKonsumert(
-                    nøkkel = sektormelding.toJsonKey(),
-                    melding = sektormelding.toJsonValue(),
-                    topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
-                )
-            }
+    fun sendSektorstatistikk(sektor: Sektor) {
+        val kvartaler = NÅVÆRENDE_KVARTAL.inkludertTidligere(25)
+        kvartaler.forEach {
+            val sektormelding = enStandardSektorMelding(
+                årstall = it.årstall,
+                kvartal = it.kvartal,
+                sektor = sektor,
+            )
+            sendOgVentTilKonsumert(
+                nøkkel = sektormelding.toJsonKey(),
+                melding = sektormelding.toJsonValue(),
+                topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            )
         }
     }
 
-    fun sendBransjestatistikk(
-        bransje: Bransje,
-        startÅr: Int = 2010,
-        sluttÅr: Int = 2024,
-    ) {
-        for (år in startÅr..sluttÅr) {
-            for (kvartal in 1..4) {
-                val bransjemelding = enStandardBransjeMelding(årstall = år, kvartal = kvartal, bransje = bransje)
-                sendOgVentTilKonsumert(
-                    nøkkel = bransjemelding.toJsonKey(),
-                    melding = bransjemelding.toJsonValue(),
-                    topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
-                )
-            }
+    fun sendBransjestatistikk(bransje: Bransje) {
+        val kvartaler = NÅVÆRENDE_KVARTAL.inkludertTidligere(25)
+        kvartaler.forEach {
+            val bransjemelding = enStandardBransjeMelding(årstall = it.årstall, kvartal = it.kvartal, bransje = bransje)
+            sendOgVentTilKonsumert(
+                nøkkel = bransjemelding.toJsonKey(),
+                melding = bransjemelding.toJsonValue(),
+                topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            )
         }
     }
 
     fun sendNæringsstatistikk(
         næring: Næring,
-        startÅr: Int = 2010,
-        sluttÅr: Int = 2024,
         harForFåAnsatte: Boolean = false,
     ) {
-        for (år in startÅr..sluttÅr) {
-            for (kvartal in 1..4) {
-                val næringMelding = if (harForFåAnsatte) {
-                    enMeldingMedFåAnsatte(
-                        årstall = år,
-                        kvartal = kvartal,
-                        statistikkategori = Statistikkategori.NÆRING,
-                        kode = næring.tosifferIdentifikator,
-                    )
-                } else {
-                    enStandardNæringMelding(årstall = år, kvartal = kvartal, næring = næring)
-                }
-                sendOgVentTilKonsumert(
-                    nøkkel = næringMelding.toJsonKey(),
-                    melding = næringMelding.toJsonValue(),
-                    topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        val kvartaler = NÅVÆRENDE_KVARTAL.inkludertTidligere(25)
+        kvartaler.forEach {
+            val næringMelding = if (harForFåAnsatte) {
+                enMeldingMedFåAnsatte(
+                    årstall = it.årstall,
+                    kvartal = it.kvartal,
+                    statistikkategori = Statistikkategori.NÆRING,
+                    kode = næring.tosifferIdentifikator,
                 )
+            } else {
+                enStandardNæringMelding(årstall = it.årstall, kvartal = it.kvartal, næring = næring)
             }
+            sendOgVentTilKonsumert(
+                nøkkel = næringMelding.toJsonKey(),
+                melding = næringMelding.toJsonValue(),
+                topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            )
         }
     }
 
     fun sendNæringskodestatistikk(
         næringskode: Næringskode,
-        startÅr: Int = 2010,
-        sluttÅr: Int = 2024,
         harForFåAnsatte: Boolean = false,
     ) {
         val statistikkategori = Statistikkategori.NÆRINGSKODE
-        for (årstall in startÅr..sluttÅr) {
-            for (kvartal in 1..4) {
-                val næringMelding = if (harForFåAnsatte) {
-                    enMeldingMedFåAnsatte(
-                        årstall = årstall,
-                        kvartal = kvartal,
-                        statistikkategori = statistikkategori,
-                        kode = næringskode.femsifferIdentifikator,
-                    )
-                } else {
-                    enStandardNæringskodeMelding(årstall = årstall, kvartal = kvartal, næringskode = næringskode)
-                }
-                sendOgVentTilKonsumert(
-                    nøkkel = næringMelding.toJsonKey(),
-                    melding = næringMelding.toJsonValue(),
-                    topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        val kvartaler = NÅVÆRENDE_KVARTAL.inkludertTidligere(25)
+        kvartaler.forEach {
+            val næringMelding = if (harForFåAnsatte) {
+                enMeldingMedFåAnsatte(
+                    årstall = it.årstall,
+                    kvartal = it.kvartal,
+                    statistikkategori = statistikkategori,
+                    kode = næringskode.femsifferIdentifikator,
                 )
+            } else {
+                enStandardNæringskodeMelding(årstall = it.årstall, kvartal = it.kvartal, næringskode = næringskode)
             }
+            sendOgVentTilKonsumert(
+                nøkkel = næringMelding.toJsonKey(),
+                melding = næringMelding.toJsonValue(),
+                topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+            )
         }
     }
 
     fun sendUgyldigNæringskodestatistikk(
         næringskode: String,
-        årstall: Int = 2025,
-        kvartal: Int = 1,
+        årstall: Int = NÅVÆRENDE_KVARTAL.årstall,
+        kvartal: Int = NÅVÆRENDE_KVARTAL.kvartal,
     ) {
         val næringMelding = JsonMelding(
             kategori = Statistikkategori.NÆRINGSKODE,

@@ -27,7 +27,7 @@ class AggregertStatistikkService(
         tilganger: VerifiserteTilganger,
     ): Either<Feil, AggregertStatistikkResponseDto> {
         val virksomhet = underenhet
-        val gjeldendePeriode = ÅrstallOgKvartal(årstall = 2024, kvartal = 4)
+        val gjeldendePeriode = importtidspunktRepository.hentNyesteImporterteKvartal()
 
         val aggregeringskategorier = buildList {
             add(Aggregeringskategorier.Land)
