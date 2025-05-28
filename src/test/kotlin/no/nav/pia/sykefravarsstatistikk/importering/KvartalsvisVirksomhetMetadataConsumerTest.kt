@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import no.nav.pia.sykefravarsstatistikk.domene.Sektor
 import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataKafkamelding
 import no.nav.pia.sykefravarsstatistikk.eksport.VirksomhetMetadataNøkkel
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.Companion.KVARTAL_2024_3
@@ -35,12 +36,16 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
 
     @Test
     fun `Kafkamelding om metadata for VIRKSOMHET_METADATA blir lagret i DB`() {
+        val orgnr = "998877665"
+        val sektor = Sektor.PRIVAT
+        val næring = "88"
+        val primærnæringskode = "88911"
         val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
-            orgnr = "998877665",
+            orgnr = orgnr,
             årstallOgKvartal = KVARTAL_2024_3,
-            sektor = "2",
-            primærnæring = "88",
-            primærnæringskode = "88911",
+            sektor = sektor.kode,
+            primærnæring = næring,
+            primærnæringskode = primærnæringskode,
         )
         kafkaContainerHelper.sendKafkaMelding(
             virksomhetMetadataStatistikk.toJsonKey(),
@@ -50,44 +55,50 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
 
         runBlocking {
             kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
-                key = Json.encodeToString(VirksomhetMetadataNøkkel(orgnr = "998877665", årstall = 2024, kvartal = 3)),
+                key = Json.encodeToString(
+                    VirksomhetMetadataNøkkel(orgnr = orgnr, årstall = KVARTAL_2024_3.årstall, kvartal = KVARTAL_2024_3.kvartal),
+                ),
                 konsument = eksportKonsument,
                 block = { meldinger ->
                     val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
                     objektene shouldHaveAtLeastSize 1
                     objektene.forEach {
-                        it.orgnr shouldBe "998877665"
-                        it.årstall shouldBe 2024
-                        it.kvartal shouldBe 3
-                        it.næring shouldBe "88"
-                        it.næringskode shouldBe "88911"
+                        it.orgnr shouldBe orgnr
+                        it.årstall shouldBe KVARTAL_2024_3.årstall
+                        it.kvartal shouldBe KVARTAL_2024_3.kvartal
+                        it.næring shouldBe næring
+                        it.næringskode shouldBe primærnæringskode
                         it.bransje shouldBe BARNEHAGER.name
-                        it.sektor shouldBe "2"
+                        it.sektor shouldBe sektor.name
                     }
                 },
             )
         }
 
         val metadataQ32024 = hentVirksomhetMetadataStatistikk(
-            orgnr = "998877665",
+            orgnr = orgnr,
             kvartal = KVARTAL_2024_3,
         )
-        metadataQ32024.orgnr shouldBe "998877665"
+        metadataQ32024.orgnr shouldBe orgnr
         metadataQ32024.årstall shouldBe 2024
         metadataQ32024.kvartal shouldBe 3
-        metadataQ32024.sektor shouldBe "2"
-        metadataQ32024.primærnæring shouldBe "88"
-        metadataQ32024.primærnæringskode shouldBe "88911"
+        metadataQ32024.sektor shouldBe "3"
+        metadataQ32024.primærnæring shouldBe næring
+        metadataQ32024.primærnæringskode shouldBe primærnæringskode
     }
 
     @Test
     fun `Kafkamelding om metadata for VIRKSOMHET_METADATA eksporteres uten Bransje dersom virksomhet ikke hører til noen bransjer`() {
+        val orgnr = "998377568"
+        val primærnæring = "88"
+        val primærnæringskode = "88001"
+        val sektor = Sektor.KOMMUNAL
         val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
-            orgnr = "998877665",
+            orgnr = orgnr,
             årstallOgKvartal = KVARTAL_2024_3,
-            sektor = "2",
-            primærnæring = "88",
-            primærnæringskode = "88001",
+            sektor = sektor.kode,
+            primærnæring = primærnæring,
+            primærnæringskode = primærnæringskode,
         )
         kafkaContainerHelper.sendKafkaMelding(
             virksomhetMetadataStatistikk.toJsonKey(),
@@ -97,19 +108,21 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
 
         runBlocking {
             kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
-                key = Json.encodeToString(VirksomhetMetadataNøkkel(orgnr = "998877665", årstall = 2024, kvartal = 3)),
+                key = Json.encodeToString(
+                    VirksomhetMetadataNøkkel(orgnr = orgnr, årstall = KVARTAL_2024_3.årstall, kvartal = KVARTAL_2024_3.kvartal),
+                ),
                 konsument = eksportKonsument,
                 block = { meldinger ->
                     val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
                     objektene shouldHaveAtLeastSize 1
                     objektene.forEach {
-                        it.orgnr shouldBe "998877665"
-                        it.årstall shouldBe 2024
-                        it.kvartal shouldBe 3
-                        it.næring shouldBe "88"
-                        it.næringskode shouldBe "88001"
+                        it.orgnr shouldBe orgnr
+                        it.årstall shouldBe KVARTAL_2024_3.årstall
+                        it.kvartal shouldBe KVARTAL_2024_3.kvartal
+                        it.næring shouldBe primærnæring
+                        it.næringskode shouldBe primærnæringskode
                         it.bransje shouldBe null
-                        it.sektor shouldBe "2"
+                        it.sektor shouldBe sektor.name
                     }
                 },
             )
@@ -118,10 +131,13 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
 
     @Test
     fun `Kafkamelding om metadata for VIRKSOMHET_METADATA kan eksporteres uten næring eller næringskode`() {
+        val orgnr = "991137665"
+        val sektor = Sektor.STATLIG
+
         val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
-            orgnr = "998877665",
+            orgnr = orgnr,
             årstallOgKvartal = KVARTAL_2024_3,
-            sektor = "2",
+            sektor = sektor.kode,
             primærnæring = null,
             primærnæringskode = null,
         )
@@ -133,19 +149,21 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
 
         runBlocking {
             kafkaContainerHelper.ventOgKonsumerKafkaMeldinger(
-                key = Json.encodeToString(VirksomhetMetadataNøkkel(orgnr = "998877665", årstall = 2024, kvartal = 3)),
+                key = Json.encodeToString(
+                    VirksomhetMetadataNøkkel(orgnr = orgnr, årstall = KVARTAL_2024_3.årstall, kvartal = KVARTAL_2024_3.kvartal),
+                ),
                 konsument = eksportKonsument,
                 block = { meldinger ->
                     val objektene = meldinger.map { Json.decodeFromString<VirksomhetMetadataKafkamelding>(it) }
                     objektene shouldHaveAtLeastSize 1
                     objektene.forEach {
-                        it.orgnr shouldBe "998877665"
-                        it.årstall shouldBe 2024
-                        it.kvartal shouldBe 3
+                        it.orgnr shouldBe orgnr
+                        it.årstall shouldBe KVARTAL_2024_3.årstall
+                        it.kvartal shouldBe KVARTAL_2024_3.kvartal
+                        it.sektor shouldBe sektor.name
                         it.næring shouldBe ""
                         it.næringskode shouldBe ""
                         it.bransje shouldBe null
-                        it.sektor shouldBe "2"
                     }
                 },
             )
@@ -154,10 +172,13 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
 
     @Test
     fun `metadata for VIRKSOMHET_METADATA kan inneholde null-verdier for primærnæring og -primærnæringskode`() {
+        val orgnr = "998877665"
+        val sektor = Sektor.PRIVAT
+
         val virksomhetMetadataStatistikk = VirksomhetMetadataJsonMelding(
-            orgnr = "998877665",
+            orgnr = orgnr,
             årstallOgKvartal = KVARTAL_2024_3,
-            sektor = "2",
+            sektor = sektor.kode,
             primærnæring = null,
             primærnæringskode = null,
         )
@@ -168,15 +189,15 @@ class KvartalsvisVirksomhetMetadataConsumerTest {
             Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_VIRKSOMHET_METADATA,
         )
 
-        val metadataQ32024 = hentVirksomhetMetadataStatistikk(
-            orgnr = "998877665",
+        val virksomhetMetadataFraDb = hentVirksomhetMetadataStatistikk(
+            orgnr = orgnr,
             kvartal = KVARTAL_2024_3,
         )
-        metadataQ32024.orgnr shouldBe "998877665"
-        metadataQ32024.årstall shouldBe 2024
-        metadataQ32024.kvartal shouldBe 3
-        metadataQ32024.sektor shouldBe "2"
-        metadataQ32024.primærnæring shouldBe null
-        metadataQ32024.primærnæringskode shouldBe null
+        virksomhetMetadataFraDb.orgnr shouldBe orgnr
+        virksomhetMetadataFraDb.årstall shouldBe KVARTAL_2024_3.årstall
+        virksomhetMetadataFraDb.kvartal shouldBe KVARTAL_2024_3.kvartal
+        virksomhetMetadataFraDb.sektor shouldBe sektor.kode
+        virksomhetMetadataFraDb.primærnæring shouldBe null
+        virksomhetMetadataFraDb.primærnæringskode shouldBe null
     }
 }
