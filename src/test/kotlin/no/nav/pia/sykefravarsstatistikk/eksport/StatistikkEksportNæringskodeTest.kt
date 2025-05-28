@@ -11,7 +11,9 @@ import no.nav.pia.sykefravarsstatistikk.domene.Statistikkategori
 import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.JsonMelding
 import no.nav.pia.sykefravarsstatistikk.helper.SykefraværsstatistikkImportTestUtils.TapteDagsverkPerVarighet
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.applikasjon
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
+import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.shouldContainLog
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -107,5 +109,13 @@ class StatistikkEksportNæringskodeTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun `sykefraværsstatistikk for kategori NÆRINGSKODE ikke eksporterer ugyldige næringskoder til kafka`() {
+        val ugyldigNæringskode = "-0.002"
+        kafkaContainerHelper.sendUgyldigNæringskodestatistikk(næringskode = ugyldigNæringskode)
+
+        applikasjon.shouldContainLog("Ignorerer ugyldig næringskode '$ugyldigNæringskode'".toRegex())
     }
 }

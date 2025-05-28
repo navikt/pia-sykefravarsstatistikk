@@ -341,6 +341,34 @@ class KafkaContainerHelper(
         }
     }
 
+    fun sendUgyldigNæringskodestatistikk(
+        næringskode: String,
+        årstall: Int = 2025,
+        kvartal: Int = 1,
+    ) {
+        val næringMelding = JsonMelding(
+            kategori = Statistikkategori.NÆRINGSKODE,
+            kode = næringskode,
+            årstallOgKvartal = ÅrstallOgKvartal(årstall = årstall, kvartal = kvartal),
+            prosent = 5.8.toBigDecimal(),
+            tapteDagsverk = 893.631879.toBigDecimal(),
+            muligeDagsverk = 15407.446182.toBigDecimal(),
+            antallPersoner = 299,
+            tapteDagsverGradert = 365.466504.toBigDecimal(),
+            tapteDagsverkMedVarighet = listOf(
+                TapteDagsverkPerVarighet(
+                    varighet = "A",
+                    tapteDagsverk = 278.26.toBigDecimal(),
+                ),
+            ),
+        )
+        sendOgVentTilKonsumert(
+            nøkkel = næringMelding.toJsonKey(),
+            melding = næringMelding.toJsonValue(),
+            topic = Topic.KVARTALSVIS_SYKEFRAVARSSTATISTIKK_ØVRIGE_KATEGORIER,
+        )
+    }
+
     private fun enMeldingMedFåAnsatte(
         årstall: Int,
         kvartal: Int,

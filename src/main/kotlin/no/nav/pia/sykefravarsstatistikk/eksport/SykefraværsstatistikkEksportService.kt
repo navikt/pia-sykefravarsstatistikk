@@ -69,8 +69,12 @@ class SykefraværsstatistikkEksportService(
                 )
             }
             is NæringskodeSykefraværsstatistikkDto -> {
-                val bransjenavn = sykefraværstatistikkDto.næringskode
-                val næringskode = bransjenavn.tilNæringskode()
+                val næringskode = try {
+                    sykefraværstatistikkDto.næringskode.tilNæringskode()
+                } catch (e: IllegalArgumentException) {
+                    logger.warn("Ignorerer ugyldig næringskode '${sykefraværstatistikkDto.næringskode}'", e)
+                    return
+                }
                 eksporterSykefraværsstatistikkNæringskode(
                     eksportkvartal = eksportkvartal,
                     næringskode = næringskode,
