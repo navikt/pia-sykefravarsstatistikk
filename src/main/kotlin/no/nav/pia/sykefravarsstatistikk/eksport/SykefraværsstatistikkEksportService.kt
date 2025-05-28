@@ -152,8 +152,7 @@ class SykefraværsstatistikkEksportService(
         val statistikkategori = Statistikkategori.BRANSJE
         logger.debug("Eksporterer sykefraværsstatistikk for {} - {}", statistikkategori, eksportkvartal)
         val sykefraværsstatistikk = sykefraværsstatistikkRepository.hentSykefraværsstatistikkBransje(bransje = bransje)
-        val kode = sykefraværsstatistikk.first().bransje.navn
-        // TODO: Sjekk om dette er rett kode
+        val kode = sykefraværsstatistikk.first().bransje.name
         val statistikk = sykefraværsstatistikk.siste4Kvartaler(eksportkvartal)
 
         eksporterSykefraværsstatistikkPerKategori(

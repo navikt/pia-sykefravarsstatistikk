@@ -43,8 +43,10 @@ class StatistikkEksportBransjeTest {
     fun `sykefraværsstatistikk for kategori BRANSJE blir eksportert til kafka`() {
         val bransje: Bransje = underenhetIBransjeAnlegg.somNæringsdrivende().bransje()!!
         kafkaContainerHelper.sendBransjestatistikk(bransje = bransje)
+        // Vi lagrer med navn i db
         val importKode = bransje.navn
-        val eksportKode = bransje.navn
+        // Vi forventer å eksportere med .name (BRANSJENAVN og ikke Bransjenavn)
+        val eksportKode = bransje.name
 
         val sykefraværsstatistikk = JsonMelding(
             kategori = Statistikkategori.BRANSJE,
