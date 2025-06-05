@@ -26,8 +26,16 @@ class EnhetsregisteretService {
             val url = "$enhetsregisteretApi/underenheter/$orgnr"
 
             val response: HttpResponse = HttpClient.client.get(url)
-            val brregUnderenhetDto = response.body<BrregUnderenhetDto>()
-            return brregUnderenhetDto.tilDomene().right()
+            return if (response.status == HttpStatusCode.OK) {
+                response.body<BrregUnderenhetDto>().tilDomene().right()
+            } else {
+                val feilmelding = "Mangler opplysninger om underenhet"
+                logger.info("$feilmelding, fikk status ${response.status} ved kall til enhetsregisteret. Returnerer Not Found")
+                Feil(
+                    feilmelding = feilmelding,
+                    httpStatusCode = HttpStatusCode.NotFound,
+                ).left()
+            }
         } catch (e: Error) {
             logger.error("Feil ved kall til Enhetsregisteret ved henting av enhet '$orgnr'", e)
             return Feil(

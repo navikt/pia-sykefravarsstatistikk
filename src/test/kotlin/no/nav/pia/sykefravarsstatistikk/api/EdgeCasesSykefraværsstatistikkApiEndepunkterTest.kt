@@ -38,6 +38,19 @@ class EdgeCasesSykefraværsstatistikkApiEndepunkterTest {
         }
     }
 
+    @Test
+    fun `Håndtere virksomhet som ikke finnes i enhetsregisteret`() {
+        val orgnrTilEnVirksomhetSomIkkeFinnesIBrreg = "123456789"
+        runBlocking {
+            val aggregertStatistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
+                orgnr = orgnrTilEnVirksomhetSomIkkeFinnesIBrreg,
+                config = withToken(),
+            )
+
+            aggregertStatistikkResponse.status shouldBe HttpStatusCode.NotFound
+        }
+    }
+
     /*
        Data fra enhetsregisteret kan mangle noe informasjon, som for eksempel institusjonell sektor kode.
      * */
