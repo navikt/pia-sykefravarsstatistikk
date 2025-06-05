@@ -60,16 +60,16 @@ class TestContainerHelper {
                 "CONSUMER_LOOP_DELAY" to "1",
                 "NAIS_CLUSTER_NAME" to "lokal",
                 "LOKAL_DATO" to lokalDato.toString(),
-                "ALTINN_RETTIGHET_SERVICE_CODE" to "3403",
-                "ALTINN_RETTIGHET_SERVICE_EDITION" to "1",
             )
                 .plus(postgresContainerHelper.envVars())
                 .plus(kafkaContainerHelper.envVars())
                 .plus(altinnTilgangerContainerHelper.envVars())
                 .plus(enhetsregisteretContainerHelper.envVars())
                 .plus(authContainerHelper.envVars()),
-        ).waitingFor(HttpWaitStrategy().forPath("/internal/isalive")
-            .withStartupTimeout(Duration.ofSeconds(20)))
+        ).waitingFor(
+            HttpWaitStrategy().forPath("/internal/isalive")
+                .withStartupTimeout(Duration.ofSeconds(20)),
+        )
             .apply {
                 start()
             }.also {
@@ -171,6 +171,7 @@ class TestContainerHelper {
         }
 
         infix fun GenericContainer<*>.shouldContainLog(regex: Regex) = logs shouldContain regex
+
         infix fun GenericContainer<*>.shouldNotContainLog(regex: Regex) = logs shouldNotContain regex
 
         internal fun accessToken(

@@ -47,9 +47,6 @@ internal object Systemmiljø {
     val altinnTilgangerProxyUrl: String by lazy { System.getenv("ALTINN_TILGANGER_PROXY_URL") }
     val enhetsregisteretUrl: String by lazy { System.getenv("ENHETSREGISTERET_URL") }
     val cluster: String by lazy { System.getenv("NAIS_CLUSTER_NAME") }
-    private val altinn2ServiceCode: String by lazy { System.getenv("ALTINN_RETTIGHET_SERVICE_CODE") }
-    private val altinn2ServiceEdition: String by lazy { System.getenv("ALTINN_RETTIGHET_SERVICE_EDITION") }
-    val altinn2EnkeltrettighetKode: String = "$altinn2ServiceCode:$altinn2ServiceEdition"
     val altinn3RessursId: String = "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk"
 }
 

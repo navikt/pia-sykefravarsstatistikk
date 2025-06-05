@@ -48,23 +48,10 @@ class AltinnTilgangerService {
             return altinn3Tilgang
         }
 
-        @Deprecated("Brukes bare til å lage metrikker")
-        fun AltinnTilganger?.harEnkeltrettighetIAltinn2(
-            orgnr: String?,
-            enkeltrettighetIAltinn2: String,
-        ): Boolean = harAltinn2Enkeltrettighet(orgnr, enkeltrettighetIAltinn2)
-
-
         private fun AltinnTilganger?.harAltinn3Enkeltrettighet(
             orgnr: String?,
             enkeltrettighetIAltinn3: String,
         ): Boolean = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn3) ?: false
-
-        @Deprecated("Brukes bare til å lage metrikker")
-        private fun AltinnTilganger?.harAltinn2Enkeltrettighet(
-            orgnr: String?,
-            enkeltrettighetIAltinn2: String,
-        ) = this?.orgNrTilTilganger?.get(orgnr)?.contains(enkeltrettighetIAltinn2) ?: false
 
         fun AltinnTilganger?.altinnOrganisasjonerVedkommendeHarTilgangTil(): List<AltinnOrganisasjon> =
             this?.hierarki?.flatMap {

@@ -12,7 +12,6 @@ import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedIkkeTilgangTilOr
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedOkKall
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUgyldigOrgnummer
 import no.nav.pia.sykefravarsstatistikk.api.auditlog.auditLogVedUkjentOrgnummer
-import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighetIAltinn2
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harEnkeltrettighetIAltinn3
 import no.nav.pia.sykefravarsstatistikk.api.auth.AltinnTilgangerService.Companion.harTilgangTilOrgnr
 import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
@@ -53,10 +52,8 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                     orgnr = underenhet.orgnr,
                     enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                 ).also {
-                    metricsCountAltinnTilgang(
-                        altinnTilganger = altinnTilganger,
-                        orgnr = underenhet.orgnr,
-                        harEnkeltRettighetIAtinn3 = it
+                    Metrics.countAltinnTilgang(
+                        altinn3 = it,
                     )
                 }
 
@@ -68,10 +65,8 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
                     orgnr = overordnetEnhet.orgnr,
                     enkeltrettighetIAltinn3 = Systemmiljø.altinn3RessursId,
                 ).also {
-                    metricsCountAltinnTilgang(
-                        altinnTilganger = altinnTilganger,
-                        orgnr = overordnetEnhet.orgnr,
-                        harEnkeltRettighetIAtinn3 = it
+                    Metrics.countAltinnTilgang(
+                        altinn3 = it,
                     )
                 }
 
@@ -104,21 +99,6 @@ fun VerifisertEnkelrettighetForOrgnrPlugin(enhetsregisteretService: Enhetsregist
             }
         }
     }
-
-private fun metricsCountAltinnTilgang(
-    altinnTilganger: AltinnTilgangerService.AltinnTilganger?,
-    orgnr: String,
-    harEnkeltRettighetIAtinn3: Boolean
-) {
-    val harFortsattEnkeltRettighetIAltinn2 = altinnTilganger.harEnkeltrettighetIAltinn2(
-        orgnr = orgnr,
-        enkeltrettighetIAltinn2 = Systemmiljø.altinn2EnkeltrettighetKode,
-    )
-    Metrics.countAltinnTilgang(
-        altinn2 = harFortsattEnkeltRettighetIAltinn2,
-        altinn3 = harEnkeltRettighetIAtinn3
-    )
-}
 
 private fun String.erEtOrgNummer() = this.matches("^[0-9]{9}$".toRegex())
 

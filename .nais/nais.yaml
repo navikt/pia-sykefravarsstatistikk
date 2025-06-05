@@ -62,9 +62,5 @@ spec:
   env:
     - name: ENHETSREGISTERET_URL
       value: {{ enhetsregisteretUrl }}
-    - name: ALTINN_RETTIGHET_SERVICE_CODE
-      value: "3403"
-    - name: ALTINN_RETTIGHET_SERVICE_EDITION
-      value: "{{ serviceEdition }}"
     - name: ALTINN_TILGANGER_PROXY_URL
       value: http://arbeidsgiver-altinn-tilganger.fager

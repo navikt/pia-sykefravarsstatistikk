@@ -15,25 +15,8 @@ class Metrics {
             .help("Bruker fikk tilgang til sykefraværsstatistikk med kun Altinn 3")
             .withoutExemplars().register(appMicrometerRegistry.prometheusRegistry)
 
-        private val altinn2Rettighet: Counter = Counter.builder()
-            .name("${NAMESPACE}_sykefravarsstatistikk_altinn_2_enkeltrettighet")
-            .help("Bruker fikk tilgang til sykefraværsstatistikk med kun Altinn 2")
-            .withoutExemplars().register(appMicrometerRegistry.prometheusRegistry)
-
-        private val altinn2og3Rettighet: Counter = Counter.builder()
-            .name("${NAMESPACE}_sykefravarsstatistikk_altinn_2_og_3_enkeltrettighet")
-            .help("Bruker fikk tilgang til sykefraværsstatistikk med både Altinn 2 og 3")
-            .withoutExemplars().register(appMicrometerRegistry.prometheusRegistry)
-
-        fun countAltinnTilgang(
-            altinn2: Boolean,
-            altinn3: Boolean,
-        ) {
-            if (altinn2 && altinn3) {
-                altinn2og3Rettighet.inc()
-            } else if (altinn2) {
-                altinn2Rettighet.inc()
-            } else if (altinn3) {
+        fun countAltinnTilgang(altinn3: Boolean) {
+            if (altinn3) {
                 altinn3Rettighet.inc()
             }
         }

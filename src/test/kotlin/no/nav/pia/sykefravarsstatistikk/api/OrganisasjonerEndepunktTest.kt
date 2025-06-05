@@ -14,7 +14,6 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.ENKELRET
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
-import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeSykehjem
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtvinningAvRåoljeOgGass
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import kotlin.test.BeforeTest
@@ -81,35 +80,6 @@ class OrganisasjonerEndepunktTest {
             val altinnOrganisasjoner = Json.decodeFromString<List<AltinnOrganisasjon>>(response.bodyAsText())
             altinnOrganisasjoner shouldNotBe null
             altinnOrganisasjoner.size shouldBe 0
-        }
-    }
-
-    @Test
-    fun `Innlogget bruker får hente organisasjoner hen har enkeltrettigheter til (Altinn2)`() {
-        val underenhet: Underenhet = underenhetIBransjeSykehjem.somNæringsdrivende()
-        val overordnetEnhet: OverordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.somOverordnetEnhet()
-        altinnTilgangerContainerHelper.leggTilRettigheter(
-            overordnetEnhet = overordnetEnhet,
-            underenhet = underenhet,
-            altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
-        )
-
-        runBlocking {
-            val response = TestContainerHelper.hentOrganisasjonerMedEnkeltrettighetResponse(
-                config = withToken(),
-            )
-
-            response.status.value shouldBe 200
-            val altinnOrganisasjoner = Json.decodeFromString<List<AltinnOrganisasjon>>(response.bodyAsText())
-            altinnOrganisasjoner shouldNotBe null
-            altinnOrganisasjoner.size shouldBe 1
-            altinnOrganisasjoner.find { it.organizationNumber == overordnetEnhet.orgnr } shouldBe null
-            val altinnOrganisasjonForUnderenhet: AltinnOrganisasjon =
-                altinnOrganisasjoner.find { it.organizationNumber == underenhet.orgnr }!!
-            altinnOrganisasjonForUnderenhet.name shouldBe (underenhet as Underenhet.Næringsdrivende).navn
-            altinnOrganisasjonForUnderenhet.organizationNumber shouldBe underenhet.orgnr
-            altinnOrganisasjonForUnderenhet.parentOrganizationNumber shouldBe overordnetEnhet.orgnr
-            altinnOrganisasjonForUnderenhet.organizationForm shouldBe "BEDR"
         }
     }
 
