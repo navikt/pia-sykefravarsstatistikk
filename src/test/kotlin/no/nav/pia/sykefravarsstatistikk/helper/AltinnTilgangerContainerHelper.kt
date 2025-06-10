@@ -91,7 +91,14 @@ class AltinnTilgangerContainerHelper(
         overordnetEnhet: OverordnetEnhet = overordnetEnhetINæringUtvinningAvRåoljeOgGass.somOverordnetEnhet(),
         underenhet: Underenhet,
         altinn3Rettighet: String = "nav-ia-sykefravarsstatistikk-IKKE-SATT-OPP-ENDA",
+        erSlettet: Boolean? = false,
     ) {
+        val erSlettetJson = if (erSlettet != null) {
+            """ "erSlettet": $erSlettet, """
+        } else {
+            ""
+        }
+
         log.info("Legger til rettigheter [altinn3: '$altinn3Rettighet'] for underenhet '${underenhet.orgnr}'")
         val client = getMockServerClient()
         runBlocking {
@@ -117,10 +124,12 @@ class AltinnTilgangerContainerHelper(
                               "altinn2Tilganger": [],
                               "underenheter": [],
                               "navn": "${underenhet.navn}",
+                              $erSlettetJson
                               "organisasjonsform": "BEDR"
                             }
                           ],
                           "navn": "${overordnetEnhet.navn}",
+                          $erSlettetJson
                           "organisasjonsform": "ORGL"
                         }
                       ],

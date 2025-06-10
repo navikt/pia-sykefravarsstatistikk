@@ -51,6 +51,50 @@ class EdgeCasesSykefraværsstatistikkApiEndepunkterTest {
         }
     }
 
+    @Test
+    fun `Henter statistikk for virksomhet som er markert slettet i Altinn`() {
+        runBlocking {
+            kafkaContainerHelper.sendStatistikk(
+                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende(),
+            )
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende(),
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+                erSlettet = true,
+            )
+
+            val aggregertStatistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
+                orgnr = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende().orgnr,
+                config = withToken(),
+            )
+
+            aggregertStatistikkResponse.status shouldBe HttpStatusCode.OK
+        }
+    }
+
+    @Test
+    fun `Håndterer med eller uten erSlettet parameter fra Altinn`() {
+        runBlocking {
+            kafkaContainerHelper.sendStatistikk(
+                overordnetEnhet = overordnetEnhetIBransjeByggUtenInstitusjonellSektorKode.somOverordnetEnhet(),
+                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende(),
+            )
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende(),
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+                erSlettet = null,
+            )
+
+            val aggregertStatistikkResponse = TestContainerHelper.hentAggregertStatistikkResponse(
+                orgnr = underenhetIBransjeByggUtenInstitusjonellSektorKode.somNæringsdrivende().orgnr,
+                config = withToken(),
+            )
+
+            aggregertStatistikkResponse.status shouldBe HttpStatusCode.OK
+        }
+    }
+
     /*
        Data fra enhetsregisteret kan mangle noe informasjon, som for eksempel institusjonell sektor kode.
      * */

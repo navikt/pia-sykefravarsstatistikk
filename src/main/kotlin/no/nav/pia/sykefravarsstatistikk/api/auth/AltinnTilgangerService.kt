@@ -148,7 +148,9 @@ class AltinnTilgangerService {
             ).left()
         }
 
-    fun String.tilAltinnTilganger() = Json.decodeFromString<AltinnTilganger>(this)
+    val jsonParser = Json { ignoreUnknownKeys = true }
+
+    fun String.tilAltinnTilganger() = jsonParser.decodeFromString<AltinnTilganger>(this)
 
     @Serializable
     data class AltinnTilgang(
@@ -158,6 +160,7 @@ class AltinnTilgangerService {
         val underenheter: List<AltinnTilgang>,
         val navn: String,
         val organisasjonsform: String,
+        val erSlettet: Boolean = false,
     )
 
     @Serializable
