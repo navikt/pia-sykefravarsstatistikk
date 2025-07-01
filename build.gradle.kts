@@ -1,16 +1,16 @@
-val arrowCoreVersion = "2.1.1"
+val arrowCoreVersion = "2.1.2"
 val iaFellesVersion = "1.10.2"
-val kafkClientVersion = "3.9.0"
+val kafkClientVersion = "3.9.1"
 val kotestVersion = "5.9.1"
 val kotlinVersion = "2.2.0"
 val ktorVersion = "3.2.0"
 val logbackVersion = "1.5.18"
 val logstashLogbackEncoderVersion = "8.1"
-val mockOAuth2ServerVersion = "2.1.10"
-val mockServerVersion = "1.0.14"
-val nimbusJoseJwtVersion = "10.2"
-val prometeusVersion = "1.14.6"
-val testcontainersVersion = "1.21.0"
+val mockOAuth2ServerVersion = "2.2.1"
+val mockServerVersion = "1.0.19"
+val nimbusJoseJwtVersion = "10.3.1"
+val prometeusVersion = "1.15.1"
+val testcontainersVersion = "1.21.3"
 val testcontainersFakeGCSVersion = "0.2.0"
 val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
 
@@ -54,9 +54,9 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:$kafkClientVersion")
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.5")
+    implementation("org.postgresql:postgresql:42.7.7")
     implementation("com.zaxxer:HikariCP:6.3.0")
-    implementation("org.flywaydb:flyway-database-postgresql:11.8.1")
+    implementation("org.flywaydb:flyway-database-postgresql:11.10.0")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Felles definisjoner for IA-domenet
@@ -75,20 +75,6 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
-        implementation("net.minidev:json-smart") {
-            version {
-                require("2.5.2")
-            }
-            because(
-                "From Kotlin version: 1.7.20 -> Earlier versions of json-smart package are vulnerable to Denial of Service (DoS) due to a StackOverflowError when parsing a deeply nested JSON array or object.",
-            )
-        }
-        implementation("io.netty:netty-codec-http2") {
-            version {
-                require("4.2.0.Final")
-            }
-            because("From Ktor version: 2.3.5 -> io.netty:netty-codec-http2 vulnerable to HTTP/2 Rapid Reset Attack")
-        }
         testImplementation("org.apache.commons:commons-compress") {
             version {
                 require("1.27.1")
