@@ -75,6 +75,15 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
+        implementation("io.netty:netty-codec-http2") {
+            version {
+                require("4.2.4.Final")
+            }
+            because(
+                "ktor-server-netty har sårbar versjon",
+            )
+        }
+
         testImplementation("org.apache.commons:commons-compress") {
             version {
                 require("1.28.0")
