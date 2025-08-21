@@ -3,13 +3,13 @@ val iaFellesVersion = "1.10.2"
 val kafkClientVersion = "3.9.1"
 val kotestVersion = "5.9.1"
 val kotlinVersion = "2.2.0"
-val ktorVersion = "3.2.0"
+val ktorVersion = "3.2.3"
 val logbackVersion = "1.5.18"
 val logstashLogbackEncoderVersion = "8.1"
 val mockOAuth2ServerVersion = "2.2.1"
-val mockServerVersion = "1.0.19"
-val nimbusJoseJwtVersion = "10.3.1"
-val prometeusVersion = "1.15.1"
+val mockServerVersion = "1.1.1"
+val nimbusJoseJwtVersion = "10.4"
+val prometheusVersion = "1.15.3"
 val testcontainersVersion = "1.21.3"
 val testcontainersFakeGCSVersion = "0.2.0"
 val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
@@ -33,7 +33,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-double-receive:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer-jvm:$ktorVersion")
-    implementation("io.micrometer:micrometer-registry-prometheus:$prometeusVersion")
+    implementation("io.micrometer:micrometer-registry-prometheus:$prometheusVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
@@ -55,8 +55,8 @@ dependencies {
 
     // Database
     implementation("org.postgresql:postgresql:42.7.7")
-    implementation("com.zaxxer:HikariCP:6.3.0")
-    implementation("org.flywaydb:flyway-database-postgresql:11.10.0")
+    implementation("com.zaxxer:HikariCP:7.0.0")
+    implementation("org.flywaydb:flyway-database-postgresql:11.10.5")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Felles definisjoner for IA-domenet
@@ -77,7 +77,7 @@ dependencies {
     constraints {
         testImplementation("org.apache.commons:commons-compress") {
             version {
-                require("1.27.1")
+                require("1.28.0")
             }
             because("testcontainers har sårbar versjon")
         }
