@@ -24,3 +24,9 @@ spec:
     - team: pia
       application: pia-devops
       access: read
+    - team: fager
+      application: min-side-arbeidsgiver-api
+      access: read
+    - team: team-dialog
+      application: sf-sykefravarsstatistikk-metadata
+      access: read

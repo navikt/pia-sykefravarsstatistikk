@@ -20,7 +20,13 @@ spec:
       access: readwrite   # read, write, readwrite
     - team: pia
       application: lydia-api
-      access: read # read, write, readwrite
+      access: read
     - team: pia
       application: pia-devops
+      access: read
+    - team: fager
+      application: min-side-arbeidsgiver-api
+      access: read
+    - team: team-dialog
+      application: sf-sykefravarsstatistikk-bransje
       access: read
