@@ -1,5 +1,5 @@
 val arrowCoreVersion = "2.1.2"
-val iaFellesVersion = "1.10.2"
+val iaFellesVersion = "2.0.3"
 val kafkClientVersion = "3.9.1"
 val kotestVersion = "5.9.1"
 val kotlinVersion = "2.2.0"
