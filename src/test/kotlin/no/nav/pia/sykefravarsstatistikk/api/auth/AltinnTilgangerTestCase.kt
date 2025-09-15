@@ -2,16 +2,16 @@ package no.nav.pia.sykefravarsstatistikk.api.auth
 
 class AltinnTilgangerTestCase {
     companion object {
-
         // Respons fra arbeidsgiver-altinn-tilganger i dev-miljø: https://arbeidsgiver-altinn-tilganger.intern.dev.nav.no/swagger-ui#
-        val jsonResponseFraAltinnTilgangerIDevMiljø: String = """
+        val jsonResponseFraAltinnTilgangerIDevMiljø: String =
+            """
             {
               "isError": false,
               "hierarki": [
                 {
                   "orgnr": "310529915",
                   "altinn3Tilganger": [
-                    "nav_forebygge-og-redusere-sykefravar_samarbeid",
+                    "nav_forebygge-og-redusere-sykefravar_ia-samarbeid",
                     "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk",
                     "nav_permittering-og-nedbemmaning_innsyn-i-alle-innsendte-meldinger",
                     "nav_sosialtjenester_digisos-avtale"
@@ -41,7 +41,7 @@ class AltinnTilgangerTestCase {
                     {
                       "orgnr": "311874411",
                       "altinn3Tilganger": [
-                        "nav_forebygge-og-redusere-sykefravar_samarbeid",
+                        "nav_forebygge-og-redusere-sykefravar_ia-samarbeid",
                         "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk",
                         "nav_permittering-og-nedbemmaning_innsyn-i-alle-innsendte-meldinger",
                         "nav_sosialtjenester_digisos-avtale"
@@ -78,7 +78,7 @@ class AltinnTilgangerTestCase {
                 {
                   "orgnr": "313068420",
                   "altinn3Tilganger": [
-                    "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                    "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                   ],
                   "altinn2Tilganger": [
                     "5934:1",
@@ -91,7 +91,7 @@ class AltinnTilgangerTestCase {
                     {
                       "orgnr": "315829062",
                       "altinn3Tilganger": [
-                        "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                        "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                       ],
                       "altinn2Tilganger": [
                         "5934:1",
@@ -123,7 +123,7 @@ class AltinnTilgangerTestCase {
                 {
                   "orgnr": "313901637",
                   "altinn3Tilganger": [
-                    "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                    "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                   ],
                   "altinn2Tilganger": [
                     "5934:1"
@@ -132,7 +132,7 @@ class AltinnTilgangerTestCase {
                     {
                       "orgnr": "311284568",
                       "altinn3Tilganger": [
-                        "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                        "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                       ],
                       "altinn2Tilganger": [
                         "5934:1"
@@ -167,7 +167,7 @@ class AltinnTilgangerTestCase {
                   "5278:1",
                   "5078:1",
                   "5902:1",
-                  "nav_forebygge-og-redusere-sykefravar_samarbeid",
+                  "nav_forebygge-og-redusere-sykefravar_ia-samarbeid",
                   "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk",
                   "nav_permittering-og-nedbemmaning_innsyn-i-alle-innsendte-meldinger",
                   "nav_sosialtjenester_digisos-avtale"
@@ -178,7 +178,7 @@ class AltinnTilgangerTestCase {
                 ],
                 "311284568": [
                   "5934:1",
-                  "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                  "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                 ],
                 "311874411": [
                   "5934:1",
@@ -200,7 +200,7 @@ class AltinnTilgangerTestCase {
                   "5278:1",
                   "5078:1",
                   "5902:1",
-                  "nav_forebygge-og-redusere-sykefravar_samarbeid",
+                  "nav_forebygge-og-redusere-sykefravar_ia-samarbeid",
                   "nav_forebygge-og-redusere-sykefravar_sykefravarsstatistikk",
                   "nav_permittering-og-nedbemmaning_innsyn-i-alle-innsendte-meldinger",
                   "nav_sosialtjenester_digisos-avtale"
@@ -211,11 +211,11 @@ class AltinnTilgangerTestCase {
                   "4936:1",
                   "5078:1",
                   "5902:1",
-                  "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                  "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                 ],
                 "313901637": [
                   "5934:1",
-                  "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                  "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                 ],
                 "315829062": [
                   "5934:1",
@@ -223,7 +223,7 @@ class AltinnTilgangerTestCase {
                   "4936:1",
                   "5078:1",
                   "5902:1",
-                  "nav_forebygge-og-redusere-sykefravar_samarbeid"
+                  "nav_forebygge-og-redusere-sykefravar_ia-samarbeid"
                 ]
               },
               "tilgangTilOrgNr": {
@@ -316,7 +316,7 @@ class AltinnTilgangerTestCase {
                   "313068420",
                   "315829062"
                 ],
-                "nav_forebygge-og-redusere-sykefravar_samarbeid": [
+                "nav_forebygge-og-redusere-sykefravar_ia-samarbeid": [
                   "310529915",
                   "311874411",
                   "313068420",
@@ -339,6 +339,6 @@ class AltinnTilgangerTestCase {
                 ]
               }
             }
-        """.trimIndent()
+            """.trimIndent()
     }
 }
