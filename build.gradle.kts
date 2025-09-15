@@ -7,16 +7,16 @@ val ktorVersion = "3.2.3"
 val logbackVersion = "1.5.18"
 val logstashLogbackEncoderVersion = "8.1"
 val mockOAuth2ServerVersion = "2.2.1"
-val mockServerVersion = "1.1.1"
+val mockServerVersion = "1.1.3"
 val nimbusJoseJwtVersion = "10.4"
-val prometheusVersion = "1.15.3"
+val prometheusVersion = "1.15.4"
 val testcontainersVersion = "1.21.3"
 val testcontainersFakeGCSVersion = "0.2.0"
 val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
 
 plugins {
-    kotlin("jvm") version "2.2.0"
-    kotlin("plugin.serialization") version "2.2.0"
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.serialization") version "2.2.20"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
@@ -55,7 +55,7 @@ dependencies {
 
     // Database
     implementation("org.postgresql:postgresql:42.7.7")
-    implementation("com.zaxxer:HikariCP:7.0.0")
+    implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.flywaydb:flyway-database-postgresql:11.10.5")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
@@ -77,7 +77,7 @@ dependencies {
     constraints {
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.2.4.Final")
+                require("4.2.6.Final")
             }
             because(
                 "ktor-server-netty har sårbar versjon",
