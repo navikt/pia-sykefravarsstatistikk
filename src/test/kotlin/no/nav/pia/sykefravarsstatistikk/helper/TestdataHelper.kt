@@ -37,7 +37,7 @@ class TestdataHelper {
             orgnr = this.organisasjonsnummer,
             navn = this.navn,
             antallAnsatte = this.antallAnsatte?: 0,
-            næringskode = this.naeringskode1!!.tilDomene(),
+            næringskode = this.naeringskode1!!.tilDomene()!!,
             overordnetEnhetOrgnr = this.overordnetEnhet,
         )
 
@@ -51,7 +51,7 @@ class TestdataHelper {
             orgnr = this.organisasjonsnummer,
             navn = this.navn,
             antallAnsatte = this.antallAnsatte,
-            næringskode = this.naeringskode1.tilDomene(),
+            næringskode = this.naeringskode1?.tilDomene(),
             sektor = this.institusjonellSektorkode?.tilDomene(),
         )
 
@@ -239,6 +239,24 @@ class TestdataHelper {
                 overordnetEnhet = overordnetEnhetMedUnderenhetUtenNæringskode.organisasjonsnummer,
             )
 
+        val overordnetEnhetUtenNæringskode =
+            BrregEnhetDto(
+                organisasjonsnummer = "100000023",
+                navn = "Overordnet Enhet Uten Næringskode",
+                antallAnsatte = 150,
+                naeringskode1 = null,
+                institusjonellSektorkode = PRIVAT_AKS,
+            )
+
+        val underenhetMedOverordnetEnhetSomIkkeHarNæringskode =
+            BrregUnderenhetDto(
+                organisasjonsnummer = "100000024",
+                navn = "Underenhet Som Er Knyttet Til En Overenhet Uten Næringskode",
+                antallAnsatte = 150,
+                naeringskode1 = UTVINNING_AV_RÅOLJE_OG_GASS,
+                overordnetEnhet = overordnetEnhetUtenNæringskode.organisasjonsnummer,
+            )
+
         val virksomheterMedBransje: List<Pair<BrregEnhetDto, BrregUnderenhetDto>> =
             listOf(
                 Pair(overordnetEnhetIBransjeBarnehage, underenhetIBransjeBarnehage),
@@ -264,6 +282,10 @@ class TestdataHelper {
                 Pair(
                     overordnetEnhetMedUnderenhetUtenNæringskode,
                     underenhetUtenNæringskode,
+                ),
+                Pair(
+                    overordnetEnhetUtenNæringskode,
+                    underenhetMedOverordnetEnhetSomIkkeHarNæringskode,
                 ),
             )
 
