@@ -42,7 +42,7 @@ class StatistikkEksportNæringskodeTest {
 
     @Test
     fun `sykefraværsstatistikk for kategori NÆRINGSKODE blir eksportert til kafka`() {
-        val næringskode: Næringskode = "88.911".tilNæringskode()
+        val næringskode: Næringskode = "88.911".tilNæringskode()!!
         kafkaContainerHelper.sendNæringskodestatistikk(næringskode = næringskode)
 
         val importKode = næringskode.femsifferIdentifikator
@@ -116,6 +116,6 @@ class StatistikkEksportNæringskodeTest {
         val ugyldigNæringskode = "-0.002"
         kafkaContainerHelper.sendUgyldigNæringskodestatistikk(næringskode = ugyldigNæringskode)
 
-        applikasjon.shouldContainLog("Ignorerer ugyldig næringskode '$ugyldigNæringskode'".toRegex())
+        applikasjon.shouldContainLog("Utledet næringskode ble null, kjører ikke eksport for mottatt næringskode '$ugyldigNæringskode'".toRegex())
     }
 }

@@ -19,7 +19,7 @@ data class BrregUnderenhetDto(
                 orgnr = organisasjonsnummer,
                 overordnetEnhetOrgnr = overordnetEnhet,
                 navn = navn,
-                næringskode = naeringskode1.tilDomene(),
+                næringskode = naeringskode1.tilDomene()!!,
                 antallAnsatte = antallAnsatte?: 0,
             )
         } else {

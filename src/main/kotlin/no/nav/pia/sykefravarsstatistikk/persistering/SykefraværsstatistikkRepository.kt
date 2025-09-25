@@ -270,7 +270,7 @@ class SykefraværsstatistikkRepository(
 
     private fun Row.tilUmaskertNæringskodestatistikk(): UmaskertSykefraværsstatistikkForEttKvartalNæringskode =
         UmaskertSykefraværsstatistikkForEttKvartalNæringskode(
-            næringskode = string("naringskode").tilNæringskode(),
+            næringskode = string("naringskode").tilNæringskode()!!,
             årstall = int("arstall"),
             kvartal = int("kvartal"),
             antallPersoner = int("antall_personer"),
