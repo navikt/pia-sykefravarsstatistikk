@@ -10,7 +10,7 @@ import no.nav.pia.sykefravarsstatistikk.domene.OverordnetEnhet
 data class BrregEnhetDto(
     val organisasjonsnummer: String,
     val navn: String,
-    val naeringskode1: BrregNæringskodeDto,
+    val naeringskode1: BrregNæringskodeDto? = null,
     val overordnetEnhet: String? = null,
     val antallAnsatte: Int = 0,
     val institusjonellSektorkode: BrregInstitusjonellSektorkodeDto? = null,
@@ -19,7 +19,7 @@ data class BrregEnhetDto(
         OverordnetEnhet(
             orgnr = this.organisasjonsnummer,
             navn = this.navn,
-            næringskode = this.naeringskode1.tilDomene(),
+            næringskode = this.naeringskode1?.tilDomene(),
             antallAnsatte = this.antallAnsatte,
             sektor = this.institusjonellSektorkode?.tilDomene(),
         )

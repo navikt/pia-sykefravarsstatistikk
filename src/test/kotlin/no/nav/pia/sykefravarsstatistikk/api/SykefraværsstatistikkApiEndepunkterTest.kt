@@ -30,6 +30,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordn
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringProduksjonAvMatfisk
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringSkogskjøtsel
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetINæringUtleieAvEiendom
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.overordnetEnhetUtenNæringskode
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somNæringsdrivende
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.somOverordnetEnhet
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetIBransjeAnlegg
@@ -38,6 +39,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenh
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringProduksjonAvMatfisk
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringSkogskjøtsel
 import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetINæringUtleieAvEiendom
+import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenhetMedOverordnetEnhetSomIkkeHarNæringskode
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.persistering.ImporttidspunktRepository.Companion.NÅVÆRENDE_KVARTAL
 import kotlin.test.BeforeTest
@@ -519,6 +521,26 @@ class SykefraværsstatistikkApiEndepunkterTest {
                 .firstOrNull { it.statistikkategori == VIRKSOMHET }
             virksomhetStatistikk.shouldNotBeNull()
             virksomhetStatistikk.label shouldBe underenhetIBransjeBarnehage.navn
+        }
+    }
+
+    @Test
+    fun `Håndterer manglende næringskode på overordnet enhet fra brreg`() {
+        runBlocking {
+            kafkaContainerHelper.sendStatistikk(
+                overordnetEnhet = overordnetEnhetUtenNæringskode.somOverordnetEnhet(),
+                underenhet = underenhetMedOverordnetEnhetSomIkkeHarNæringskode.somNæringsdrivende(),
+            )
+            altinnTilgangerContainerHelper.leggTilRettigheter(
+                underenhet = underenhetMedOverordnetEnhetSomIkkeHarNæringskode.somNæringsdrivende(),
+                altinn3Rettighet = ENKELRETTIGHET_SYKEFRAVÆRSSTATISTIKK_ALTINN_3,
+            )
+
+            val result = TestContainerHelper.hentAggregertStatistikk(
+                orgnr = underenhetMedOverordnetEnhetSomIkkeHarNæringskode.somNæringsdrivende().orgnr,
+                config = withToken(),
+            )
+            result.shouldNotBeNull()
         }
     }
 }

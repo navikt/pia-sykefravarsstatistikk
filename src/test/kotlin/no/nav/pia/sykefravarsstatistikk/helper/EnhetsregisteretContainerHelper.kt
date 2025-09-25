@@ -133,8 +133,8 @@ class EnhetsregisteretContainerHelper(
         val næringskode = if (underenhet.naeringskode1 != null) {
             """
               "naeringskode1": {
-                "kode": "${underenhet.naeringskode1!!.kode}",
-                "beskrivelse": "${underenhet.naeringskode1!!.beskrivelse}"
+                "kode": "${underenhet.naeringskode1.kode}",
+                "beskrivelse": "${underenhet.naeringskode1.beskrivelse}"
               },
             """.trimIndent()
         } else {
@@ -219,8 +219,8 @@ class EnhetsregisteretContainerHelper(
         val institusjonellSektorkode = if (overordnetEnhet.institusjonellSektorkode != null) {
             """
             "institusjonellSektorkode": {
-                "kode": "${overordnetEnhet.institusjonellSektorkode!!.kode}",
-                "beskrivelse": "${overordnetEnhet.institusjonellSektorkode!!.beskrivelse}"
+                "kode": "${overordnetEnhet.institusjonellSektorkode.kode}",
+                "beskrivelse": "${overordnetEnhet.institusjonellSektorkode.beskrivelse}"
             },
             """.trimIndent()
         } else {
@@ -251,8 +251,8 @@ class EnhetsregisteretContainerHelper(
                       "registreringsdatoEnhetsregisteret": "1992-09-18",
                       "registrertIMvaregisteret": true,
                       "naeringskode1": {
-                        "kode": "${overordnetEnhet.naeringskode1.kode}",
-                        "beskrivelse": "${overordnetEnhet.naeringskode1.beskrivelse}"
+                        "kode": "${overordnetEnhet.naeringskode1?.kode}",
+                        "beskrivelse": "${overordnetEnhet.naeringskode1?.beskrivelse}"
                       },
                       "antallAnsatte": ${overordnetEnhet.antallAnsatte},
                       "harRegistrertAntallAnsatte": true,

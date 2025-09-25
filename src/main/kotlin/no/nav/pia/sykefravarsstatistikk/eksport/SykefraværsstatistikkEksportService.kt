@@ -69,16 +69,22 @@ class SykefraværsstatistikkEksportService(
                 )
             }
             is NæringskodeSykefraværsstatistikkDto -> {
-                val næringskode = try {
+                val næringskode: Næringskode? = try {
                     sykefraværstatistikkDto.næringskode.tilNæringskode()
                 } catch (e: IllegalArgumentException) {
                     logger.warn("Ignorerer ugyldig næringskode '${sykefraværstatistikkDto.næringskode}'", e)
                     return
                 }
-                eksporterSykefraværsstatistikkNæringskode(
-                    eksportkvartal = eksportkvartal,
-                    næringskode = næringskode,
-                )
+
+                if (næringskode != null) {
+                    eksporterSykefraværsstatistikkNæringskode(
+                        eksportkvartal = eksportkvartal,
+                        næringskode = næringskode,
+                    )
+                } else {
+                    logger.warn("Utledet næringskode ble null, kjører ikke eksport for mottatt næringskode '${sykefraværstatistikkDto.næringskode}'")
+                    return
+                }
             }
             is VirksomhetSykefraværsstatistikkDto -> {
                 val orgnummer = sykefraværstatistikkDto.orgnr
