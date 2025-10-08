@@ -3,10 +3,10 @@ val iaFellesVersion = "2.0.3"
 val kafkClientVersion = "4.1.0"
 val kotestVersion = "6.0.3"
 val kotlinVersion = "2.2.20"
-val ktorVersion = "3.3.0"
-val logbackVersion = "1.5.18"
+val ktorVersion = "3.3.1"
+val logbackVersion = "1.5.19"
 val logstashLogbackEncoderVersion = "8.1"
-val mockOAuth2ServerVersion = "2.3.0"
+val mockOAuth2ServerVersion = "3.0.0"
 val mockServerVersion = "1.1.3"
 val nimbusJoseJwtVersion = "10.5"
 val prometheusVersion = "1.15.4"
@@ -44,7 +44,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
     // Logging (inkl. auditlogg)
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -54,9 +54,9 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:$kafkClientVersion")
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.7")
+    implementation("org.postgresql:postgresql:42.7.8")
     implementation("com.zaxxer:HikariCP:7.0.2")
-    implementation("org.flywaydb:flyway-database-postgresql:11.12.0")
+    implementation("org.flywaydb:flyway-database-postgresql:11.13.3")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Felles definisjoner for IA-domenet
