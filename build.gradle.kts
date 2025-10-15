@@ -17,7 +17,12 @@ val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
 plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.20"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("application")
+}
+
+application {
+    mainClass.set("no.nav.pia.sykefravarsstatistikk.ApplicationKt")
+    applicationName = "app"
 }
 
 group = "no.nav"
@@ -101,17 +106,5 @@ dependencies {
                 """.trimIndent(),
             )
         }
-    }
-}
-
-tasks {
-    shadowJar {
-        mergeServiceFiles()
-        manifest {
-            attributes("Main-Class" to "no.nav.pia.sykefravarsstatistikk.ApplicationKt")
-        }
-    }
-    test {
-        dependsOn(shadowJar)
     }
 }
