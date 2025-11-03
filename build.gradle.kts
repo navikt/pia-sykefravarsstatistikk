@@ -1,22 +1,22 @@
 val arrowCoreVersion = "2.1.2"
 val iaFellesVersion = "2.0.3"
 val kafkClientVersion = "4.1.0"
-val kotestVersion = "6.0.3"
-val kotlinVersion = "2.2.20"
+val kotestVersion = "6.0.4"
+val kotlinVersion = "2.2.21"
 val ktorVersion = "3.3.1"
-val logbackVersion = "1.5.19"
+val logbackVersion = "1.5.20"
 val logstashLogbackEncoderVersion = "8.1"
 val mockOAuth2ServerVersion = "3.0.0"
 val mockServerVersion = "1.1.3"
 val nimbusJoseJwtVersion = "10.5"
-val prometheusVersion = "1.15.4"
+val prometheusVersion = "1.15.5"
 val testcontainersVersion = "1.21.3"
 val testcontainersFakeGCSVersion = "0.2.0"
 val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
 
 plugins {
-    kotlin("jvm") version "2.2.20"
-    kotlin("plugin.serialization") version "2.2.20"
+    kotlin("jvm") version "2.2.21"
+    kotlin("plugin.serialization") version "2.2.21"
     id("application")
 }
 
@@ -82,7 +82,7 @@ dependencies {
     constraints {
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.2.6.Final")
+                require("4.2.7.Final")
             }
             because(
                 "ktor-server-netty har sårbar versjon",
