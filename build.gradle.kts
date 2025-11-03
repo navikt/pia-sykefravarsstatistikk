@@ -1,5 +1,6 @@
-val arrowCoreVersion = "2.1.2"
+val arrowCoreVersion = "2.2.0"
 val iaFellesVersion = "2.0.3"
+val flywayPostgresqlVersion = "11.15.0"
 val kafkClientVersion = "4.1.0"
 val kotestVersion = "6.0.4"
 val kotlinVersion = "2.2.21"
@@ -7,7 +8,7 @@ val ktorVersion = "3.3.1"
 val logbackVersion = "1.5.20"
 val logstashLogbackEncoderVersion = "8.1"
 val mockOAuth2ServerVersion = "3.0.0"
-val mockServerVersion = "1.1.3"
+val mockServerVersion = "1.3.0"
 val nimbusJoseJwtVersion = "10.5"
 val prometheusVersion = "1.15.5"
 val testcontainersVersion = "1.21.3"
@@ -61,7 +62,7 @@ dependencies {
     // Database
     implementation("org.postgresql:postgresql:42.7.8")
     implementation("com.zaxxer:HikariCP:7.0.2")
-    implementation("org.flywaydb:flyway-database-postgresql:11.13.3")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayPostgresqlVersion")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Felles definisjoner for IA-domenet
@@ -97,7 +98,7 @@ dependencies {
         }
         testImplementation("com.jayway.jsonpath:json-path") {
             version {
-                require("2.9.0")
+                require("2.10.0")
             }
             because(
                 """
