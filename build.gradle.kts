@@ -28,6 +28,12 @@ application {
     applicationName = "app"
 }
 
+tasks {
+    test {
+        dependsOn(installDist)
+    }
+}
+
 group = "no.nav"
 
 repositories {
