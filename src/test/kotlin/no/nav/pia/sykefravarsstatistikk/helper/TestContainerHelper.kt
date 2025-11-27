@@ -43,7 +43,7 @@ class TestContainerHelper {
         val kafkaContainerHelper = KafkaContainerHelper(network = network, log = log)
 
         // Setter lokal dato for å kunne teste /publiseringsdato uten å være avhengig av tidspunktet testen kjører
-        private val lokalDato = LocalDateTime.parse("2025-03-01T15:59:59")
+        private val lokalDato = LocalDateTime.parse("2025-11-27T15:59:59")
 
         val applikasjon: GenericContainer<*> = GenericContainer(
             ImageFromDockerfile().withDockerfile(Path("./Dockerfile")),
