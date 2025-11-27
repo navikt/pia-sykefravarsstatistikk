@@ -8,10 +8,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.dto.PubliseringskalenderDto
+import no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.altinnTilgangerContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.kafkaContainerHelper
-import no.nav.pia.sykefravarsstatistikk.helper.TestContainerHelper.Companion.postgresContainerHelper
 import no.nav.pia.sykefravarsstatistikk.helper.withToken
 import no.nav.pia.sykefravarsstatistikk.persistering.PubliseringsdatoDto
 import kotlin.test.BeforeTest
@@ -22,13 +22,13 @@ class PubliseringsdatoEndepunktTest {
     fun setup() {
         runBlocking {
             altinnTilgangerContainerHelper.slettAlleRettigheter()
-            postgresContainerHelper.slettAllData("publiseringsdatoer")
         }
     }
 
     @Test
     fun `Innlogget bruker får riktig publiseringsdato ift dagens dato`() {
         runBlocking {
+            // OBS det finnes allerede en publiseringsdato i DB lagret via script
             kafkaContainerHelper.sendPubliseringsdatoer(
                 listOf(
                     PubliseringsdatoDto(
@@ -46,6 +46,11 @@ class PubliseringsdatoEndepunktTest {
                         offentligDato = LocalDateTime.parse("2025-09-01T08:00:00"),
                         oppdatertIDvh = LocalDateTime.parse("2024-12-02T10:59:59"),
                     ),
+                    PubliseringsdatoDto(
+                        rapportPeriode = "202503",
+                        offentligDato = LocalDateTime.parse("2025-11-27T08:00:00"),
+                        oppdatertIDvh = LocalDateTime.parse("2024-12-02T10:59:59"),
+                    ),
                 ),
             )
 
@@ -56,9 +61,9 @@ class PubliseringsdatoEndepunktTest {
             response.status.value shouldBe 200
             val dato = Json.decodeFromString<PubliseringskalenderDto>(response.bodyAsText())
             dato shouldNotBe null
-            dato.nestePubliseringsdato shouldBe LocalDate.parse("2025-06-01")
-            dato.sistePubliseringsdato shouldBe LocalDate.parse("2025-02-27")
-            dato.gjeldendePeriode shouldBe no.nav.pia.sykefravarsstatistikk.domene.ÅrstallOgKvartal(2024, 4)
+            dato.nestePubliseringsdato shouldBe LocalDate.parse("2026-02-26")
+            dato.sistePubliseringsdato shouldBe LocalDate.parse("2025-11-27")
+            dato.gjeldendePeriode shouldBe ÅrstallOgKvartal(2025, 3)
         }
     }
 }
