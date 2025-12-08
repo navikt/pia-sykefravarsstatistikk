@@ -1,7 +1,7 @@
 val arrowCoreVersion = "2.2.0"
 val iaFellesVersion = "2.0.4"
 val flywayPostgresqlVersion = "11.15.0"
-val kafkClientVersion = "4.1.0"
+val kafkaClientVersion = "4.1.0"
 val kotestVersion = "6.0.4"
 val kotlinVersion = "2.2.21"
 val ktorVersion = "3.3.1"
@@ -65,7 +65,11 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$opentelemetryLogbackMdcVersion")
     // Kafka
-    implementation("org.apache.kafka:kafka-clients:$kafkClientVersion")
+    implementation("at.yawk.lz4:lz4-java:1.10.1")
+    implementation("org.apache.kafka:kafka-clients:$kafkaClientVersion") {
+        // "Fikser CVE-2025-12183 - lz4-java >1.8.1 har sårbar versjon (transitive dependency fra kafka-clients:4.1.0)"
+        exclude("org.lz4", "lz4-java")
+    }
 
     // Database
     implementation("org.postgresql:postgresql:42.7.8")
@@ -89,19 +93,6 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
-        implementation("org.lz4:lz4-java") {
-            modules {
-                module("org.lz4:lz4-java") {
-                    replacedBy("at.yawk.lz4:lz4-java", "Fork of the original unmaintained lz4-java library that fixes a CVE")
-                }
-            }
-            version {
-                require("1.8.1")
-            }
-            because(
-                "Fikser CVE-2025-12183 - lz4-java 1.8.0 har sårbar versjon (transitive dependency fra kafka-clients:4.1.0)",
-            )
-        }
         implementation("io.netty:netty-codec-http2") {
             version {
                 require("4.2.7.Final")
