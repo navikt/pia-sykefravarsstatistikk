@@ -1,17 +1,17 @@
 val arrowCoreVersion = "2.2.0"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "11.15.0"
-val kafkaClientVersion = "4.1.0"
-val kotestVersion = "6.0.4"
+val flywayPostgresqlVersion = "11.20.2"
+val kafkaClientVersion = "4.1.1"
+val kotestVersion = "6.0.7"
 val kotlinVersion = "2.2.21"
-val ktorVersion = "3.3.1"
-val logbackVersion = "1.5.20"
+val ktorVersion = "3.3.3"
+val logbackVersion = "1.5.24"
 val logstashLogbackEncoderVersion = "9.0"
-val mockOAuth2ServerVersion = "3.0.0"
-val mockServerVersion = "1.3.0"
-val nimbusJoseJwtVersion = "10.5"
-val prometheusVersion = "1.15.5"
-val testcontainersVersion = "2.0.1"
+val mockOAuth2ServerVersion = "3.0.1"
+val mockServerVersion = "1.3.1"
+val nimbusJoseJwtVersion = "10.7"
+val prometheusVersion = "1.16.2"
+val testcontainersVersion = "2.0.3"
 val testcontainersFakeGCSVersion = "0.2.0"
 val testcontainersKafkaVersion = "1.21.3"
 val testcontainersPostgresqlVersion = "1.21.3"
@@ -65,14 +65,14 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$opentelemetryLogbackMdcVersion")
     // Kafka
-    implementation("at.yawk.lz4:lz4-java:1.10.1")
+    implementation("at.yawk.lz4:lz4-java:1.10.2")
     implementation("org.apache.kafka:kafka-clients:$kafkaClientVersion") {
         // "Fikser CVE-2025-12183 - lz4-java >1.8.1 har sårbar versjon (transitive dependency fra kafka-clients:4.1.0)"
         exclude("org.lz4", "lz4-java")
     }
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.8")
+    implementation("org.postgresql:postgresql:42.7.9")
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayPostgresqlVersion")
     implementation("com.github.seratch:kotliquery:1.9.1")
@@ -95,7 +95,7 @@ dependencies {
     constraints {
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.2.7.Final")
+                require("4.2.9.Final")
             }
             because(
                 "ktor-server-netty har sårbar versjon",
