@@ -3,7 +3,7 @@ val iaFellesVersion = "2.0.4"
 val flywayPostgresqlVersion = "11.20.2"
 val kafkaClientVersion = "4.1.1"
 val kotestVersion = "6.1.3"
-val kotlinVersion = "2.3.10"
+val kotlinVersion = "2.3.0"
 val ktorVersion = "3.4.0"
 val logbackVersion = "1.5.29"
 val logstashLogbackEncoderVersion = "9.0"
@@ -18,8 +18,8 @@ val testcontainersPostgresqlVersion = "1.21.4"
 val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
 
 plugins {
-    kotlin("jvm") version "2.3.10"
-    kotlin("plugin.serialization") version "2.3.10"
+    kotlin("jvm") version "2.3.0"
+    kotlin("plugin.serialization") version "2.3.0"
     id("application")
 }
 
