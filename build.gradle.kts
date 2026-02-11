@@ -1,6 +1,6 @@
 val arrowCoreVersion = "2.2.1"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "12.0.0"
+val flywayPostgresqlVersion = "11.20.2"
 val kafkaClientVersion = "4.1.1"
 val kotestVersion = "6.1.3"
 val kotlinVersion = "2.3.10"
