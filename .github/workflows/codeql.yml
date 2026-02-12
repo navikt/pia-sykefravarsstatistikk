@@ -1,4 +1,6 @@
 name: "CodeQL"
+permissions: {}
+
 on:
   push:
     branches: [ "main" ]
@@ -6,21 +8,20 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '37 1 * * 1'
-  workflow_dispatch:
 jobs:
   analyze-kotlin:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     permissions:
       security-events: write
       packages: read
       actions: read
       contents: read
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -49,7 +50,7 @@ jobs:
       actions: read
       contents: read
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
 
