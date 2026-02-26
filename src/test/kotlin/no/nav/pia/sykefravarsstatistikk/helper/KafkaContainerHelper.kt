@@ -217,8 +217,8 @@ class KafkaContainerHelper(
 
     fun sendVirksomhetsstatistikk(
         virksomhet: Virksomhet,
-        startÅr: Int = 2010,
-        sluttÅr: Int = 2024,
+        startÅr: Int = NÅVÆRENDE_KVARTAL.årstall - 5,
+        sluttÅr: Int = NÅVÆRENDE_KVARTAL.årstall,
     ) {
         for (år in startÅr..sluttÅr) {
             for (kvartal in 1..4) {

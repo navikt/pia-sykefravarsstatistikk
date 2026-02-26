@@ -11,7 +11,7 @@ class ImporttidspunktRepository(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {
-        val NÅVÆRENDE_KVARTAL = ÅrstallOgKvartal(årstall = 2025, kvartal = 3)
+        val NÅVÆRENDE_KVARTAL = ÅrstallOgKvartal(årstall = 2025, kvartal = 4)
     }
 
     fun hentNyesteImporterteKvartal(): ÅrstallOgKvartal {
