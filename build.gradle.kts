@@ -93,31 +93,13 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOAuth2ServerVersion")
 
     constraints {
-        implementation("io.netty:netty-codec-http2") {
-            version {
-                require("4.2.10.Final")
-            }
-            because(
-                "ktor-server-netty har sårbar versjon",
-            )
+        implementation("com.fasterxml.jackson.core:jackson-core") {
+            version { require("2.21.1") }
+            because("versjoner < 2.21.1 har sårbarhet. inkludert i ktor-server-auth:3.4.0")
         }
-
-        testImplementation("org.apache.commons:commons-compress") {
-            version {
-                require("1.28.0")
-            }
-            because("testcontainers har sårbar versjon")
-        }
-        testImplementation("com.jayway.jsonpath:json-path") {
-            version {
-                require("2.10.0")
-            }
-            because(
-                """
-                json-path v2.8.0 was discovered to contain a stack overflow via the Criteria.parse() method.
-                introdusert gjennom io.kotest:kotest-assertions-json:5.8.0
-                """.trimIndent(),
-            )
+        implementation("tools.jackson.core:jackson-core") {
+            version { require("3.1.0") }
+            because("versjoner < 3.1.0 har sårbarhet. inkludert i logstash-logback-encoder:9.0")
         }
     }
 }
