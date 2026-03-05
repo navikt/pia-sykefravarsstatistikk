@@ -1,25 +1,25 @@
-val arrowCoreVersion = "2.2.1"
+val arrowCoreVersion = "2.2.1.1"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "12.0.0"
-val kafkaClientVersion = "4.1.1"
-val kotestVersion = "6.1.3"
-val kotlinVersion = "2.3.0" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
+val flywayPostgresqlVersion = "12.0.2"
+val kafkaClientVersion = "4.2.0"
+val kotestVersion = "6.1.4"
+val kotlinVersion = "2.3.10" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.4.0"
-val logbackVersion = "1.5.29"
+val logbackVersion = "1.5.32"
 val logstashLogbackEncoderVersion = "9.0"
 val mockOAuth2ServerVersion = "3.0.1"
 val mockServerVersion = "2.0.2"
-val nimbusJoseJwtVersion = "10.7"
+val nimbusJoseJwtVersion = "10.8"
 val prometheusVersion = "1.16.3"
 val testcontainersVersion = "2.0.3"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
-val opentelemetryLogbackMdcVersion = "2.16.0-alpha"
+val opentelemetryLogbackMdcVersion = "2.25.0-alpha"
 
 plugins {
-    kotlin("jvm") version "2.3.0"
-    kotlin("plugin.serialization") version "2.3.0"
+    kotlin("jvm") version "2.3.10"
+    kotlin("plugin.serialization") version "2.3.10"
     id("application")
 }
 
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat")
     // Logging (inkl. auditlogg)
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -72,7 +72,7 @@ dependencies {
     }
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.9")
+    implementation("org.postgresql:postgresql:42.7.10")
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayPostgresqlVersion")
     implementation("com.github.seratch:kotliquery:1.9.1")
