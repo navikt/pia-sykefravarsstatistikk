@@ -1,6 +1,6 @@
 val arrowCoreVersion = "2.2.1.1"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "12.0.2"
+val flywayPostgresqlVersion = "12.0.3"
 val kafkaClientVersion = "4.2.0"
 val kotestVersion = "6.1.4"
 val kotlinVersion = "2.3.10" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
