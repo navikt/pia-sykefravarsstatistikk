@@ -30,13 +30,13 @@ jobs:
       - name: Compile, run tests and build
         run: ./gradlew test installDist
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
         with:
           platforms: linux/amd64,linux/arm64
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # release v3.12.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # release v4.0.0
       - name: Build and push docker image
-        uses: nais/docker-build-push@ae613eff6f44f0323476eda1c3994a7c518761c3 # tag v0
+        uses: nais/docker-build-push@078e460885ed0424b60d45ce9220b4be1748be9d # tag v0
         id: docker-push
         with:
           team: pia
