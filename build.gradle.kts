@@ -109,5 +109,21 @@ dependencies {
                 "versjoner < 4.2.10.Final har sårbarhet. inkludert i ktor-server-netty-jvm:3.4.2",
             )
         }
+        testImplementation("org.bouncycastle:bcprov-jdk18on") {
+            version {
+                require("1.84")
+            }
+            because(
+                "versjoner < 1.84 har sårbarhet. inkludert i no.nav.security:mock-oauth2-server:3.0.1",
+            )
+        }
+        testImplementation("org.bouncycastle:bcpkix-jdk18on") {
+            version {
+                require("1.84")
+            }
+            because(
+                "versjoner < 1.84 har sårbarhet. inkludert i no.nav.security:mock-oauth2-server:3.0.1",
+            )
+        }
     }
 }
