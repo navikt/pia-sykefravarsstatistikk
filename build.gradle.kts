@@ -72,7 +72,7 @@ dependencies {
     }
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.10")
+    implementation("org.postgresql:postgresql:42.7.11")
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayPostgresqlVersion")
     implementation("com.github.seratch:kotliquery:1.9.1")
