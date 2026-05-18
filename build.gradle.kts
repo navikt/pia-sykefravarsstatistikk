@@ -1,21 +1,21 @@
 val arrowCoreVersion = "2.2.2.1"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "12.3.0"
+val flywayPostgresqlVersion = "12.6.0"
 val kafkaClientVersion = "4.2.0"
 val kotestVersion = "6.1.11"
-val kotlinVersion = "2.3.20" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
-val ktorVersion = "3.4.2"
+val kotlinVersion = "2.3.21" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
+val ktorVersion = "3.4.3"
 val logbackVersion = "1.5.32"
 val logstashLogbackEncoderVersion = "9.0"
-val mockOAuth2ServerVersion = "3.0.1"
-val mockServerVersion = "2.50.5"
+val mockOAuth2ServerVersion = "3.0.3"
+val mockServerVersion = "2.50.8"
 val nimbusJoseJwtVersion = "10.9"
-val prometheusVersion = "1.16.4"
-val testcontainersVersion = "2.0.4"
+val prometheusVersion = "1.16.5"
+val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
-val opentelemetryLogbackMdcVersion = "2.26.1-alpha"
+val opentelemetryLogbackMdcVersion = "2.27.0-alpha"
 
 plugins {
     kotlin("jvm") version "2.3.20"
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0-0.6.x-compat")
     // Logging (inkl. auditlogg)
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -72,7 +72,7 @@ dependencies {
     }
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.10")
+    implementation("org.postgresql:postgresql:42.7.11")
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayPostgresqlVersion")
     implementation("com.github.seratch:kotliquery:1.9.1")
