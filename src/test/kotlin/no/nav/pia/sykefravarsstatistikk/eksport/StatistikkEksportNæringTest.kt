@@ -1,6 +1,5 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
@@ -16,6 +15,7 @@ import no.nav.pia.sykefravarsstatistikk.helper.TestdataHelper.Companion.underenh
 import no.nav.pia.sykefravarsstatistikk.konfigurasjon.Topic
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import tools.jackson.databind.ObjectMapper
 import kotlin.test.Test
 
 class StatistikkEksportNæringTest {

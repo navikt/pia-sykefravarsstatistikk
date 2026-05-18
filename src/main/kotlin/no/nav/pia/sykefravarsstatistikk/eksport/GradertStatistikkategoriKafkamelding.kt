@@ -1,8 +1,8 @@
 package no.nav.pia.sykefravarsstatistikk.eksport
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.serialization.json.Json
 import no.nav.pia.sykefravarsstatistikk.api.maskering.SykefraværMedKategori
+import tools.jackson.databind.ObjectMapper
 
 data class GradertStatistikkategoriKafkamelding(
     val sisteKvartal: SykefraværMedKategori,
