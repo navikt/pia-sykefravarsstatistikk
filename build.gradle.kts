@@ -1,14 +1,14 @@
 val arrowCoreVersion = "2.2.2.1"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "12.6.1"
-val kafkaClientVersion = "4.2.0"
+val flywayPostgresqlVersion = "12.6.2"
+val kafkaClientVersion = "4.3.0"
 val kotestVersion = "6.1.11"
 val kotlinVersion = "2.3.21" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.5.0"
 val logbackVersion = "1.5.32"
 val logstashLogbackEncoderVersion = "9.0"
 val mockOAuth2ServerVersion = "4.0.0"
-val mockServerVersion = "2.50.8"
+val mockServerVersion = "2.50.9"
 val nimbusJoseJwtVersion = "10.9"
 val prometheusVersion = "1.16.5"
 val testcontainersVersion = "2.0.5"
@@ -103,11 +103,15 @@ dependencies {
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.2.13.Final")
+                require("4.2.14.Final")
             }
             because(
                 "versjoner < 4.2.10.Final har sårbarhet. inkludert i ktor-server-netty-jvm:3.4.2",
             )
+        }
+        implementation("io.opentelemetry:opentelemetry-api") {
+            version { require("1.62.0") }
+            because("versjoner <= 1.61.0 har sårbarhet. Transitive deps i opentelemetry-logback-mdc-1.0 2.27.0-alpha")
         }
         testImplementation("org.bouncycastle:bcprov-jdk18on") {
             version {
