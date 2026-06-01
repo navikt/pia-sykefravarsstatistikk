@@ -15,7 +15,7 @@ val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
-val opentelemetryLogbackMdcVersion = "2.27.0-alpha"
+val opentelemetryLogbackMdcVersion = "2.28.1-alpha"
 
 plugins {
     kotlin("jvm") version "2.3.21"
