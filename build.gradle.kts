@@ -3,7 +3,7 @@ val iaFellesVersion = "2.0.4"
 val flywayPostgresqlVersion = "12.8.1"
 val kafkaClientVersion = "4.3.0"
 val kotestVersion = "6.1.11"
-val kotlinVersion = "2.4.0" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
+val kotlinVersion = "2.3.21" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.5.0"
 val logbackVersion = "1.5.34"
 val logstashLogbackEncoderVersion = "9.0"
@@ -18,8 +18,8 @@ val testcontainersPostgresqlVersion = "1.21.4"
 val opentelemetryLogbackMdcVersion = "2.28.1-alpha"
 
 plugins {
-    kotlin("jvm") version "2.4.0"
-    kotlin("plugin.serialization") version "2.4.0"
+    kotlin("jvm") version "2.3.21"
+    kotlin("plugin.serialization") version "2.3.21"
     id("application")
 }
 
