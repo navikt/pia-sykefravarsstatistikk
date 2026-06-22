@@ -7,7 +7,7 @@ val kotlinVersion = "2.3.21" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.5.0"
 val logbackVersion = "1.5.34"
 val logstashLogbackEncoderVersion = "9.0"
-val mockOAuth2ServerVersion = "4.0.0"
+val mockOAuth2ServerVersion = "4.0.1"
 val mockServerVersion = "2.50.9"
 val nimbusJoseJwtVersion = "10.9.1"
 val prometheusVersion = "1.16.5"
@@ -103,7 +103,7 @@ dependencies {
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.2.14.Final")
+                require("4.2.15.Final")
             }
             because(
                 "versjoner < 4.2.10.Final har sårbarhet. inkludert i ktor-server-netty-jvm:3.4.2",
