@@ -1,8 +1,9 @@
 val arrowCoreVersion = "2.2.3"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "12.8.1"
+val flywayPostgresqlVersion = "12.9.0"
+val hikariVersion = "7.1.0"
 val kafkaClientVersion = "4.3.0"
-val kotestVersion = "6.1.11"
+val kotestVersion = "6.2.1"
 val kotlinVersion = "2.3.21" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.5.0"
 val logbackVersion = "1.5.34"
@@ -10,12 +11,12 @@ val logstashLogbackEncoderVersion = "9.0"
 val mockOAuth2ServerVersion = "4.0.1"
 val mockServerVersion = "2.50.9"
 val nimbusJoseJwtVersion = "10.9.1"
-val prometheusVersion = "1.16.5"
+val opentelemetryLogbackMdcVersion = "2.28.1-alpha"
+val prometheusVersion = "1.17.0"
 val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
-val opentelemetryLogbackMdcVersion = "2.28.1-alpha"
 
 plugins {
     kotlin("jvm") version "2.3.21"
@@ -73,7 +74,7 @@ dependencies {
 
     // Database
     implementation("org.postgresql:postgresql:42.7.11")
-    implementation("com.zaxxer:HikariCP:7.0.2")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayPostgresqlVersion")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
@@ -94,11 +95,11 @@ dependencies {
 
     constraints {
         implementation("com.fasterxml.jackson.core:jackson-core") {
-            version { require("2.21.3") }
+            version { require("2.22.0") }
             because("versjoner < 2.21.1 har sårbarhet. inkludert i ktor-server-auth:3.4.0")
         }
         implementation("tools.jackson.core:jackson-core") {
-            version { require("3.1.3") }
+            version { require("3.2.0") }
             because("versjoner <= 3.1.0 har sårbarhet. inkludert i logstash-logback-encoder:9.0")
         }
         implementation("io.netty:netty-codec-http2") {
@@ -110,7 +111,7 @@ dependencies {
             )
         }
         implementation("io.opentelemetry:opentelemetry-api") {
-            version { require("1.62.0") }
+            version { require("1.63.0") }
             because("versjoner <= 1.61.0 har sårbarhet. Transitive deps i opentelemetry-logback-mdc-1.0 2.27.0-alpha")
         }
         testImplementation("org.bouncycastle:bcprov-jdk18on") {
