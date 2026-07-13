@@ -95,7 +95,7 @@ jobs:
       id-token: write # for nais/login
     runs-on: ubuntu-latest
     steps:
-      - uses: navikt/pia-actions/trivy-scan@v1.1.15 # https://github.com/navikt/pia-actions/tree/main/trivy-scan
+      - uses: navikt/pia-actions/trivy-scan@a7e3f6b39a28f0544600fcce70933e3c69c6b7a7 # v1.1.15
         with:
           image: ${{ needs.build.outputs.image }}
           team: pia
