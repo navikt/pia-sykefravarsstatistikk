@@ -1,14 +1,14 @@
 val arrowCoreVersion = "2.2.3"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "13.0.0"
+val flywayPostgresqlVersion = "13.3.0"
 val hikariVersion = "7.1.0"
 val kafkaClientVersion = "4.3.1"
-val kotestVersion = "6.2.3"
+val kotestVersion = "6.2.4"
 val kotlinVersion = "2.4.10" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
-val ktorVersion = "3.5.1"
-val logbackVersion = "1.6.0"
+val ktorVersion = "3.5.2"
+val logbackVersion = "1.6.3"
 val logstashLogbackEncoderVersion = "9.0"
-val mockOAuth2ServerVersion = "5.0.2"
+val mockOAuth2ServerVersion = "6.0.1"
 val mockServerVersion = "2.51.1"
 val nimbusJoseJwtVersion = "10.9.1"
 val opentelemetryLogbackMdcVersion = "2.30.0-alpha"
@@ -66,7 +66,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$opentelemetryLogbackMdcVersion")
     // Kafka
-    implementation("at.yawk.lz4:lz4-java:1.11.1")
+    implementation("at.yawk.lz4:lz4-java:1.11.2")
     implementation("org.apache.kafka:kafka-clients:$kafkaClientVersion") {
         // "Fikser CVE-2025-12183 - lz4-java >1.8.1 har sårbar versjon (transitive dependency fra kafka-clients:4.1.0)"
         exclude("org.lz4", "lz4-java")
