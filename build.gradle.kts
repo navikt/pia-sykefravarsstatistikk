@@ -1,18 +1,18 @@
 val arrowCoreVersion = "2.2.3"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "13.3.0"
+val flywayPostgresqlVersion = "13.6.0"
 val hikariVersion = "7.1.0"
 val kafkaClientVersion = "4.3.1"
-val kotestVersion = "6.2.4"
+val kotestVersion = "6.2.5"
 val kotlinVersion = "2.4.10" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.5.2"
 val logbackVersion = "1.6.3"
 val logstashLogbackEncoderVersion = "9.0"
-val mockOAuth2ServerVersion = "6.0.1"
-val mockServerVersion = "2.51.1"
+val mockOAuth2ServerVersion = "6.0.2"
+val mockServerVersion = "2.51.2"
 val nimbusJoseJwtVersion = "10.9.1"
 val opentelemetryLogbackMdcVersion = "2.30.0-alpha"
-val prometheusVersion = "1.17.0"
+val prometheusVersion = "1.17.1"
 val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
@@ -95,23 +95,23 @@ dependencies {
 
     constraints {
         implementation("com.fasterxml.jackson.core:jackson-core") {
-            version { require("2.22.1") }
+            version { require("2.22.2") }
             because("versjoner < 2.22.1 har sårbarhet. inkludert i ktor-server-auth:3.4.0")
         }
         implementation("tools.jackson.core:jackson-core") {
-            version { require("3.2.1") }
+            version { require("3.2.2") }
             because("versjoner <= 3.2.0 har sårbarhet. inkludert i logstash-logback-encoder:9.0")
         }
         implementation("io.netty:netty-codec-http2") {
             version {
-                require("4.2.16.Final")
+                require("4.2.18.Final")
             }
             because(
-                "versjoner < 4.2.16.Final har sårbarhet. inkludert i ktor-server-netty-jvm:3.4.2",
+                "versjoner < 4.2.18.Final har sårbarhet",
             )
         }
         implementation("io.opentelemetry:opentelemetry-api") {
-            version { require("1.63.0") }
+            version { require("1.65.0") }
             because("versjoner <= 1.61.0 har sårbarhet. Transitive deps i opentelemetry-logback-mdc-1.0 2.27.0-alpha")
         }
     }
