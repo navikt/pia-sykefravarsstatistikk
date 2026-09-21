@@ -4,14 +4,14 @@ val flywayPostgresqlVersion = "13.6.0"
 val hikariVersion = "7.1.0"
 val kafkaClientVersion = "4.3.1"
 val kotestVersion = "6.2.5"
-val kotlinVersion = "2.4.10" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
+val kotlinVersion = "2.4.20" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
 val ktorVersion = "3.5.2"
 val logbackVersion = "1.6.3"
 val logstashLogbackEncoderVersion = "9.0"
 val mockOAuth2ServerVersion = "6.0.2"
 val mockServerVersion = "2.51.2"
 val nimbusJoseJwtVersion = "10.9.1"
-val opentelemetryLogbackMdcVersion = "2.30.0-alpha"
+val opentelemetryLogbackMdcVersion = "2.31.1-alpha"
 val prometheusVersion = "1.17.1"
 val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
@@ -19,8 +19,8 @@ val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
 
 plugins {
-    kotlin("jvm") version "2.4.10"
-    kotlin("plugin.serialization") version "2.4.10"
+    kotlin("jvm") version "2.4.20"
+    kotlin("plugin.serialization") version "2.4.20"
     id("application")
 }
 
@@ -66,7 +66,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$opentelemetryLogbackMdcVersion")
     // Kafka
-    implementation("at.yawk.lz4:lz4-java:1.11.2")
+    implementation("at.yawk.lz4:lz4-java:1.11.3")
     implementation("org.apache.kafka:kafka-clients:$kafkaClientVersion") {
         // "Fikser CVE-2025-12183 - lz4-java >1.8.1 har sårbar versjon (transitive dependency fra kafka-clients:4.1.0)"
         exclude("org.lz4", "lz4-java")
