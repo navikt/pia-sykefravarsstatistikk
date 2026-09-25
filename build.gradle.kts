@@ -1,22 +1,23 @@
 val arrowCoreVersion = "2.2.3"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "13.6.0"
+val flywayPostgresqlVersion = "13.8.0"
 val hikariVersion = "7.1.0"
 val kafkaClientVersion = "4.3.1"
 val kotestVersion = "6.2.5"
 val kotlinVersion = "2.4.10" // OBS: CodeQL støtter ikke Kotlin > 2.3.0
-val ktorVersion = "3.5.2"
-val logbackVersion = "1.6.3"
+val ktorVersion = "3.6.0"
+val logbackVersion = "1.6.4"
 val logstashLogbackEncoderVersion = "9.0"
 val mockOAuth2ServerVersion = "6.0.2"
-val mockServerVersion = "2.51.2"
-val nimbusJoseJwtVersion = "10.9.1"
+val mockServerVersion = "2.52.1"
+val nimbusJoseJwtVersion = "10.10"
 val opentelemetryLogbackMdcVersion = "2.30.0-alpha"
 val prometheusVersion = "1.17.1"
 val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
+val yawkLz4JavaVersion = "1.11.3"
 
 plugins {
     kotlin("jvm") version "2.4.10"
@@ -66,7 +67,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:$opentelemetryLogbackMdcVersion")
     // Kafka
-    implementation("at.yawk.lz4:lz4-java:1.11.2")
+    implementation("at.yawk.lz4:lz4-java:$yawkLz4JavaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaClientVersion") {
         // "Fikser CVE-2025-12183 - lz4-java >1.8.1 har sårbar versjon (transitive dependency fra kafka-clients:4.1.0)"
         exclude("org.lz4", "lz4-java")
@@ -95,11 +96,11 @@ dependencies {
 
     constraints {
         implementation("com.fasterxml.jackson.core:jackson-core") {
-            version { require("2.22.2") }
+            version { require("2.22.3") }
             because("versjoner < 2.22.1 har sårbarhet. inkludert i ktor-server-auth:3.4.0")
         }
         implementation("tools.jackson.core:jackson-core") {
-            version { require("3.2.2") }
+            version { require("3.2.3") }
             because("versjoner <= 3.2.0 har sårbarhet. inkludert i logstash-logback-encoder:9.0")
         }
         implementation("io.netty:netty-codec-http2") {
@@ -111,7 +112,7 @@ dependencies {
             )
         }
         implementation("io.opentelemetry:opentelemetry-api") {
-            version { require("1.65.0") }
+            version { require("1.66.0") }
             because("versjoner <= 1.61.0 har sårbarhet. Transitive deps i opentelemetry-logback-mdc-1.0 2.27.0-alpha")
         }
     }
