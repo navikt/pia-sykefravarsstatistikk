@@ -17,7 +17,7 @@ val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
 val testcontainersKafkaVersion = "1.21.4"
 val testcontainersPostgresqlVersion = "1.21.4"
-val yawkLz4JavaVersion = "1.11.3"
+val yawkLz4JavaVersion = "1.11.4"
 
 plugins {
     kotlin("jvm") version "2.4.10"
