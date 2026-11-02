@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy application to ${{ matrix.cluster }}
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@v3
         env:
           IMAGE: ${{ needs.build.outputs.image }}
           CLUSTER: ${{ matrix.cluster }}-gcp
@@ -78,7 +78,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy application to dev
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@v3
         env:
           IMAGE: ${{ needs.build.outputs.image }}
           CLUSTER: dev-gcp
@@ -95,7 +95,7 @@ jobs:
       id-token: write # for nais/login
     runs-on: ubuntu-latest
     steps:
-      - uses: navikt/pia-actions/trivy-scan@ea9f43f25bc2f188d474b00c3041b3f3b4d0e541 # v1.1.16
+      - uses: navikt/pia-actions/trivy-scan@80bfd2bc5d4e1eac799d806fff2a018829ff04c4 # v1.1.17
         with:
           image: ${{ needs.build.outputs.image }}
           team: pia
