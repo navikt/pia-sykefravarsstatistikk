@@ -7,9 +7,9 @@ import no.nav.pia.sykefravarsstatistikk.runMigration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.Network
-import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
+import org.testcontainers.postgresql.PostgreSQLContainer
 
 class PostgrestContainerHelper(
     network: Network = Network.newNetwork(),
@@ -18,7 +18,7 @@ class PostgrestContainerHelper(
     private val postgresNetworkAlias = "postgrescontainer"
     private val piaSykefraværsstatistikkDbName = "pia-sykefravarsstatistikk-container-db"
     private var migreringErKjørt = false
-    val postgresContainer: PostgreSQLContainer<*> =
+    val postgresContainer: PostgreSQLContainer =
         PostgreSQLContainer("postgres:17")
             .withLogConsumer(
                 Slf4jLogConsumer(log).withPrefix(postgresNetworkAlias).withSeparateOutputStreams(),

@@ -15,8 +15,6 @@ val opentelemetryLogbackMdcVersion = "2.33.1-alpha"
 val prometheusVersion = "1.17.2"
 val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
-val testcontainersKafkaVersion = "1.21.4"
-val testcontainersPostgresqlVersion = "1.21.4"
 val yawkLz4JavaVersion = "1.13.0"
 
 plugins {
@@ -87,8 +85,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
-    testImplementation("org.testcontainers:kafka:$testcontainersKafkaVersion")
-    testImplementation("org.testcontainers:postgresql:$testcontainersPostgresqlVersion")
+    testImplementation("org.testcontainers:testcontainers-kafka:$testcontainersVersion")
+    testImplementation("org.testcontainers:testcontainers-postgresql:$testcontainersVersion")
     testImplementation("software.xdev.mockserver:testcontainers:$mockServerVersion")
     testImplementation("software.xdev.mockserver:client:$mockServerVersion")
     testImplementation("io.aiven:testcontainers-fake-gcs-server:$testcontainersFakeGCSVersion")
