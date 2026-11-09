@@ -1,6 +1,6 @@
 val arrowCoreVersion = "2.3.0.1"
 val iaFellesVersion = "2.0.4"
-val flywayPostgresqlVersion = "13.12.0"
+val flywayPostgresqlVersion = "13.12.1"
 val hikariVersion = "7.1.0"
 val kafkaClientVersion = "4.4.0"
 val kotestVersion = "6.2.6"
@@ -9,13 +9,13 @@ val ktorVersion = "3.6.1"
 val logbackVersion = "1.6.6"
 val logstashLogbackEncoderVersion = "9.0"
 val mockOAuth2ServerVersion = "6.1.4"
-val mockServerVersion = "2.52.1"
+val mockServerVersion = "2.52.2"
 val nimbusJoseJwtVersion = "10.10"
 val opentelemetryLogbackMdcVersion = "2.33.1-alpha"
 val prometheusVersion = "1.17.2"
 val testcontainersVersion = "2.0.5"
 val testcontainersFakeGCSVersion = "0.3.0"
-val yawkLz4JavaVersion = "1.13.0"
+val yawkLz4JavaVersion = "1.14.0"
 
 plugins {
     kotlin("jvm") version "2.4.21"
@@ -102,11 +102,11 @@ dependencies {
             because("Sikkerhetsoppdatering av transitiv avhengighet")
         }
         implementation("com.fasterxml.jackson.core:jackson-core") {
-            version { require("2.22.4") }
+            version { require("2.23.0") }
             because("versjoner < 2.22.1 har sårbarhet. inkludert i ktor-server-auth:3.4.0")
         }
         implementation("tools.jackson.core:jackson-core") {
-            version { require("3.2.4") }
+            version { require("3.3.0") }
             because("versjoner <= 3.2.0 har sårbarhet. inkludert i logstash-logback-encoder:9.0")
         }
         implementation("io.netty:netty-codec-http2") {
@@ -118,7 +118,7 @@ dependencies {
             )
         }
         implementation("io.opentelemetry:opentelemetry-api") {
-            version { require("1.66.0") }
+            version { require("1.68.0") }
             because("versjoner <= 1.61.0 har sårbarhet. Transitive deps i opentelemetry-logback-mdc-1.0 2.27.0-alpha")
         }
         testImplementation("org.apache.commons:commons-lang3") {
