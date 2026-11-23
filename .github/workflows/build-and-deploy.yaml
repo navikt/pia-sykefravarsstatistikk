@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-java@v6.1.0
+      - uses: actions/setup-java@v6.3.0
         with:
           distribution: temurin
           java-version: 21
@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy application to ${{ matrix.cluster }}
-        uses: nais/deploy/actions/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # tag v3
+        uses: nais/deploy/actions/deploy@427e29c94d911626a023a76f402f6dcae1f840b7 # tag v3
         env:
           IMAGE: ${{ needs.build.outputs.image }}
           CLUSTER: ${{ matrix.cluster }}-gcp
@@ -83,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy application to dev
-        uses: nais/deploy/actions/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # tag v3
+        uses: nais/deploy/actions/deploy@427e29c94d911626a023a76f402f6dcae1f840b7 # tag v3
         env:
           IMAGE: ${{ needs.build.outputs.image }}
           CLUSTER: dev-gcp
